@@ -1,30 +1,35 @@
-import { View, Text } from "react-native";
+import { View, Text, Linking } from "react-native";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import { config } from "../../../webServices/config";
 
-import { CallGetApiServices } from "../../../webServices/apiCalls";
 import CommonStyles from "../../../components/css/commonStyles";
-import { useEffect, useState } from "react";
+import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 
 function AnalysisStatsScreen() {
-  const [data, setData] = useState("");
-  useEffect(() => {
-    CallGetApiServices(
-      `https://first-mern-y32l.onrender.com/feed/posts`,
-      (response) => {
-        if (response.status == 200) {
-          console.log(response.data.posts[0].price);
-          setData(response.data.posts[0].price);
-        }
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-  }, []);
+  const downloadPdf = async () => {
+    const url = `${config.apiurl}/book/downloadPdf`;
+    Linking.openURL(url);
+    // const url = "http://192.168.1.8:3000/api/book/downloadPdf";
+    // const fileUri = FileSystem.documentDirectory + "Trading-guide.pdf";
+
+    // try {
+    //   const { uri } = await FileSystem.downloadAsync(url, fileUri);
+
+    //   // Open the downloaded PDF file
+    //   await Sharing.shareAsync(uri, {
+    //     mimeType: "application/pdf",
+    //     dialogTitle: "Share PDF",
+    //   });
+    // } catch (error) {
+    //   console.error("Error downloading PDF:", error);
+    // }
+  };
 
   return (
     <View style={CommonStyles.mainContainer}>
       <Text style={{ color: "#fff" }}>analysis stats screen</Text>
-      <Text style={{ color: "#fff" }}>{data}</Text>
+      <ButtonComponent text={"download"} handler={downloadPdf} />
     </View>
   );
 }

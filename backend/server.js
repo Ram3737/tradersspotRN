@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const userRoutes = require("./routes/userRoutes");
+const pdfRoutes = require("./routes/pdfRoutes");
 
 dotenv.config();
 const MONGODB_URI = process.env.MONGO_CONNECTION;
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 });
 //ROUTES
 app.use("/api/user", userRoutes);
+app.use("/api/book", pdfRoutes);
 
 //ERROR MIDDLEWARE
 app.use((error, req, res, next) => {

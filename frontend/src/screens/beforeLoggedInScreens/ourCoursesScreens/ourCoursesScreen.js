@@ -8,6 +8,7 @@ import {
   Modal,
   ActivityIndicator,
   StyleSheet,
+  Linking,
 } from "react-native";
 import { useState, useLayoutEffect, useContext, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -88,6 +89,20 @@ function OurCoursesScreen() {
     }
   }
 
+  const handlePay = async () => {
+    try {
+      const upiAppURI = "upi://pay";
+      const receiverUPIID = "7010034542@ybl";
+      const amount = "10.00";
+
+      const paymentLink = `${upiAppURI}?pa=${receiverUPIID}&mc=yourMerchantCode&tid=yourTransactionId&tr=yourTransactionRefId&tn=yourTransactionNote&am=${amount}&cu=INR&url=yourCallBackURL`;
+
+      await Linking.openURL(paymentLink);
+    } catch (error) {
+      console.error("Error opening UPI app:", error);
+    }
+  };
+
   return (
     <View
       style={[CommonStyles.mainContainer, { justifyContent: "flex-start" }]}
@@ -151,9 +166,11 @@ function OurCoursesScreen() {
           <View style={styles.btnCont}>
             <ButtonComponent
               text={"Buy Now"}
-              handler={() => {
-                buyNowHandler("basic");
-              }}
+              // handler={() => {
+              //   buyNowHandler("basic");
+              // }}
+
+              handler={handlePay}
             />
           </View>
         </View>
