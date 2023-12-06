@@ -4,28 +4,26 @@
     "slug": "TradersSpotRN",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/alien.png",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#011417"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/alien.png",
+        "backgroundColor": "#000000"
       },
       "package": "com.ram37.TradersSpotRN"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/alien.png"
     },
     "extra": {
       "eas": {

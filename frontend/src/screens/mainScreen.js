@@ -14,6 +14,7 @@ import DiscussScreen from "./loggedInScreens/discussScreen/discussScreen";
 import DashboardScreen from "./beforeLoggedInScreens/dashboardScreens/dashboardScreen";
 import AnalysisStatsScreen from "./beforeLoggedInScreens/analysisStatsScreens/analysisStatsScreen";
 import OurCoursesScreen from "./beforeLoggedInScreens/ourCoursesScreens/ourCoursesScreen";
+import ResourcesScreen from "./beforeLoggedInScreens/resources/resourcesScreen";
 import { AuthContext } from "../components/stores/context/authContextProvider";
 
 const stack = createNativeStackNavigator();
@@ -71,6 +72,11 @@ function BottomNavigatorBeforeLoggedIn() {
       <bottomTab.Screen
         name="analysis Stats"
         component={AnalysisStatsScreen}
+        options={{ headerShown: false }}
+      />
+      <bottomTab.Screen
+        name="resources"
+        component={ResourcesScreen}
         options={{ headerShown: false }}
       />
       <bottomTab.Screen

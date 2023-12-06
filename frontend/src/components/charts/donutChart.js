@@ -34,14 +34,14 @@ const Legend = ({ color, label }) => (
   </View>
 );
 
-const DonutChart = () => {
+const DonutChart = (props) => {
   const widthAndHeight = 110;
   const series = [123, 321];
   const sliceColor = [Colors.clr4, Colors.clr3];
 
   return (
     <ScrollView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <View style={[styles.container, { marginTop: props.marginTop }]}>
         <PieChart
           widthAndHeight={widthAndHeight}
           series={series}
@@ -55,8 +55,8 @@ const DonutChart = () => {
             flexDirection: "column",
             alignItems: "center",
             position: "absolute",
-            top: "35%",
-            left: "26%",
+            top: props.top,
+            left: props.left,
           }}
         >
           {sliceColor.map((color, index) => (
@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     alignItems: "flex-start",
-    marginTop: "8%",
     position: "relative",
   },
   title: {

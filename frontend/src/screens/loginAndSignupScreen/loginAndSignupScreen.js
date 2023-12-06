@@ -41,6 +41,7 @@ function LoginAndSignupScreen() {
   const [errFromBackend, setErrFromBackend] = useState(null);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [btnLoader, setBtnLoader] = useState(false);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -76,6 +77,7 @@ function LoginAndSignupScreen() {
     setLoginEmail("");
     setLoginPassword("");
     setErrFromBackend("");
+    setBtnLoader(false);
   };
 
   const hideAlert = () => {
@@ -125,6 +127,7 @@ function LoginAndSignupScreen() {
     if (!loginEmail || !loginPassword) {
       return;
     }
+    setBtnLoader(true);
     CallPostApiServices(
       `/user/signin`,
       {
@@ -141,6 +144,7 @@ function LoginAndSignupScreen() {
           authCtx.setUserEmail(response.data.email);
           authCtx.setPaid(response.data.paid);
           authCtx.authenticationHandler();
+          setBtnLoader(false);
           if (
             authCtx.isAuthenticated &&
             response.data.courseType &&
@@ -157,6 +161,7 @@ function LoginAndSignupScreen() {
         }
       },
       (err) => {
+        setBtnLoader(false);
         console.log(3);
         console.log(
           "errr",
@@ -212,6 +217,7 @@ function LoginAndSignupScreen() {
       setConfirmPasswordErr("");
     }
 
+    setBtnLoader(true);
     CallPostApiServices(
       `/user/signup`,
       {
@@ -222,17 +228,19 @@ function LoginAndSignupScreen() {
       },
       (response) => {
         if (response.status === 201) {
+          setBtnLoader(false);
           setErrFromBackend(null);
           setAlertVisible(true);
         }
       },
       (err) => {
         console.log("err", err, "hiiiiiii");
-        // if (err.response?.data.message) {
-        //   setErrFromBackend(err.response.data.message);
-        // } else {
-        //   setErrFromBackend(err.message);
-        // }
+        setBtnLoader(false);
+        if (err.response?.data.message) {
+          setErrFromBackend(err.response.data.message);
+        } else {
+          setErrFromBackend(err.message);
+        }
       }
     );
 
@@ -295,6 +303,7 @@ function LoginAndSignupScreen() {
                 />
                 <ButtonComponent
                   style={{ marginTop: 20 }}
+                  indicator={btnLoader}
                   text={"Login"}
                   handler={loginClickHandler}
                 />
@@ -355,6 +364,7 @@ function LoginAndSignupScreen() {
                 />
                 <ButtonComponent
                   style={{ marginTop: 20 }}
+                  indicator={btnLoader}
                   text={"SignUp"}
                   handler={signUpClickHandler}
                 />

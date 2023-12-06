@@ -1,10 +1,18 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import Colors from "../colors/colors";
 
-function ButtonComponent({ style, text, handler }) {
+function ButtonComponent({ style, indicator, text, handler }) {
   return (
     <TouchableOpacity style={[styles.buttonCont, style]} onPress={handler}>
-      <Text style={styles.buttonText}>{text}</Text>
+      {indicator && (
+        <ActivityIndicator size="small" color={Colors.transparentBg} />
+      )}
+      {!indicator && <Text style={styles.buttonText}>{text}</Text>}
     </TouchableOpacity>
   );
 }

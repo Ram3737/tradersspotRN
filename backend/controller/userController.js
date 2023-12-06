@@ -2,7 +2,6 @@ const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 
 const createUser = async (req, res) => {
-  console.log("hiiiiiii");
   try {
     const { email, mobileNumber, password, courseType } = req.body;
     const userType = "learner";

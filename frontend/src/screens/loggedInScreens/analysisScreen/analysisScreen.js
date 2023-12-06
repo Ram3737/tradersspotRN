@@ -1,10 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Vibration } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Vibration,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import Colors from "../../../components/colors/colors";
 import DonutChart from "../../../components/charts/donutChart";
+import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 
 import { Switch } from "react-native-switch";
 import HapticFeedback from "react-native-haptic-feedback";
@@ -12,8 +21,9 @@ import { LinkPreview } from "@flyerhq/react-native-link-preview";
 
 function AnalysisScreen() {
   const analysisArr = [1, 2, 3, 4];
-
+  const scrollViewRef = useRef();
   const [contToDisplay, setContToDisplay] = useState(false);
+  const [viewResult, setViewResult] = useState(0);
 
   const toggleSwitch = () => {
     if (Platform.OS === "ios") {
@@ -28,6 +38,114 @@ function AnalysisScreen() {
 
     setContToDisplay(!contToDisplay);
   };
+
+  const handleScrollToBottom = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  };
+
+  function viewResultHandler(index) {
+    setViewResult(index);
+  }
+
+  const renderItem = ({ item, index }) => (
+    <View
+      key={index}
+      style={[
+        styles.analysis,
+        {
+          height:
+            viewResult === index
+              ? CalculateFontSize(58.5)
+              : CalculateFontSize(32.5),
+        },
+      ]}
+    >
+      <View style={styles.analysisSub}>
+        <View style={styles.analysisSubBtns}>
+          <Text style={styles.analysisSubBtnsText}>JWSENERGY</Text>
+        </View>
+
+        <View style={[styles.analysisSubBtns, { marginLeft: 8 }]}>
+          <Text style={styles.analysisSubBtnsText}>TRIANGLE PATTERN</Text>
+        </View>
+      </View>
+
+      <LinkPreview
+        enableAnimation={true}
+        containerStyle={{
+          // backgroundColor: "red",
+          width: "95%",
+        }}
+        metadataContainerStyle={{
+          display: "none",
+        }}
+        textContainerStyle={{
+          // backgroundColor: "#fff",
+          marginLeft: 0,
+          marginTop: 0,
+          marginBottom: 11,
+        }}
+        renderText={(text, props) => (
+          <Text
+            {...props}
+            style={{
+              color: Colors.clr4,
+              fontSize: CalculateFontSize(1.5),
+              fontWeight: "400",
+            }}
+          >
+            {text}
+          </Text>
+        )}
+        text="https://www.tradingview.com/x/tXn6jAey"
+      />
+      <View style={styles.viewResultCont}>
+        <TouchableOpacity
+          style={styles.playBtn}
+          onPress={() => viewResultHandler(index)}
+        >
+          <Text style={styles.viewResultText}>View Result</Text>
+        </TouchableOpacity>
+      </View>
+      {viewResult === index && (
+        <>
+          <Text style={styles.riskRewardText}>1:2 RR</Text>
+
+          <LinkPreview
+            enableAnimation={true}
+            containerStyle={{
+              // backgroundColor: "red",
+              width: "95%",
+            }}
+            metadataContainerStyle={{
+              display: "none",
+            }}
+            textContainerStyle={{
+              // backgroundColor: "#fff",
+              marginLeft: 0,
+              marginTop: 8,
+              marginBottom: 11,
+            }}
+            renderText={(text, props) => (
+              <Text
+                {...props}
+                style={{
+                  color: Colors.clr4,
+                  fontSize: CalculateFontSize(1.5),
+                  fontWeight: "400",
+                }}
+              >
+                {text}
+              </Text>
+            )}
+            text="https://www.tradingview.com/x/tXn6jAey"
+          />
+        </>
+      )}
+    </View>
+  );
 
   return (
     <View
@@ -71,7 +189,7 @@ function AnalysisScreen() {
             </View>
           </View>
           <View style={styles.topContSubBottom}>
-            <DonutChart />
+            <DonutChart top={"35%"} left={"26%"} marginTop={"8%"} />
             <View style={styles.topContSubBottomSub}>
               <Text style={styles.topContSubBottomSubText1}>
                 Total analysis shared:
@@ -82,9 +200,31 @@ function AnalysisScreen() {
         </View>
       </View>
       <View style={styles.analysisScrollCont}>
-        <ScrollView style={styles.analysisScrollContSub}>
+        <FlatList
+          data={analysisArr}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          style={styles.analysisScrollContSub}
+          inverted={true}
+        />
+        {/* <ScrollView
+          ref={scrollViewRef}
+          onLayout={handleScrollToBottom}
+          style={styles.analysisScrollContSub}
+        >
           {analysisArr.map((analysis, index) => (
-            <View key={index} style={styles.analysis}>
+            <View
+              key={index}
+              style={[
+                styles.analysis,
+                {
+                  height:
+                    viewResult === index
+                      ? CalculateFontSize(58)
+                      : CalculateFontSize(32.5),
+                },
+              ]}
+            >
               <View style={styles.analysisSub}>
                 <View style={styles.analysisSubBtns}>
                   <Text style={styles.analysisSubBtnsText}>JWSENERGY</Text>
@@ -126,9 +266,50 @@ function AnalysisScreen() {
                 )}
                 text="https://www.tradingview.com/x/tXn6jAey"
               />
+
+              <TouchableOpacity
+                style={styles.playBtn}
+                onPress={() => viewResultHandler(index)}
+              ></TouchableOpacity>
+
+              {viewResult === index && (
+                <>
+                  <Text style={styles.riskRewardText}>1:2 RR</Text>
+
+                  <LinkPreview
+                    enableAnimation={true}
+                    containerStyle={{
+                      // backgroundColor: "red",
+                      width: "95%",
+                    }}
+                    metadataContainerStyle={{
+                      display: "none",
+                    }}
+                    textContainerStyle={{
+                      // backgroundColor: "#fff",
+                      marginLeft: 0,
+                      marginTop: 15,
+                      marginBottom: 11,
+                    }}
+                    renderText={(text, props) => (
+                      <Text
+                        {...props}
+                        style={{
+                          color: Colors.clr4,
+                          fontSize: CalculateFontSize(1.5),
+                          fontWeight: "400",
+                        }}
+                      >
+                        {text}
+                      </Text>
+                    )}
+                    text="https://www.tradingview.com/x/tXn6jAey"
+                  />
+                </>
+              )}
             </View>
           ))}
-        </ScrollView>
+        </ScrollView> */}
       </View>
     </View>
   );
@@ -226,7 +407,7 @@ const styles = StyleSheet.create({
 
   analysis: {
     width: "95%",
-    height: CalculateFontSize(30),
+    height: CalculateFontSize(53),
     marginBottom: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -259,5 +440,32 @@ const styles = StyleSheet.create({
   analysisSubBtnsText: {
     fontSize: CalculateFontSize(1.3),
     fontWeight: "600",
+  },
+  riskRewardText: {
+    fontSize: CalculateFontSize(1.5),
+    fontWeight: "200",
+    color: "#fff",
+    marginLeft: "2%",
+    alignSelf: "flex-start",
+  },
+  viewResultCont: {
+    width: "100%",
+    flexDirection: "row",
+    marginTop: "2%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  playBtn: {
+    marginRight: "2%",
+    alignSelf: "flex-end",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 50,
+  },
+  viewResultText: {
+    fontSize: CalculateFontSize(1.2),
+    marginRight: "2%",
+    color: Colors.clr4,
+    // textDecorationLine: "underline",
   },
 });

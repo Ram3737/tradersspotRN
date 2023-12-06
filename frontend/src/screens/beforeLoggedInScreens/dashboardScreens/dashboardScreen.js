@@ -11,7 +11,6 @@ function DashboardScreen() {
   const authCtx = useContext(AuthContext);
 
   function loginrSignupHandler() {
-    console.log("hiiii");
     // authCtx.authenticationHandler();
     // authCtx.setCourseType("basic");
     // authCtx.setPaid(true);
