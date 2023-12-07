@@ -95,7 +95,8 @@ function OurCoursesScreen() {
 
   function buyNowHandler(course) {
     authCtx.setUserSelectedCourse(course);
-    if (authCtx.isAuthenticated && !authCtx.courseType) {
+    if (authCtx.isAuthenticated && !authCtx.paid) {
+      toggleModal();
       CallPatchApiServices(
         `/user/buyCourse`,
         {
@@ -104,6 +105,7 @@ function OurCoursesScreen() {
         },
         (response) => {
           if (response.status === 201) {
+            toggleModal();
             console.log("course updated");
           }
         },
@@ -111,9 +113,24 @@ function OurCoursesScreen() {
           console.log("payerr", error.message);
         }
       );
-    }
-    if (authCtx.isAuthenticated) {
+    } else if (authCtx.isAuthenticated && authCtx.paid) {
       toggleModal();
+      CallPatchApiServices(
+        `/user/buyCourse`,
+        {
+          email: authCtx.userEmail,
+          triedToUpdate: true,
+        },
+        (response) => {
+          if (response.status === 201) {
+            toggleModal();
+            console.log("course updated");
+          }
+        },
+        (error) => {
+          console.log("payerr", error.message);
+        }
+      );
     } else {
       authCtx.setRegisterSignupToggle(true);
       navigation.navigate("loginSignup");

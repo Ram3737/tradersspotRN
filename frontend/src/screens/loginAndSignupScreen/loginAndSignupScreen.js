@@ -136,23 +136,24 @@ function LoginAndSignupScreen() {
       },
       (response) => {
         if (response.status === 200) {
-          console.log(response.data);
           setErrFromBackend(null);
           setLoginEmail("");
           setLoginPassword("");
+          authCtx.setToken(response.data.token);
           authCtx.setCourseType(response.data.courseType);
           authCtx.setUserType(response.data.userType);
           authCtx.setUserEmail(response.data.email);
           authCtx.setPaid(response.data.paid);
+          authCtx.setTriedToUpdate(response.data.triedToUpdate);
           authCtx.authenticationHandler();
           setBtnLoader(false);
           if (
-            authCtx.isAuthenticated &&
+            response.data.token &&
             response.data.courseType &&
             response.data.paid
           ) {
             navigation.navigate("afterLoggedIn");
-          } else if (authCtx.isAuthenticated && response.data.courseType) {
+          } else if (response.data.token && response.data.courseType) {
             navigation.navigate("courses");
           } else {
             navigation.navigate("dashboard");
@@ -224,6 +225,7 @@ function LoginAndSignupScreen() {
         mobileNumber: mblNo,
         password: Password,
         courseType: authCtx.userSelectedCourse,
+        triedToUpdate: false,
       },
       (response) => {
         if (response.status === 201) {

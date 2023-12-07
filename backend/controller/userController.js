@@ -4,7 +4,8 @@ const jwt = require("jsonwebtoken");
 
 const createUser = async (req, res) => {
   try {
-    const { email, mobileNumber, password, courseType } = req.body;
+    const { email, mobileNumber, password, courseType, triedToUpdate } =
+      req.body;
     const userType = "learner";
     const paid = null;
 
@@ -19,6 +20,7 @@ const createUser = async (req, res) => {
       userType,
       courseType,
       paid,
+      triedToUpdate,
     });
 
     await newUser.save();
@@ -71,13 +73,14 @@ const signInUser = async (req, res) => {
       courseType: user.courseType,
       paid: user.paid,
       token: token,
+      triedToUpdate: user.triedToUpdate,
     });
   } catch (error) {}
 };
 
 const buyCourse = async (req, res) => {
   try {
-    const { email, courseType } = req.body;
+    const { email, courseType, triedToUpdate } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -85,12 +88,14 @@ const buyCourse = async (req, res) => {
     }
 
     user.courseType = courseType;
+    user.triedToUpdate = triedToUpdate;
     // user.paid = true;
 
     await user.save();
 
     res.status(201).json({
       courseType: courseType,
+      triedToUpdate: triedToUpdate,
     });
   } catch (error) {
     res.status(404).json({ message: "Server Error - Try after sometime" });

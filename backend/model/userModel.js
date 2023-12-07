@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       require: true,
     },
+    triedToUpdate: {
+      type: Boolean,
+      require: true,
+    },
   },
   {
     timestamps: true,
