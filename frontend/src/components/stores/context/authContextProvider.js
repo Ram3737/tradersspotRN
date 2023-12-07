@@ -37,6 +37,7 @@ function AuthContextProvider({ children }) {
     setCourseType(false);
     setUserType(false);
     setUserEmail(false);
+    setUserSelectedCourse(null);
   }
 
   const value = {

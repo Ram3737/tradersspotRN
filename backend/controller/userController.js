@@ -1,5 +1,6 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const createUser = async (req, res) => {
   try {
@@ -55,11 +56,21 @@ const signInUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
+    const token = jwt.sign(
+      {
+        email: user.email,
+        userType: user.userType,
+      },
+      "willbethebestsecretkeyintheworldnouniversenogalaxy", // Replace with your secret key
+      { expiresIn: "1h" } // Set the expiration time of the token
+    );
+
     res.status(200).json({
       email: user.email,
       userType: user.userType,
       courseType: user.courseType,
       paid: user.paid,
+      token: token,
     });
   } catch (error) {}
 };

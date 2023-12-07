@@ -100,7 +100,7 @@ function OurCoursesScreen() {
         `/user/buyCourse`,
         {
           email: authCtx.userEmail,
-          courseType: authCtx.userSelectedCourse,
+          courseType: course,
         },
         (response) => {
           if (response.status === 201) {
