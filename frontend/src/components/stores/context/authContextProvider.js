@@ -7,8 +7,6 @@ export const AuthContext = createContext({
   userType: "",
   userEmail: "",
   registerSignupToggle: "",
-  buyingWithoutLogin: "",
-  buyingWithoutLogin1: "",
   userSelectedCourse: "",
   authenticationHandler: () => {},
   setPaid: () => {},
@@ -16,8 +14,6 @@ export const AuthContext = createContext({
   setUserType: () => {},
   setUserEmail: () => {},
   setRegisterSignupToggle: () => {},
-  setBuyingWithoutLogin: () => {},
-  setBuyingWithoutLogin1: () => {},
   setUserSelectedCourse: () => {},
   logout: () => {},
 });
@@ -30,8 +26,6 @@ function AuthContextProvider({ children }) {
   const [userEmail, setUserEmail] = useState(null);
   const [registerSignupToggle, setRegisterSignupToggle] = useState(false);
   const [userSelectedCourse, setUserSelectedCourse] = useState(null);
-  const [buyingWithoutLogin, setBuyingWithoutLogin] = useState(false);
-  const [buyingWithoutLogin1, setBuyingWithoutLogin1] = useState(false);
 
   function authenticationHandler() {
     setIsAuthenticated(!isAuthenticated);
@@ -53,16 +47,12 @@ function AuthContextProvider({ children }) {
     userType: userType,
     userEmail: userEmail,
     registerSignupToggle: registerSignupToggle,
-    buyingWithoutLogin: buyingWithoutLogin,
-    buyingWithoutLogin1: buyingWithoutLogin1,
     userSelectedCourse: userSelectedCourse,
     setUserEmail: setUserEmail,
     setPaid: setPaid,
     setCourseType: setCourseType,
     setUserType: setUserType,
     setRegisterSignupToggle: setRegisterSignupToggle,
-    setBuyingWithoutLogin: setBuyingWithoutLogin,
-    setBuyingWithoutLogin1: setBuyingWithoutLogin1,
     setUserSelectedCourse: setUserSelectedCourse,
     logout: logout,
   };

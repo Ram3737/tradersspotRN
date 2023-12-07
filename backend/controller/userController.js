@@ -74,14 +74,12 @@ const buyCourse = async (req, res) => {
     }
 
     user.courseType = courseType;
-    user.paid = true;
+    // user.paid = true;
 
     await user.save();
 
     res.status(201).json({
-      message: "Purchased Successfully",
       courseType: courseType,
-      paid: user.paid,
     });
   } catch (error) {
     res.status(404).json({ message: "Server Error - Try after sometime" });

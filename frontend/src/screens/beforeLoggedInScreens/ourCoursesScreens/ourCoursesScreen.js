@@ -25,12 +25,23 @@ import { AuthContext } from "../../../components/stores/context/authContextProvi
 function OurCoursesScreen() {
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
-  const [tab, setTab] = useState("basic");
+  const [tab, setTab] = useState("standard");
   const [paidStatus, setPaidStatus] = useState(false);
   const [courseTypeFromRes, setCourseTypeFromRes] = useState(null);
+  const [courseAmount, setCourseAmount] = useState("6499.00");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
+
+  useEffect(() => {
+    if (tab === "basic") {
+      setCourseAmount("2499.00");
+    } else if (tab === "standard") {
+      setCourseAmount("6499.00");
+    } else if (tab === "premium") {
+      setCourseAmount("9499.00");
+    }
+  }, [tab]);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -53,39 +64,59 @@ function OurCoursesScreen() {
     authCtx.setPaid(paidStatus);
   };
 
-  const makePaymentHandler = () => {
+  const makePaymentHandler = async () => {
     setIsLoading(true);
-    CallPatchApiServices(
-      `/user/buyCourse`,
-      {
-        email: authCtx.userEmail,
-        courseType: authCtx.userSelectedCourse,
-      },
-      (response) => {
-        if (response.status === 201) {
-          setCourseTypeFromRes(response.data.courseType);
-          setPaidStatus(response.data.paid);
-          setTimeout(() => {
-            setIsLoading(false);
-            setAlertVisible(true);
-          }, 3000);
-        }
-      },
-      (error) => {
-        console.log("payerr", error.message);
-      }
-    );
+
+    setTimeout(() => {
+      setIsLoading(false);
+      handlePay();
+    }, 2000);
+    // CallPatchApiServices(
+    //   `/user/buyCourse`,
+    //   {
+    //     email: authCtx.userEmail,
+    //     courseType: authCtx.userSelectedCourse,
+    //   },
+    //   (response) => {
+    //     if (response.status === 201) {
+    //       setCourseTypeFromRes(response.data.courseType);
+    //       setPaidStatus(response.data.paid);
+    //       setTimeout(() => {
+    //         setIsLoading(false);
+    //         setAlertVisible(true);
+    //       }, 3000);
+    //     }
+    //   },
+    //   (error) => {
+    //     console.log("payerr", error.message);
+    //   }
+    // );
   };
 
   function buyNowHandler(course) {
+    authCtx.setUserSelectedCourse(course);
+    if (authCtx.isAuthenticated && !authCtx.courseType) {
+      CallPatchApiServices(
+        `/user/buyCourse`,
+        {
+          email: authCtx.userEmail,
+          courseType: authCtx.userSelectedCourse,
+        },
+        (response) => {
+          if (response.status === 201) {
+            console.log("course updated");
+          }
+        },
+        (error) => {
+          console.log("payerr", error.message);
+        }
+      );
+    }
     if (authCtx.isAuthenticated) {
       toggleModal();
-      authCtx.setUserSelectedCourse(course);
     } else {
       authCtx.setRegisterSignupToggle(true);
       navigation.navigate("loginSignup");
-      authCtx.setBuyingWithoutLogin1(true);
-      authCtx.setUserSelectedCourse(course);
     }
   }
 
@@ -93,7 +124,7 @@ function OurCoursesScreen() {
     try {
       const upiAppURI = "upi://pay";
       const receiverUPIID = "7010034542@ybl";
-      const amount = "10.00";
+      const amount = courseAmount;
 
       const paymentLink = `${upiAppURI}?pa=${receiverUPIID}&mc=yourMerchantCode&tid=yourTransactionId&tr=yourTransactionRefId&tn=yourTransactionNote&am=${amount}&cu=INR&url=yourCallBackURL`;
 
@@ -145,56 +176,161 @@ function OurCoursesScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.cardsCont}>
-        <Image
-          source={require("../../../images/pictures/cardBg.png")}
-          style={styles.courseIcon}
-        />
-        <View style={styles.cards}>
-          <View style={styles.priceCont}>
-            <Text style={styles.priceText}>₹ 2,499</Text>
+      {tab === "basic" && (
+        <View style={styles.cardsCont}>
+          <Image
+            source={require("../../../images/pictures/cardBg.png")}
+            style={styles.courseIcon}
+          />
+          <View style={styles.cards}>
+            <View style={styles.priceCont}>
+              <Text style={styles.priceText}>₹ 2,499</Text>
+            </View>
+
+            <View style={styles.featuresCont}>
+              <Text style={styles.featureText}>
+                - Access to 14hrs of course
+              </Text>
+              <Text style={styles.featureText}>- Any time oubt clearence</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+            </View>
+
+            <View style={styles.btnCont}>
+              <ButtonComponent
+                text={"Buy Now"}
+                handler={() => {
+                  buyNowHandler("basic");
+                }}
+
+                // handler={handlePay}
+              />
+            </View>
           </View>
 
-          <View style={styles.featuresCont}>
-            <Text style={styles.featureText}>- Access to 14hrs of course</Text>
-            <Text style={styles.featureText}>- Any time oubt clearence</Text>
-            <Text style={styles.featureText}>- Validity 1 Month</Text>
-            <Text style={styles.featureText}>- Validity 1 Month</Text>
-            <Text style={styles.featureText}>- Validity 1 Month</Text>
-          </View>
-
-          <View style={styles.btnCont}>
-            <ButtonComponent
-              text={"Buy Now"}
-              // handler={() => {
-              //   buyNowHandler("basic");
-              // }}
-
-              handler={handlePay}
-            />
-          </View>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isModalVisible}
+            onRequestClose={() => {
+              toggleModal();
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <ButtonComponent
+                text={"Make Payment"}
+                handler={makePaymentHandler}
+              />
+              {isLoading && (
+                <ActivityIndicator size="large" color={Colors.clr4} />
+              )}
+            </View>
+          </Modal>
         </View>
+      )}
+      {tab === "standard" && (
+        <View style={styles.cardsCont}>
+          <Image
+            source={require("../../../images/pictures/cardBg.png")}
+            style={styles.courseIcon}
+          />
+          <View style={styles.cards}>
+            <View style={styles.priceCont}>
+              <Text style={styles.priceText}>₹ 6,499</Text>
+            </View>
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isModalVisible}
-          onRequestClose={() => {
-            toggleModal();
-          }}
-        >
-          <View style={styles.modalContainer}>
-            <ButtonComponent
-              text={"Make Payment"}
-              handler={makePaymentHandler}
-            />
-            {isLoading && (
-              <ActivityIndicator size="large" color={Colors.clr4} />
-            )}
+            <View style={styles.featuresCont}>
+              <Text style={styles.featureText}>
+                - Access to 14hrs of course
+              </Text>
+              <Text style={styles.featureText}>- Any time oubt clearence</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+            </View>
+
+            <View style={styles.btnCont}>
+              <ButtonComponent
+                text={"Buy Now"}
+                handler={() => {
+                  buyNowHandler("standard");
+                }}
+              />
+            </View>
           </View>
-        </Modal>
-      </View>
 
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isModalVisible}
+            onRequestClose={() => {
+              toggleModal();
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <ButtonComponent
+                text={"Make Payment"}
+                handler={makePaymentHandler}
+              />
+              {isLoading && (
+                <ActivityIndicator size="large" color={Colors.clr4} />
+              )}
+            </View>
+          </Modal>
+        </View>
+      )}
+      {tab === "premium" && (
+        <View style={styles.cardsCont}>
+          <Image
+            source={require("../../../images/pictures/cardBg.png")}
+            style={styles.courseIcon}
+          />
+          <View style={styles.cards}>
+            <View style={styles.priceCont}>
+              <Text style={styles.priceText}>₹ 9,499</Text>
+            </View>
+
+            <View style={styles.featuresCont}>
+              <Text style={styles.featureText}>
+                - Access to 14hrs of course
+              </Text>
+              <Text style={styles.featureText}>- Any time oubt clearence</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+              <Text style={styles.featureText}>- Validity 1 Month</Text>
+            </View>
+
+            <View style={styles.btnCont}>
+              <ButtonComponent
+                text={"Buy Now"}
+                handler={() => {
+                  buyNowHandler("premium");
+                }}
+              />
+            </View>
+          </View>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isModalVisible}
+            onRequestClose={() => {
+              toggleModal();
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <ButtonComponent
+                text={"Make Payment"}
+                handler={makePaymentHandler}
+              />
+              {isLoading && (
+                <ActivityIndicator size="large" color={Colors.clr4} />
+              )}
+            </View>
+          </Modal>
+        </View>
+      )}
       <Text style={styles.SwipeText}>Swipe up for course contents</Text>
       <BottomSheet
         isOpen={false}

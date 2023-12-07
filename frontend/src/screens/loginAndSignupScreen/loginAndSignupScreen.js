@@ -136,6 +136,7 @@ function LoginAndSignupScreen() {
       },
       (response) => {
         if (response.status === 200) {
+          console.log(response.data);
           setErrFromBackend(null);
           setLoginEmail("");
           setLoginPassword("");
@@ -151,12 +152,10 @@ function LoginAndSignupScreen() {
             response.data.paid
           ) {
             navigation.navigate("afterLoggedIn");
-          } else {
+          } else if (authCtx.isAuthenticated && response.data.courseType) {
             navigation.navigate("courses");
-            if (authCtx.buyingWithoutLogin1) {
-              authCtx.setBuyingWithoutLogin(true);
-              authCtx.setBuyingWithoutLogin1(false);
-            }
+          } else {
+            navigation.navigate("dashboard");
           }
         }
       },
