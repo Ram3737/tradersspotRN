@@ -5,7 +5,7 @@ const apiurl = config.apiurl;
 
 export const CallGetApiServices = (url, successCallBack, errorCallBack) => {
   console.log(`${apiurl}${url}`);
-  axios.get(`${url}`).then(successCallBack).catch(errorCallBack);
+  axios.get(`${apiurl}${url}`).then(successCallBack).catch(errorCallBack);
 };
 
 export const CallPostApiServices = (

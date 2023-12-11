@@ -96,12 +96,14 @@ function OurCoursesScreen() {
   function buyNowHandler(course) {
     authCtx.setUserSelectedCourse(course);
     if (authCtx.isAuthenticated && !authCtx.paid) {
-      toggleModal();
+      console.log(1);
+
       CallPatchApiServices(
         `/user/buyCourse`,
         {
           email: authCtx.userEmail,
           courseType: course,
+          triedToUpdate: false,
         },
         (response) => {
           if (response.status === 201) {
@@ -114,11 +116,13 @@ function OurCoursesScreen() {
         }
       );
     } else if (authCtx.isAuthenticated && authCtx.paid) {
-      toggleModal();
+      console.log(2);
+
       CallPatchApiServices(
         `/user/buyCourse`,
         {
           email: authCtx.userEmail,
+          courseType: authCtx.courseType,
           triedToUpdate: true,
         },
         (response) => {

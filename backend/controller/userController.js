@@ -1,6 +1,7 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 const createUser = async (req, res) => {
   try {
@@ -78,6 +79,45 @@ const signInUser = async (req, res) => {
   } catch (error) {}
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const page = req.query.page; // Get the page from the query parameters
+    const limit = req.query.limit || 10;
+    const search = req.query.search || null;
+
+    const skip = (page - 1) * limit;
+
+    if (search) {
+      const users = await User.find(
+        { email: { $regex: new RegExp(search, "i") } },
+        "_id email courseType paid userType triedToUpdate"
+      )
+        .skip(skip)
+        .limit(limit);
+
+      const totalUsers = await User.countDocuments({
+        email: { $regex: new RegExp(search, "i") },
+      });
+
+      res.status(200).json({ users, totalUsers });
+    } else {
+      const users = await User.find(
+        {},
+        "_id email courseType paid userType triedToUpdate"
+      )
+        .skip(skip)
+        .limit(limit);
+
+      const totalUsers = await User.countDocuments();
+
+      res.status(200).json({ users, totalUsers });
+    }
+  } catch (error) {
+    console.error("getAllUsers", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const buyCourse = async (req, res) => {
   try {
     const { email, courseType, triedToUpdate } = req.body;
@@ -102,8 +142,31 @@ const buyCourse = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+    // const { courseType, paid, triedToUpdate } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(404).send({ error: "User not found!" });
+    }
+
+    const user = await User.findByIdAndUpdate(userId, req.body);
+
+    await user.save();
+
+    res.status(201).json({
+      message: "user Updated",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error - Try after sometime" });
+  }
+};
+
 module.exports = {
   createUser,
   signInUser,
+  getAllUsers,
   buyCourse,
+  updateUser,
 };

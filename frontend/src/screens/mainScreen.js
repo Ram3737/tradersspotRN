@@ -15,6 +15,8 @@ import DashboardScreen from "./beforeLoggedInScreens/dashboardScreens/dashboardS
 import AnalysisStatsScreen from "./beforeLoggedInScreens/analysisStatsScreens/analysisStatsScreen";
 import OurCoursesScreen from "./beforeLoggedInScreens/ourCoursesScreens/ourCoursesScreen";
 import ResourcesScreen from "./beforeLoggedInScreens/resources/resourcesScreen";
+import AdminAnalysisScreen from "./adminLoggedInScreens/adminAnalysisScreen/adminAnalysis";
+import UserAuthenticationScreen from "./adminLoggedInScreens/userAuthenticationScreens/userAuthenticationScreen";
 import { AuthContext } from "../components/stores/context/authContextProvider";
 
 const stack = createNativeStackNavigator();
@@ -88,6 +90,30 @@ function BottomNavigatorBeforeLoggedIn() {
   );
 }
 
+function BottomNavigatorAdminLoggedIn() {
+  return (
+    <bottomTab.Navigator
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: Colors.mainBgClr,
+          // borderColor: Colors.mainBgClr,
+        },
+      }}
+    >
+      <bottomTab.Screen
+        name="admin analysis"
+        component={AdminAnalysisScreen}
+        options={{ headerShown: false }}
+      />
+      <bottomTab.Screen
+        name="user authentication"
+        component={UserAuthenticationScreen}
+        options={{ headerShown: false }}
+      />
+    </bottomTab.Navigator>
+  );
+}
+
 function BeforeLogin() {
   return (
     <stack.Navigator>
@@ -127,12 +153,26 @@ function AfterLogin() {
   );
 }
 
+function AdminLogin() {
+  return (
+    <stack.Navigator>
+      <stack.Screen
+        name="adminLoggedIn"
+        component={BottomNavigatorAdminLoggedIn}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+    </stack.Navigator>
+  );
+}
+
 function MainScreen() {
   const authCtx = useContext(AuthContext);
   return (
     <NavigationContainer>
       {authCtx.isAuthenticated && authCtx.courseType && authCtx.paid ? (
         <AfterLogin />
+      ) : authCtx.userType === "admin" ? (
+        <AdminLogin />
       ) : (
         <BeforeLogin />
       )}

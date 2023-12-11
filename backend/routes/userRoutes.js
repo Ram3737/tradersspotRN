@@ -27,6 +27,8 @@ router.post(
 );
 
 router.post("/signin", userController.signInUser);
+router.get("/getAllUsers", userController.getAllUsers);
 router.patch("/buyCourse", userController.buyCourse);
+router.patch("/updateUser/:id", userController.updateUser);
 
 module.exports = router;

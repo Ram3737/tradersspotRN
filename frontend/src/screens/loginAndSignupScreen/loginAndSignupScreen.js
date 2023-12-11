@@ -136,6 +136,8 @@ function LoginAndSignupScreen() {
       },
       (response) => {
         if (response.status === 200) {
+          console.log(response.data);
+
           setErrFromBackend(null);
           setLoginEmail("");
           setLoginPassword("");
@@ -147,6 +149,10 @@ function LoginAndSignupScreen() {
           authCtx.setTriedToUpdate(response.data.triedToUpdate);
           authCtx.authenticationHandler();
           setBtnLoader(false);
+          if (response.data.userType === "admin") {
+            navigation.navigate("adminLoggedIn");
+            return;
+          }
           if (
             response.data.token &&
             response.data.courseType &&
