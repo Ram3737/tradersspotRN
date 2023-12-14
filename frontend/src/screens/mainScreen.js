@@ -117,11 +117,11 @@ function BottomNavigatorAdminLoggedIn() {
 function BeforeLogin() {
   return (
     <stack.Navigator>
-      <stack.Screen
+      {/* <stack.Screen
         name="starter"
         component={StarterScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
       <stack.Screen
         name="beforeLoggedIn"
         component={BottomNavigatorBeforeLoggedIn}

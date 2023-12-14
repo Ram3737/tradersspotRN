@@ -36,7 +36,7 @@ const Legend = ({ color, label }) => (
 
 const DonutChart = (props) => {
   const widthAndHeight = 110;
-  const series = [123, 321];
+  const series = props.series;
   const sliceColor = [Colors.clr4, Colors.clr3];
 
   return (
@@ -60,7 +60,11 @@ const DonutChart = (props) => {
           }}
         >
           {sliceColor.map((color, index) => (
-            <Legend key={index} color={color} label={`Item ${index + 1}`} />
+            <Legend
+              key={index}
+              color={color}
+              label={index === 0 ? "Risk      " : "Reward"}
+            />
           ))}
         </View>
       </View>

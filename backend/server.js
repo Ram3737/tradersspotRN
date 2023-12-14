@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const userRoutes = require("./routes/userRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
+const analysisResultRoutes = require("./routes/analysisResultRoutes");
 
 dotenv.config();
 const MONGODB_URI = process.env.MONGO_CONNECTION;
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 //ROUTES
 app.use("/api/user", userRoutes);
 app.use("/api/book", pdfRoutes);
+app.use("/api/analysis", analysisResultRoutes);
 
 //ERROR MIDDLEWARE
 app.use((error, req, res, next) => {

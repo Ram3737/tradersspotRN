@@ -8,22 +8,24 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import { useContext } from "react";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import Colors from "../../../components/colors/colors";
 import DonutChart from "../../../components/charts/donutChart";
-import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
+import { CallGetApiServices } from "../../../webServices/apiCalls";
+import { AuthContext } from "../../../components/stores/context/authContextProvider";
 
 import { Switch } from "react-native-switch";
 import HapticFeedback from "react-native-haptic-feedback";
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
 
 function AnalysisScreen() {
-  const analysisArr = [1, 2, 3, 4];
-  const scrollViewRef = useRef();
+  const authCtx = useContext(AuthContext);
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
+  const [analysisData, setAnalysisData] = useState([]);
 
   const toggleSwitch = () => {
     if (Platform.OS === "ios") {
@@ -39,11 +41,23 @@ function AnalysisScreen() {
     setContToDisplay(!contToDisplay);
   };
 
-  const handleScrollToBottom = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
-    }
-  };
+  function getAllAnalysis() {
+    CallGetApiServices(
+      `/analysis/getAllIntradayAnalysis?page=100`,
+      (response) => {
+        if (response.status === 200) {
+          setAnalysisData(response.data);
+        }
+      },
+      (err) => {
+        console.log("err getting getallanalysis", err);
+      }
+    );
+  }
+
+  useEffect(() => {
+    getAllAnalysis();
+  }, []);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -56,7 +70,7 @@ function AnalysisScreen() {
         styles.analysis,
         {
           height:
-            viewResult === index
+            viewResult === index && item.result.reward
               ? CalculateFontSize(58.5)
               : CalculateFontSize(32.5),
         },
@@ -64,11 +78,15 @@ function AnalysisScreen() {
     >
       <View style={styles.analysisSub}>
         <View style={styles.analysisSubBtns}>
-          <Text style={styles.analysisSubBtnsText}>JWSENERGY</Text>
+          <Text style={styles.analysisSubBtnsText}>
+            {item?.analysis?.stockName}
+          </Text>
         </View>
 
         <View style={[styles.analysisSubBtns, { marginLeft: 8 }]}>
-          <Text style={styles.analysisSubBtnsText}>TRIANGLE PATTERN</Text>
+          <Text style={styles.analysisSubBtnsText}>
+            {item?.analysis?.pattern}
+          </Text>
         </View>
       </View>
 
@@ -99,7 +117,7 @@ function AnalysisScreen() {
             {text}
           </Text>
         )}
-        text="https://www.tradingview.com/x/tXn6jAey"
+        text={item.analysis.analysisLink}
       />
       <View style={styles.viewResultCont}>
         <TouchableOpacity
@@ -109,41 +127,59 @@ function AnalysisScreen() {
           <Text style={styles.viewResultText}>View Result</Text>
         </TouchableOpacity>
       </View>
-      {viewResult === index && (
-        <>
-          <Text style={styles.riskRewardText}>1:2 RR</Text>
+      {viewResult === index &&
+        (item.result.resultLink && item.result.resultLink !== "none" ? (
+          <>
+            <Text
+              style={styles.riskRewardText}
+            >{`${item.result.risk}:${item.result.reward} RR`}</Text>
 
-          <LinkPreview
-            enableAnimation={true}
-            containerStyle={{
-              // backgroundColor: "red",
-              width: "95%",
-            }}
-            metadataContainerStyle={{
-              display: "none",
-            }}
-            textContainerStyle={{
-              // backgroundColor: "#fff",
-              marginLeft: 0,
-              marginTop: 8,
-              marginBottom: 11,
-            }}
-            renderText={(text, props) => (
-              <Text
-                {...props}
-                style={{
-                  color: Colors.clr4,
-                  fontSize: CalculateFontSize(1.5),
-                  fontWeight: "400",
-                }}
-              >
-                {text}
-              </Text>
-            )}
-            text="https://www.tradingview.com/x/tXn6jAey"
-          />
-        </>
-      )}
+            <LinkPreview
+              enableAnimation={true}
+              containerStyle={{
+                // backgroundColor: "red",
+                width: "95%",
+              }}
+              metadataContainerStyle={{
+                display: "none",
+              }}
+              textContainerStyle={{
+                // backgroundColor: "#fff",
+                marginLeft: 0,
+                marginTop: 8,
+                marginBottom: 11,
+              }}
+              renderText={(text, props) => (
+                <Text
+                  {...props}
+                  style={{
+                    color: Colors.clr4,
+                    fontSize: CalculateFontSize(1.5),
+                    fontWeight: "400",
+                  }}
+                >
+                  {text}
+                </Text>
+              )}
+              text={item.result.resultLink}
+            />
+          </>
+        ) : (
+          <Text
+            style={[
+              styles.riskRewardText,
+              {
+                marginTop: -10,
+                marginLeft: 10,
+                fontSize: CalculateFontSize(1.2),
+              },
+            ]}
+          >
+            {item.result.resultLink == "none"
+              ? "No Result"
+              : "Not yet updated..."}
+          </Text>
+        ))}
     </View>
   );
 
@@ -189,24 +225,83 @@ function AnalysisScreen() {
             </View>
           </View>
           <View style={styles.topContSubBottom}>
-            <DonutChart top={"35%"} left={"26%"} marginTop={"8%"} />
+            {authCtx.intradayAnalysisStats && (
+              <DonutChart
+                top={"35%"}
+                left={"26%"}
+                marginTop={"8%"}
+                series={[
+                  authCtx.intradayAnalysisStats.totalRisk || 10,
+                  authCtx.intradayAnalysisStats.totalReward || 50,
+                ]}
+              />
+            )}
             <View style={styles.topContSubBottomSub}>
               <Text style={styles.topContSubBottomSubText1}>
                 Total analysis shared:
               </Text>
-              <Text style={styles.topContSubBottomSubText2}>2146</Text>
+              <Text style={styles.topContSubBottomSubText2}>
+                {authCtx.intradayAnalysisStats.totalIntradayAnalysisCount || 0}
+              </Text>
+
+              {/* <Text style={styles.topContSubBottomSubText1}>
+                Risk/Reward Stats :
+              </Text> */}
+              <View style={styles.riskRewardStatMainCont}>
+                {authCtx.intradayAnalysisStats && (
+                  <ScrollView
+                    style={{
+                      width: "100%",
+                    }}
+                    horizontal={true}
+                  >
+                    <View style={styles.riskRewardStatCont}>
+                      <Text style={styles.rrContSubBottomSubText1}>Today</Text>
+                      <Text
+                        style={styles.rrContSubBottomSubText2}
+                      >{`${authCtx.intradayAnalysisStats.totalRiskToday}:${authCtx.intradayAnalysisStats.totalRewardToday}`}</Text>
+                    </View>
+                    <View style={styles.riskRewardStatCont}>
+                      <Text style={styles.rrContSubBottomSubText1}>
+                        Yesterday
+                      </Text>
+                      <Text
+                        style={styles.rrContSubBottomSubText2}
+                      >{`${authCtx.intradayAnalysisStats.totalRiskYesterday}:${authCtx.intradayAnalysisStats.totalRewardYesterday}`}</Text>
+                    </View>
+                    <View style={styles.riskRewardStatCont}>
+                      <Text style={styles.rrContSubBottomSubText1}>
+                        This Week
+                      </Text>
+                      <Text
+                        style={styles.rrContSubBottomSubText2}
+                      >{`${authCtx.intradayAnalysisStats.totalRiskThisWeek}:${authCtx.intradayAnalysisStats.totalRewardThisWeek}`}</Text>
+                    </View>
+                    <View style={styles.riskRewardStatCont}>
+                      <Text style={styles.rrContSubBottomSubText1}>
+                        Last Month
+                      </Text>
+                      <Text
+                        style={styles.rrContSubBottomSubText2}
+                      >{`${authCtx.intradayAnalysisStats.totalRiskLastMonth}:${authCtx.intradayAnalysisStats.totalRewardLastMonth}`}</Text>
+                    </View>
+                  </ScrollView>
+                )}
+              </View>
             </View>
           </View>
         </View>
       </View>
       <View style={styles.analysisScrollCont}>
-        <FlatList
-          data={analysisArr}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.analysisScrollContSub}
-          inverted={true}
-        />
+        {analysisData.length > 0 && (
+          <FlatList
+            data={analysisData}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.analysisScrollContSub}
+            inverted={true}
+          />
+        )}
         {/* <ScrollView
           ref={scrollViewRef}
           onLayout={handleScrollToBottom}
@@ -370,14 +465,15 @@ const styles = StyleSheet.create({
     width: "60%",
     height: "100%",
     paddingTop: "3%",
-    paddingLeft: "5%",
+    paddingLeft: "1%",
+    // marginTop: 5,
     justifyContent: "center",
     // backgroundColor: "yellow",
   },
 
   topContSubBottomSubText1: {
     fontSize: CalculateFontSize(1.5),
-    color: "#fff",
+    color: "#b8b6b6",
     fontWeight: "400",
     marginBottom: "1%",
   },
@@ -386,6 +482,19 @@ const styles = StyleSheet.create({
     fontSize: CalculateFontSize(2.3),
     color: Colors.clr4,
     fontWeight: "600",
+  },
+
+  rrContSubBottomSubText1: {
+    fontSize: CalculateFontSize(1.2),
+    color: "#b8b6b6",
+    fontWeight: "400",
+    marginBottom: "2%",
+  },
+
+  rrContSubBottomSubText2: {
+    fontSize: CalculateFontSize(1.8),
+    color: Colors.clr4,
+    fontWeight: "500",
   },
 
   analysisScrollCont: {
@@ -403,6 +512,27 @@ const styles = StyleSheet.create({
     width: "100%",
     // overflow: "hidden",
     // backgroundColor: Colors.clr2,
+  },
+
+  riskRewardStatMainCont: {
+    marginTop: 11,
+    marginBottom: 5,
+    borderColor: Colors.clr3,
+    borderWidth: 0.3,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    marginRight: "-7%",
+    paddingLeft: 5,
+    paddingRight: 12,
+    height: 50,
+  },
+
+  riskRewardStatCont: {
+    height: "100%",
+    width: 70,
+    paddingLeft: 10,
+    marginRight: 5,
+    justifyContent: "center",
   },
 
   analysis: {

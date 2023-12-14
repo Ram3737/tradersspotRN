@@ -1,4 +1,5 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { CallGetApiServices } from "../../../webServices/apiCalls";
 
 export const AuthContext = createContext({
   isAuthenticated: "",
@@ -10,6 +11,8 @@ export const AuthContext = createContext({
   triedToUpdate: "",
   registerSignupToggle: "",
   userSelectedCourse: "",
+  intradayAnalysisStats: "",
+  freeAnalysisStats: "",
   authenticationHandler: () => {},
   setToken: () => {},
   setPaid: () => {},
@@ -32,10 +35,45 @@ function AuthContextProvider({ children }) {
   const [registerSignupToggle, setRegisterSignupToggle] = useState(false);
   const [userSelectedCourse, setUserSelectedCourse] = useState(null);
   const [triedToUpdate, setTriedToUpdate] = useState(false);
+  const [intradayAnalysisStats, setIntradayAnalysisStats] = useState({});
+  const [freeAnalysisStats, setFreeAnalysisStats] = useState({});
 
   function authenticationHandler() {
     setIsAuthenticated(!isAuthenticated);
   }
+
+  function intradayAnalysisStatsFn() {
+    CallGetApiServices(
+      `/analysis/sumRiskRewardIntraday`,
+      (response) => {
+        if (response.status === 200) {
+          setIntradayAnalysisStats(response.data);
+        }
+      },
+      (err) => {
+        console.log("fetching intraday analysis stats err", err);
+      }
+    );
+  }
+
+  function freeAnalysisStatsFn() {
+    CallGetApiServices(
+      `/analysis/sumRiskRewardFree`,
+      (response) => {
+        if (response.status === 200) {
+          setFreeAnalysisStats(response.data);
+        }
+      },
+      (err) => {
+        console.log("fetching free analysis stats err", err);
+      }
+    );
+  }
+
+  useEffect(() => {
+    intradayAnalysisStatsFn();
+    freeAnalysisStatsFn();
+  }, []);
 
   function logout() {
     setIsAuthenticated(false);
@@ -59,6 +97,8 @@ function AuthContextProvider({ children }) {
     triedToUpdate: triedToUpdate,
     registerSignupToggle: registerSignupToggle,
     userSelectedCourse: userSelectedCourse,
+    intradayAnalysisStats: intradayAnalysisStats,
+    freeAnalysisStats: freeAnalysisStats,
     setUserEmail: setUserEmail,
     setToken: setToken,
     setPaid: setPaid,
