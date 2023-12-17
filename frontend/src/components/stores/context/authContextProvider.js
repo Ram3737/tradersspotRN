@@ -13,6 +13,8 @@ export const AuthContext = createContext({
   userSelectedCourse: "",
   intradayAnalysisStats: "",
   freeAnalysisStats: "",
+  intradayAnalysisLoader: "",
+  freeAnalysisLoader: "",
   authenticationHandler: () => {},
   setToken: () => {},
   setPaid: () => {},
@@ -37,34 +39,42 @@ function AuthContextProvider({ children }) {
   const [triedToUpdate, setTriedToUpdate] = useState(false);
   const [intradayAnalysisStats, setIntradayAnalysisStats] = useState({});
   const [freeAnalysisStats, setFreeAnalysisStats] = useState({});
+  const [intradayAnalysisLoader, setIntradayAnalysisLoader] = useState(false);
+  const [freeAnalysisLoader, setFreeAnalysisLoader] = useState(false);
 
   function authenticationHandler() {
     setIsAuthenticated(!isAuthenticated);
   }
 
   function intradayAnalysisStatsFn() {
+    setIntradayAnalysisLoader(true);
     CallGetApiServices(
       `/analysis/sumRiskRewardIntraday`,
       (response) => {
         if (response.status === 200) {
           setIntradayAnalysisStats(response.data);
+          setIntradayAnalysisLoader(false);
         }
       },
       (err) => {
+        setIntradayAnalysisLoader(false);
         console.log("fetching intraday analysis stats err", err);
       }
     );
   }
 
   function freeAnalysisStatsFn() {
+    setFreeAnalysisLoader(true);
     CallGetApiServices(
       `/analysis/sumRiskRewardFree`,
       (response) => {
         if (response.status === 200) {
           setFreeAnalysisStats(response.data);
+          setFreeAnalysisLoader(false);
         }
       },
       (err) => {
+        setFreeAnalysisLoader(false);
         console.log("fetching free analysis stats err", err);
       }
     );
@@ -99,6 +109,8 @@ function AuthContextProvider({ children }) {
     userSelectedCourse: userSelectedCourse,
     intradayAnalysisStats: intradayAnalysisStats,
     freeAnalysisStats: freeAnalysisStats,
+    intradayAnalysisLoader: intradayAnalysisLoader,
+    freeAnalysisLoader: freeAnalysisLoader,
     setUserEmail: setUserEmail,
     setToken: setToken,
     setPaid: setPaid,

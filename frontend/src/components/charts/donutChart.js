@@ -35,7 +35,7 @@ const Legend = ({ color, label }) => (
 );
 
 const DonutChart = (props) => {
-  const widthAndHeight = 110;
+  const widthAndHeight = props.height || 110;
   const series = props.series;
   const sliceColor = [Colors.clr4, Colors.clr3];
 

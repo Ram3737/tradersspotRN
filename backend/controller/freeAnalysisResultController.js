@@ -281,7 +281,7 @@ const sumRiskRewardFree = async (req, res) => {
 
         const analysesOnCurrentDay = allFreeAnalyses.filter(
           (analysis) =>
-            analysis.updatedAt.toDateString() ===
+            analysis.createdAt.toDateString() ===
             currentDatePointer.toDateString()
         );
 

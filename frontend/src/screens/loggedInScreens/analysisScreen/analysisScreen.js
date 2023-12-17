@@ -6,6 +6,7 @@ import {
   ScrollView,
   Vibration,
   TouchableOpacity,
+  ActivityIndicator,
   FlatList,
 } from "react-native";
 import { useContext } from "react";
@@ -26,6 +27,7 @@ function AnalysisScreen() {
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
   const [analysisData, setAnalysisData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSwitch = () => {
     if (Platform.OS === "ios") {
@@ -42,14 +44,17 @@ function AnalysisScreen() {
   };
 
   function getAllAnalysis() {
+    setIsLoading(true);
     CallGetApiServices(
       `/analysis/getAllIntradayAnalysis?page=100`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data);
+          setIsLoading(false);
         }
       },
       (err) => {
+        setIsLoading(false);
         console.log("err getting getallanalysis", err);
       }
     );
@@ -64,18 +69,7 @@ function AnalysisScreen() {
   }
 
   const renderItem = ({ item, index }) => (
-    <View
-      key={index}
-      style={[
-        styles.analysis,
-        {
-          height:
-            viewResult === index && item.result.reward
-              ? CalculateFontSize(58.5)
-              : CalculateFontSize(32.5),
-        },
-      ]}
-    >
+    <View key={index} style={styles.analysis}>
       <View style={styles.analysisSub}>
         <View style={styles.analysisSubBtns}>
           <Text style={styles.analysisSubBtnsText}>
@@ -128,7 +122,9 @@ function AnalysisScreen() {
         </TouchableOpacity>
       </View>
       {viewResult === index &&
-        (item.result.resultLink && item.result.resultLink !== "none" ? (
+        (item.result.resultLink &&
+        item.result.resultLink !== "none" &&
+        item.result.resultLink !== "sl" ? (
           <>
             <Text
               style={styles.riskRewardText}
@@ -177,6 +173,8 @@ function AnalysisScreen() {
           >
             {item.result.resultLink == "none"
               ? "No Result"
+              : item.result.resultLink == "sl"
+              ? "Stoploss hit"
               : "Not yet updated..."}
           </Text>
         ))}
@@ -237,63 +235,79 @@ function AnalysisScreen() {
               />
             )}
             <View style={styles.topContSubBottomSub}>
-              <Text style={styles.topContSubBottomSubText1}>
-                Total analysis shared:
-              </Text>
-              <Text style={styles.topContSubBottomSubText2}>
-                {authCtx.intradayAnalysisStats.totalIntradayAnalysisCount || 0}
-              </Text>
-
-              {/* <Text style={styles.topContSubBottomSubText1}>
-                Risk/Reward Stats :
-              </Text> */}
-              <View style={styles.riskRewardStatMainCont}>
-                {authCtx.intradayAnalysisStats && (
-                  <ScrollView
-                    style={{
-                      width: "100%",
-                    }}
-                    horizontal={true}
-                  >
-                    <View style={styles.riskRewardStatCont}>
-                      <Text style={styles.rrContSubBottomSubText1}>Today</Text>
-                      <Text
-                        style={styles.rrContSubBottomSubText2}
-                      >{`${authCtx.intradayAnalysisStats.totalRiskToday}:${authCtx.intradayAnalysisStats.totalRewardToday}`}</Text>
-                    </View>
-                    <View style={styles.riskRewardStatCont}>
-                      <Text style={styles.rrContSubBottomSubText1}>
-                        Yesterday
-                      </Text>
-                      <Text
-                        style={styles.rrContSubBottomSubText2}
-                      >{`${authCtx.intradayAnalysisStats.totalRiskYesterday}:${authCtx.intradayAnalysisStats.totalRewardYesterday}`}</Text>
-                    </View>
-                    <View style={styles.riskRewardStatCont}>
-                      <Text style={styles.rrContSubBottomSubText1}>
-                        This Week
-                      </Text>
-                      <Text
-                        style={styles.rrContSubBottomSubText2}
-                      >{`${authCtx.intradayAnalysisStats.totalRiskThisWeek}:${authCtx.intradayAnalysisStats.totalRewardThisWeek}`}</Text>
-                    </View>
-                    <View style={styles.riskRewardStatCont}>
-                      <Text style={styles.rrContSubBottomSubText1}>
-                        Last Month
-                      </Text>
-                      <Text
-                        style={styles.rrContSubBottomSubText2}
-                      >{`${authCtx.intradayAnalysisStats.totalRiskLastMonth}:${authCtx.intradayAnalysisStats.totalRewardLastMonth}`}</Text>
-                    </View>
-                  </ScrollView>
-                )}
-              </View>
+              {authCtx.intradayAnalysisLoader ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "25%" }}
+                />
+              ) : (
+                <>
+                  <Text style={styles.topContSubBottomSubText1}>
+                    Total analysis shared:
+                  </Text>
+                  <Text style={styles.topContSubBottomSubText2}>
+                    {authCtx.intradayAnalysisStats.totalIntradayAnalysisCount ||
+                      0}
+                  </Text>
+                  <View style={styles.riskRewardStatMainCont}>
+                    {authCtx.intradayAnalysisStats && (
+                      <ScrollView
+                        style={{
+                          width: "100%",
+                        }}
+                        horizontal={true}
+                      >
+                        <View style={styles.riskRewardStatCont}>
+                          <Text style={styles.rrContSubBottomSubText1}>
+                            Today
+                          </Text>
+                          <Text
+                            style={styles.rrContSubBottomSubText2}
+                          >{`${authCtx.intradayAnalysisStats.totalRiskToday}:${authCtx.intradayAnalysisStats.totalRewardToday}`}</Text>
+                        </View>
+                        <View style={styles.riskRewardStatCont}>
+                          <Text style={styles.rrContSubBottomSubText1}>
+                            Yesterday
+                          </Text>
+                          <Text
+                            style={styles.rrContSubBottomSubText2}
+                          >{`${authCtx.intradayAnalysisStats.totalRiskYesterday}:${authCtx.intradayAnalysisStats.totalRewardYesterday}`}</Text>
+                        </View>
+                        <View style={styles.riskRewardStatCont}>
+                          <Text style={styles.rrContSubBottomSubText1}>
+                            This Week
+                          </Text>
+                          <Text
+                            style={styles.rrContSubBottomSubText2}
+                          >{`${authCtx.intradayAnalysisStats.totalRiskThisWeek}:${authCtx.intradayAnalysisStats.totalRewardThisWeek}`}</Text>
+                        </View>
+                        <View style={styles.riskRewardStatCont}>
+                          <Text style={styles.rrContSubBottomSubText1}>
+                            Last Month
+                          </Text>
+                          <Text
+                            style={styles.rrContSubBottomSubText2}
+                          >{`${authCtx.intradayAnalysisStats.totalRiskLastMonth}:${authCtx.intradayAnalysisStats.totalRewardLastMonth}`}</Text>
+                        </View>
+                      </ScrollView>
+                    )}
+                  </View>
+                </>
+              )}
             </View>
           </View>
         </View>
       </View>
       <View style={styles.analysisScrollCont}>
-        {analysisData.length > 0 && (
+        {isLoading && (
+          <ActivityIndicator
+            size="large"
+            color={Colors.clr4}
+            style={{ marginTop: "60%" }}
+          />
+        )}
+        {analysisData.length > 0 && !isLoading && (
           <FlatList
             data={analysisData}
             renderItem={renderItem}
@@ -537,8 +551,8 @@ const styles = StyleSheet.create({
 
   analysis: {
     width: "95%",
-    height: CalculateFontSize(53),
     marginBottom: 20,
+    paddingVertical: 9,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",

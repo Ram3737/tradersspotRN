@@ -4,12 +4,12 @@ import {
   FlatList,
   TouchableOpacity,
   Vibration,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { useState, useEffect, useContext } from "react";
 
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
-import { BarChart, LineChart } from "react-native-chart-kit";
 import { Switch } from "react-native-switch";
 import DonutChart from "../../../components/charts/donutChart";
 
@@ -27,16 +27,20 @@ function AnalysisStatsScreen() {
   const [barChartLabel, setBarChartLabel] = useState([]);
   const [barChartValue, setBarChartValue] = useState([]);
   const [analysisData, setAnalysisData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   function getAllAnalysis() {
+    setIsLoading(true);
     CallGetApiServices(
       `/analysis/getAll${contToDisplay ? "Free" : "Intraday"}Analysis?page=100`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data);
+          setIsLoading(false);
         }
       },
       (err) => {
+        setIsLoading(false);
         console.log("err getting getallanalysis", err);
       }
     );
@@ -51,15 +55,17 @@ function AnalysisStatsScreen() {
     : authCtx.intradayAnalysisStats.lastFiveDaysData;
 
   useEffect(() => {
-    const days = Object.keys(lastFiveDaysDataIntraday);
-    const riskRewards = days.map((day) => {
-      return {
-        risk: lastFiveDaysDataIntraday[day].risk,
-        reward: lastFiveDaysDataIntraday[day].reward,
-      };
-    });
-    setBarChartLabel(Object.keys(lastFiveDaysDataIntraday).reverse());
-    setBarChartValue(riskRewards.reverse());
+    if (lastFiveDaysDataIntraday) {
+      const days = Object.keys(lastFiveDaysDataIntraday);
+      const riskRewards = days.map((day) => {
+        return {
+          risk: lastFiveDaysDataIntraday[day].risk,
+          reward: lastFiveDaysDataIntraday[day].reward,
+        };
+      });
+      setBarChartLabel(Object.keys(lastFiveDaysDataIntraday).reverse());
+      setBarChartValue(riskRewards.reverse());
+    }
   }, [lastFiveDaysDataIntraday]);
 
   function viewResultHandler(index) {
@@ -83,18 +89,7 @@ function AnalysisStatsScreen() {
   const renderItemPaid = ({ item, index }) =>
     item?.result?.resultLink &&
     item?.result?.resultLink !== "none" && (
-      <View
-        key={index}
-        style={[
-          styles.analysis,
-          {
-            height:
-              viewResult === index && item.result.reward
-                ? CalculateFontSize(58.5)
-                : CalculateFontSize(32.5),
-          },
-        ]}
-      >
+      <View key={index} style={styles.analysis}>
         <View style={styles.analysisSub}>
           <View style={styles.analysisSubBtns}>
             <Text style={styles.analysisSubBtnsText}>
@@ -147,7 +142,9 @@ function AnalysisStatsScreen() {
           </TouchableOpacity>
         </View>
         {viewResult === index &&
-          (item.result.reward ? (
+          (item.result.resultLink &&
+          item.result.resultLink !== "none" &&
+          item.result.resultLink !== "sl" ? (
             <>
               <Text
                 style={styles.riskRewardText}
@@ -194,25 +191,16 @@ function AnalysisStatsScreen() {
                 },
               ]}
             >
-              Not yet updated...
+              {item.result.resultLink == "sl"
+                ? "Stoploss hit"
+                : "Not yet updated..."}
             </Text>
           ))}
       </View>
     );
 
   const renderItemFree = ({ item, index }) => (
-    <View
-      key={index}
-      style={[
-        styles.analysis,
-        {
-          height:
-            viewResult === index && item.result.reward
-              ? CalculateFontSize(58.5)
-              : CalculateFontSize(32.5),
-        },
-      ]}
-    >
+    <View key={index} style={styles.analysis}>
       <View style={styles.analysisSub}>
         <View style={styles.analysisSubBtns}>
           <Text style={styles.analysisSubBtnsText}>
@@ -265,7 +253,9 @@ function AnalysisStatsScreen() {
         </TouchableOpacity>
       </View>
       {viewResult === index &&
-        (item.result.resultLink && item.result.resultLink !== "none" ? (
+        (item.result.resultLink &&
+        item.result.resultLink !== "none" &&
+        item.result.resultLink !== "sl" ? (
           <>
             <Text
               style={styles.riskRewardText}
@@ -314,6 +304,8 @@ function AnalysisStatsScreen() {
           >
             {item.result.resultLink == "none"
               ? "No Result"
+              : item.result.resultLink == "sl"
+              ? "Stoploss hit"
               : "Not yet updated..."}
           </Text>
         ))}
@@ -362,7 +354,7 @@ function AnalysisStatsScreen() {
 
           <View style={styles.statContTop2}>
             <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
-              {authCtx.freeAnalysisStats && (
+              {authCtx?.freeAnalysisStats && (
                 <DonutChart
                   top={"36%"}
                   left={"24%"}
@@ -380,31 +372,46 @@ function AnalysisStatsScreen() {
               )}
             </View>
             <View style={styles.lineChartCont}>
-              <View style={styles.lineChartContSub}>
-                {barChartLabel.length > 0 &&
-                  barChartLabel.map((item, index) => (
-                    <View key={index} style={styles.lineCont}>
-                      <Text style={[styles.labelContText, { marginTop: 0 }]}>
-                        {`${barChartValue[index].risk}:${barChartValue[index].reward}`}
-                      </Text>
-                      <View style={styles.lineOut}>
-                        <View
-                          style={[
-                            styles.lineIn,
-                            { height: `${barChartValue[index].reward * 10}%` },
-                          ]}
-                        ></View>
+              {authCtx.intradayAnalysisLoader || authCtx.freeAnalysisLoader ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "25%" }}
+                />
+              ) : (
+                <View style={styles.lineChartContSub}>
+                  {barChartLabel.length > 0 &&
+                    barChartLabel.map((item, index) => (
+                      <View key={index} style={styles.lineCont}>
+                        <Text style={[styles.labelContText, { marginTop: 0 }]}>
+                          {`${barChartValue[index].risk}:${barChartValue[index].reward}`}
+                        </Text>
+                        <View style={styles.lineOut}>
+                          <View
+                            style={[
+                              styles.lineIn,
+                              { height: `${barChartValue[index].reward * 5}%` },
+                            ]}
+                          ></View>
+                        </View>
+                        <Text style={[styles.labelContText]}>{item}</Text>
                       </View>
-                      <Text style={[styles.labelContText]}>{item}</Text>
-                    </View>
-                  ))}
-              </View>
+                    ))}
+                </View>
+              )}
             </View>
           </View>
         </View>
       </View>
       <View style={styles.analysisScrollCont}>
-        {analysisData.length > 0 && (
+        {isLoading && (
+          <ActivityIndicator
+            size="large"
+            color={Colors.clr4}
+            style={{ marginTop: "60%" }}
+          />
+        )}
+        {analysisData.length > 0 && !isLoading && (
           <FlatList
             data={analysisData}
             renderItem={contToDisplay ? renderItemFree : renderItemPaid}
@@ -509,8 +516,9 @@ const styles = StyleSheet.create({
   },
   analysis: {
     width: "95%",
-    height: CalculateFontSize(53),
+    height: "auto",
     marginBottom: 20,
+    paddingVertical: 9,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",

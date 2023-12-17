@@ -6,7 +6,14 @@ import {
 } from "react-native";
 import Colors from "../colors/colors";
 
-function ButtonComponent({ style, indicator, text, handler, disabled }) {
+function ButtonComponent({
+  style,
+  fontStyle,
+  indicator,
+  text,
+  handler,
+  disabled,
+}) {
   return (
     <TouchableOpacity
       style={[styles.buttonCont, style]}
@@ -16,7 +23,7 @@ function ButtonComponent({ style, indicator, text, handler, disabled }) {
       {indicator && (
         <ActivityIndicator size="small" color={Colors.transparentBg} />
       )}
-      {!indicator && <Text style={styles.buttonText}>{text}</Text>}
+      {!indicator && <Text style={[styles.buttonText, fontStyle]}>{text}</Text>}
     </TouchableOpacity>
   );
 }

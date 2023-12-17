@@ -258,8 +258,7 @@ function AdminAnalysisScreen() {
                   <View style={styles.analysisSub}>
                     {lastFiveAnalysis.map(
                       (item, index) =>
-                        (!item.result.resultLink ||
-                          !item.result.resultLink === "none") && (
+                        !item.result.resultLink && (
                           <TouchableOpacity
                             key={index}
                             style={[
@@ -388,7 +387,7 @@ function AdminAnalysisScreen() {
                   <View style={styles.analysisSub}>
                     {lastFiveAnalysis.map(
                       (item, index) =>
-                        !item.result.reward && (
+                        !item.result.resultLink && (
                           <TouchableOpacity
                             key={index}
                             style={[

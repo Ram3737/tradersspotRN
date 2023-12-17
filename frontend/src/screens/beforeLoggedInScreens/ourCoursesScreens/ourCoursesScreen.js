@@ -9,10 +9,18 @@ import {
   ActivityIndicator,
   StyleSheet,
   Linking,
+  Dimensions,
 } from "react-native";
-import { useState, useLayoutEffect, useContext, useEffect } from "react";
+import {
+  useState,
+  useLayoutEffect,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { useNavigation } from "@react-navigation/native";
 import BottomSheet from "react-native-simple-bottom-sheet";
+import Carousel, { Pagination } from "react-native-snap-carousel";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import Colors from "../../../components/colors/colors";
@@ -22,23 +30,46 @@ import CustomAlertBox from "../../../components/customAlertBox/customAlertBox";
 import { CallPatchApiServices } from "../../../webServices/apiCalls";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 
+const SLIDER_WIDTH = Dimensions.get("window").width + 80;
+const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
+
 function OurCoursesScreen() {
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
-  const [tab, setTab] = useState("standard");
+  const [tab, setTab] = useState(0);
   const [paidStatus, setPaidStatus] = useState(false);
   const [courseTypeFromRes, setCourseTypeFromRes] = useState(null);
   const [courseAmount, setCourseAmount] = useState("6499.00");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
+  const [index, setIndex] = useState(0);
+  const isCarousel = useRef(null);
+
+  const data = [
+    {
+      title: "Aenean leo",
+      body: "Ut tincidunt tincidunt erat. Sed cursus turpis vitae tortor. Quisque malesuada placerat nisl. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.",
+      imgUrl: "https://picsum.photos/id/11/200/300",
+    },
+    {
+      title: "In turpis",
+      body: "Aenean ut eros et nisl sagittis vestibulum. Donec posuere vulputate arcu. Proin faucibus arcu quis ante. Curabitur at lacus ac velit ornare lobortis. ",
+      imgUrl: "https://picsum.photos/id/10/200/300",
+    },
+    {
+      title: "Lorem Ipsum",
+      body: "Phasellus ullamcorper ipsum rutrum nunc. Nullam quis ante. Etiam ultricies nisi vel augue. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc.",
+      imgUrl: "https://picsum.photos/id/12/200/300",
+    },
+  ];
 
   useEffect(() => {
-    if (tab === "basic") {
+    if (tab === 0) {
       setCourseAmount("2499.00");
-    } else if (tab === "standard") {
+    } else if (tab === 1) {
       setCourseAmount("6499.00");
-    } else if (tab === "premium") {
+    } else if (tab === 2) {
       setCourseAmount("9499.00");
     }
   }, [tab]);
@@ -155,6 +186,119 @@ function OurCoursesScreen() {
     }
   };
 
+  const CarouselCardItem = ({ item, index }) => {
+    const imageSource1 = `../../../images/pictures/buyNow1.jpg`;
+    const imageSource2 = `../../../images/pictures/buyNow2.jpg`;
+    const imageSource3 = `../../../images/pictures/buyNow0.jpg`;
+    return (
+      <View style={styles.container} key={index}>
+        {index === 0 ? (
+          <ImageBackground
+            source={require(imageSource1)}
+            style={styles.priceCont}
+            imageStyle={{ opacity: 0.2, height: "100%" }}
+          >
+            <Text style={styles.planText}>
+              {tab === 0
+                ? "BASIC"
+                : tab === 1
+                ? "STANDARD"
+                : tab === 2
+                ? "PRO"
+                : ""}
+            </Text>
+            <Text style={styles.priceText}>
+              {tab === 0
+                ? "₹ 2,499"
+                : tab === 1
+                ? "₹ 6,499"
+                : tab === 2
+                ? "₹ 9,499"
+                : ""}
+            </Text>
+          </ImageBackground>
+        ) : index === 1 ? (
+          <ImageBackground
+            source={require(imageSource2)}
+            style={styles.priceCont}
+            imageStyle={{ opacity: 0.15, height: "100%" }}
+          >
+            <Text style={styles.planText}>
+              {tab === 0
+                ? "BASIC"
+                : tab === 1
+                ? "STANDARD"
+                : tab === 2
+                ? "PRO"
+                : ""}
+            </Text>
+            <Text style={styles.priceText}>
+              {tab === 0
+                ? "₹ 2,499"
+                : tab === 1
+                ? "₹ 6,499"
+                : tab === 2
+                ? "₹ 9,499"
+                : ""}
+            </Text>
+          </ImageBackground>
+        ) : index === 2 ? (
+          <ImageBackground
+            source={require(imageSource3)}
+            style={styles.priceCont}
+            imageStyle={{ opacity: 0.12, height: "100%" }}
+          >
+            <Text style={styles.planText}>
+              {tab === 0
+                ? "BASIC"
+                : tab === 1
+                ? "STANDARD"
+                : tab === 2
+                ? "PRO"
+                : ""}
+            </Text>
+            <Text style={styles.priceText}>
+              {tab === 0
+                ? "₹ 2,499"
+                : tab === 1
+                ? "₹ 6,499"
+                : tab === 2
+                ? "₹ 9,499"
+                : ""}
+            </Text>
+          </ImageBackground>
+        ) : (
+          ""
+        )}
+        <View style={styles.featuresCont}>
+          <Text style={styles.featureText}>- Access to 14hrs of course</Text>
+          <Text style={styles.featureText}>- Any time oubt clearence</Text>
+          <Text style={styles.featureText}>- Validity 1 Month</Text>
+          <Text style={styles.featureText}>- Validity 1 Month</Text>
+          <Text style={styles.featureText}>- Validity 1 Month</Text>
+        </View>
+        <View style={styles.btnCont}>
+          <ButtonComponent
+            text={"Buy Now"}
+            handler={() => {
+              buyNowHandler(
+                tab === 0
+                  ? "basic"
+                  : tab === 1
+                  ? "standard"
+                  : tab === 2
+                  ? "pro"
+                  : ""
+              );
+            }}
+
+            // handler={handlePay}
+          />
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View
       style={[CommonStyles.mainContainer, { justifyContent: "flex-start" }]}
@@ -165,7 +309,7 @@ function OurCoursesScreen() {
         message="Purchased successfully"
         needCancelBtn={false}
       />
-      <View style={styles.tabCont}>
+      {/* <View style={styles.tabCont}>
         <TouchableOpacity
           style={[
             { backgroundColor: tab === "basic" ? Colors.clr3 : Colors.clr2 },
@@ -195,164 +339,51 @@ function OurCoursesScreen() {
         >
           <Text style={styles.tabText}>Premium</Text>
         </TouchableOpacity>
+      </View>*/}
+
+      <View style={{ height: "80%", marginTop: "8%" }}>
+        <Carousel
+          layout="default"
+          layoutCardOffset={9}
+          ref={isCarousel}
+          data={data}
+          renderItem={CarouselCardItem}
+          sliderWidth={SLIDER_WIDTH - 20}
+          itemWidth={ITEM_WIDTH - 20}
+          onSnapToItem={(index) => setTab(index)}
+          useScrollView={true}
+        />
+        <Pagination
+          dotsLength={data.length}
+          activeDotIndex={tab}
+          carouselRef={isCarousel}
+          dotStyle={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            marginHorizontal: 0,
+            backgroundColor: "#555",
+          }}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+          tappableDots={true}
+        />
       </View>
 
-      {tab === "basic" && (
-        <View style={styles.cardsCont}>
-          <Image
-            source={require("../../../images/pictures/cardBg.png")}
-            style={styles.courseIcon}
-          />
-          <View style={styles.cards}>
-            <View style={styles.priceCont}>
-              <Text style={styles.priceText}>₹ 2,499</Text>
-            </View>
-
-            <View style={styles.featuresCont}>
-              <Text style={styles.featureText}>
-                - Access to 14hrs of course
-              </Text>
-              <Text style={styles.featureText}>- Any time oubt clearence</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-            </View>
-
-            <View style={styles.btnCont}>
-              <ButtonComponent
-                text={"Buy Now"}
-                handler={() => {
-                  buyNowHandler("basic");
-                }}
-
-                // handler={handlePay}
-              />
-            </View>
-          </View>
-
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={isModalVisible}
-            onRequestClose={() => {
-              toggleModal();
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <ButtonComponent
-                text={"Make Payment"}
-                handler={makePaymentHandler}
-              />
-              {isLoading && (
-                <ActivityIndicator size="large" color={Colors.clr4} />
-              )}
-            </View>
-          </Modal>
-        </View>
-      )}
-      {tab === "standard" && (
-        <View style={styles.cardsCont}>
-          <Image
-            source={require("../../../images/pictures/cardBg.png")}
-            style={styles.courseIcon}
-          />
-          <View style={styles.cards}>
-            <View style={styles.priceCont}>
-              <Text style={styles.priceText}>₹ 6,499</Text>
-            </View>
-
-            <View style={styles.featuresCont}>
-              <Text style={styles.featureText}>
-                - Access to 14hrs of course
-              </Text>
-              <Text style={styles.featureText}>- Any time oubt clearence</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-            </View>
-
-            <View style={styles.btnCont}>
-              <ButtonComponent
-                text={"Buy Now"}
-                handler={() => {
-                  buyNowHandler("standard");
-                }}
-              />
-            </View>
-          </View>
-
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={isModalVisible}
-            onRequestClose={() => {
-              toggleModal();
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <ButtonComponent
-                text={"Make Payment"}
-                handler={makePaymentHandler}
-              />
-              {isLoading && (
-                <ActivityIndicator size="large" color={Colors.clr4} />
-              )}
-            </View>
-          </Modal>
-        </View>
-      )}
-      {tab === "premium" && (
-        <View style={styles.cardsCont}>
-          <Image
-            source={require("../../../images/pictures/cardBg.png")}
-            style={styles.courseIcon}
-          />
-          <View style={styles.cards}>
-            <View style={styles.priceCont}>
-              <Text style={styles.priceText}>₹ 9,499</Text>
-            </View>
-
-            <View style={styles.featuresCont}>
-              <Text style={styles.featureText}>
-                - Access to 14hrs of course
-              </Text>
-              <Text style={styles.featureText}>- Any time oubt clearence</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-              <Text style={styles.featureText}>- Validity 1 Month</Text>
-            </View>
-
-            <View style={styles.btnCont}>
-              <ButtonComponent
-                text={"Buy Now"}
-                handler={() => {
-                  buyNowHandler("premium");
-                }}
-              />
-            </View>
-          </View>
-
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={isModalVisible}
-            onRequestClose={() => {
-              toggleModal();
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <ButtonComponent
-                text={"Make Payment"}
-                handler={makePaymentHandler}
-              />
-              {isLoading && (
-                <ActivityIndicator size="large" color={Colors.clr4} />
-              )}
-            </View>
-          </Modal>
-        </View>
-      )}
       <Text style={styles.SwipeText}>Swipe up for course contents</Text>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => {
+          toggleModal();
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <ButtonComponent text={"Make Payment"} handler={makePaymentHandler} />
+          {isLoading && <ActivityIndicator size="large" color={Colors.clr4} />}
+        </View>
+      </Modal>
       <BottomSheet
         isOpen={false}
         sliderMinHeight={40}
@@ -478,6 +509,30 @@ function OurCoursesScreen() {
 export default OurCoursesScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.transparentBg,
+    height: "90%",
+    width: ITEM_WIDTH - 20,
+    // paddingVertical: 10,
+    // paddingHorizontal: 20,
+    // paddingBottom: 30,
+    borderWidth: 0.5,
+    borderColor: Colors.clr3,
+    borderRadius: 8,
+    marginTop: "15%",
+    justifyContent: "space-between",
+    alignItems: "center",
+    overflow: "hidden",
+    // shadowColor: "#000",
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 3,
+    // },
+    // shadowOpacity: 0.29,
+    // shadowRadius: 4.65,
+    // elevation: 7,
+  },
+
   tabCont: {
     height: "6%",
     width: "90%",
@@ -540,22 +595,29 @@ const styles = StyleSheet.create({
 
   priceCont: {
     width: "100%",
-    height: "auto",
+    height: "30%",
     alignItems: "center",
-    marginTop: "2%",
     // backgroundColor: "red",
   },
-  priceText: {
-    fontSize: CalculateFontSize(6),
+  planText: {
+    fontSize: CalculateFontSize(2.5),
     fontWeight: "800",
-    color: Colors.clr4,
+    padding: 10,
+    alignSelf: "flex-start",
+    color: Colors.midWhite,
+  },
+  priceText: {
+    fontSize: CalculateFontSize(5),
+    fontWeight: "700",
+    color: Colors.btnClr,
   },
 
   featuresCont: {
     width: "100%",
     height: "auto",
-    marginTop: "15.5%",
-    // backgroundColor: "red",
+    marginTop: "10%",
+    alignItems: "center",
+    // backgroundColor: "blue",
   },
 
   featureText: {
@@ -565,15 +627,19 @@ const styles = StyleSheet.create({
   },
   btnCont: {
     width: "100%",
-    justifyContent: "flex-end",
+    flex: 1,
+    justifyContent: "center",
     // alignItems: "center",
-    marginTop: "11%",
+    // marginTop: "11%",
+    paddingHorizontal: 20,
+    marginBottom: "5%",
+    // backgroundColor: "red",
   },
 
   SwipeText: {
     fontSize: CalculateFontSize(2),
     fontWeight: "400",
-    marginTop: "35%",
+    marginTop: "13%",
     color: Colors.btnClr,
   },
 
