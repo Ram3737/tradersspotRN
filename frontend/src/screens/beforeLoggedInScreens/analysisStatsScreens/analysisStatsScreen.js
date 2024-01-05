@@ -16,6 +16,7 @@ import DonutChart from "../../../components/charts/donutChart";
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
+import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 import Colors from "../../../components/colors/colors";
 
@@ -32,10 +33,12 @@ function AnalysisStatsScreen() {
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
-      `/analysis/getAll${contToDisplay ? "Free" : "Intraday"}Analysis?page=100`,
+      `/analysis/getAll${
+        contToDisplay ? "FreeSwing" : "Swing"
+      }AnalysisUser?page=100`,
       (response) => {
         if (response.status === 200) {
-          setAnalysisData(response.data);
+          setAnalysisData(response.data.allSwingAnalyses);
           setIsLoading(false);
         }
       },
@@ -48,25 +51,12 @@ function AnalysisStatsScreen() {
 
   useEffect(() => {
     getAllAnalysis();
+    setBarChartValue(
+      contToDisplay
+        ? authCtx.freeSwingAnalysisStats?.reversedMonthlyTotals
+        : authCtx.swingAnalysisStats?.reversedMonthlyTotals
+    );
   }, [contToDisplay]);
-
-  const lastFiveDaysDataIntraday = contToDisplay
-    ? authCtx.freeAnalysisStats.lastFiveDaysData
-    : authCtx.intradayAnalysisStats.lastFiveDaysData;
-
-  useEffect(() => {
-    if (lastFiveDaysDataIntraday) {
-      const days = Object.keys(lastFiveDaysDataIntraday);
-      const riskRewards = days.map((day) => {
-        return {
-          risk: lastFiveDaysDataIntraday[day].risk,
-          reward: lastFiveDaysDataIntraday[day].reward,
-        };
-      });
-      setBarChartLabel(Object.keys(lastFiveDaysDataIntraday).reverse());
-      setBarChartValue(riskRewards.reverse());
-    }
-  }, [lastFiveDaysDataIntraday]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -101,6 +91,10 @@ function AnalysisStatsScreen() {
             <Text style={styles.analysisSubBtnsText}>
               {item?.analysis?.pattern}
             </Text>
+          </View>
+
+          <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
+            {item.result?.breakout && <BlinkingDot />}
           </View>
         </View>
 
@@ -148,7 +142,7 @@ function AnalysisStatsScreen() {
             <>
               <Text
                 style={styles.riskRewardText}
-              >{`${item.result.risk}:${item.result.reward} RR`}</Text>
+              >{`${item.result.risk}:${item.result.reward} RR     ${item.result?.percentage}%`}</Text>
 
               <LinkPreview
                 enableAnimation={true}
@@ -212,6 +206,10 @@ function AnalysisStatsScreen() {
           <Text style={styles.analysisSubBtnsText}>
             {item?.analysis?.pattern}
           </Text>
+        </View>
+
+        <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
+          {item.result?.breakout && <BlinkingDot />}
         </View>
       </View>
 
@@ -322,7 +320,7 @@ function AnalysisStatsScreen() {
       <View style={styles.statCont}>
         <View style={styles.statContTop}>
           <View style={styles.statContBottom}>
-            <Text style={styles.statContTopText}>Last five days stats</Text>
+            <Text style={styles.statContTopText}>Last five months stats</Text>
             <Switch
               value={contToDisplay}
               onValueChange={toggleSwitch}
@@ -354,25 +352,31 @@ function AnalysisStatsScreen() {
 
           <View style={styles.statContTop2}>
             <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
-              {authCtx?.freeAnalysisStats && (
-                <DonutChart
-                  top={"36%"}
-                  left={"24%"}
-                  series={[
-                    contToDisplay
-                      ? authCtx.freeAnalysisStats.totalRiskLastFiveDays
-                      : authCtx.intradayAnalysisStats.totalRiskLastFiveDays ||
-                        10,
-                    contToDisplay
-                      ? authCtx.freeAnalysisStats.totalRewardLastFiveDays
-                      : authCtx.intradayAnalysisStats.totalRewardLastFiveDays ||
-                        50,
-                  ]}
-                />
-              )}
+              <DonutChart
+                top={"36%"}
+                left={"24%"}
+                series={[
+                  contToDisplay
+                    ? authCtx.freeSwingAnalysisStats?.totalRiskLastFiveMonth > 0
+                      ? authCtx.freeSwingAnalysisStats.totalRiskLastFiveMonth
+                      : 10
+                    : (authCtx.swingAnalysisStats.totalRiskLastFiveMonth > 0
+                        ? authCtx.swingAnalysisStats.totalRiskLastFiveMonth
+                        : 10) || 10,
+                  contToDisplay
+                    ? authCtx.freeSwingAnalysisStats.totalRewardLastFiveMonth >
+                      0
+                      ? authCtx.freeSwingAnalysisStats.totalRewardLastFiveMonth
+                      : 50
+                    : (authCtx.swingAnalysisStats.totalRewardLastFiveMonth > 0
+                        ? authCtx.swingAnalysisStats.totalRewardLastFiveMonth
+                        : 30) || 50,
+                ]}
+              />
             </View>
             <View style={styles.lineChartCont}>
-              {authCtx.intradayAnalysisLoader || authCtx.freeAnalysisLoader ? (
+              {authCtx.swingAnalysisLoader ||
+              authCtx.freeSwingAnalysisLoader ? (
                 <ActivityIndicator
                   size="small"
                   color={Colors.clr4}
@@ -380,21 +384,25 @@ function AnalysisStatsScreen() {
                 />
               ) : (
                 <View style={styles.lineChartContSub}>
-                  {barChartLabel.length > 0 &&
-                    barChartLabel.map((item, index) => (
+                  {barChartValue.length > 0 &&
+                    barChartValue.map((item, index) => (
                       <View key={index} style={styles.lineCont}>
                         <Text style={[styles.labelContText, { marginTop: 0 }]}>
-                          {`${barChartValue[index].risk}:${barChartValue[index].reward}`}
+                          {`${item.risk}:${item.reward}`}
                         </Text>
                         <View style={styles.lineOut}>
                           <View
                             style={[
                               styles.lineIn,
-                              { height: `${barChartValue[index].reward * 5}%` },
+                              {
+                                height: `${
+                                  item.reward * 5 >= 100 ? 100 : item.reward * 5
+                                }%`,
+                              },
                             ]}
                           ></View>
                         </View>
-                        <Text style={[styles.labelContText]}>{item}</Text>
+                        <Text style={[styles.labelContText]}>{item.month}</Text>
                       </View>
                     ))}
                 </View>

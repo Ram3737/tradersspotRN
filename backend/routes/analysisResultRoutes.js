@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const intradayAnalysisResultController = require("../controller/intradayAnalysisResultController");
 const freeAnalysisResultController = require("../controller/freeAnalysisResultController");
+const swingAnalysisResultController = require("../controller/swingAnalysisResultController");
+const freeSwingAnalysisResultController = require("../controller/freeSwingAnalysisResultController");
 
 //INTRADAY
 router.post(
@@ -37,6 +39,50 @@ router.patch(
 router.get(
   "/sumRiskRewardFree",
   freeAnalysisResultController.sumRiskRewardFree
+);
+
+//SWING
+router.post(
+  "/createSwingAnalysis",
+  swingAnalysisResultController.createSwingAnalysis
+);
+router.get(
+  "/getAllSwingAnalysis",
+  swingAnalysisResultController.getAllSwingAnalysis
+);
+router.get(
+  "/getAllSwingAnalysisUser",
+  swingAnalysisResultController.getAllSwingAnalysisUser
+);
+router.patch(
+  "/updateSwingResults/:id",
+  swingAnalysisResultController.updateSwingResults
+);
+router.get(
+  "/sumRiskRewardSwing",
+  swingAnalysisResultController.sumRiskRewardSwing
+);
+
+//FREE SWING
+router.post(
+  "/createFreeSwingAnalysis",
+  freeSwingAnalysisResultController.createFreeSwingAnalysis
+);
+router.get(
+  "/getAllFreeSwingAnalysis",
+  freeSwingAnalysisResultController.getAllFreeSwingAnalysis
+);
+router.get(
+  "/getAllFreeSwingAnalysisUser",
+  freeSwingAnalysisResultController.getAllFreeSwingAnalysisUser
+);
+router.patch(
+  "/updateFreeSwingResults/:id",
+  freeSwingAnalysisResultController.updateFreeSwingResults
+);
+router.get(
+  "/sumRiskRewardFreeSwing",
+  freeSwingAnalysisResultController.sumRiskRewardFreeSwing
 );
 
 module.exports = router;

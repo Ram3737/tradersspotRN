@@ -101,7 +101,6 @@ const sumRiskRewardFree = async (req, res) => {
     if (!allFreeAnalyses || allFreeAnalyses.length === 0) {
       throw new Error("No analyses found to calculate sum");
     }
-
     const currentDate = new Date();
 
     const currentWeekStart = new Date(currentDate);

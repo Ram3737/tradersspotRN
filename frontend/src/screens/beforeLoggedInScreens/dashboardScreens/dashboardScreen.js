@@ -11,6 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
+import MarqueeView from "react-native-marquee-view";
 
 import Colors from "../../../components/colors/colors";
 import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
@@ -18,6 +19,7 @@ import CalculateFontSize from "../../../components/calculateFontSize/calculateFo
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 import DonutChart from "../../../components/charts/donutChart";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
+import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 
 function DashboardScreen() {
   const navigation = useNavigation();
@@ -26,24 +28,8 @@ function DashboardScreen() {
   const [viewResult, setViewResult] = useState(false);
   const [barChartLabel, setBarChartLabel] = useState([]);
   const [barChartValue, setBarChartValue] = useState([]);
+  const [stocksToWatch, setStocksToWatch] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const lastFiveDaysDataIntraday =
-    authCtx.intradayAnalysisStats.lastFiveDaysData;
-
-  useEffect(() => {
-    if (lastFiveDaysDataIntraday) {
-      const days = Object.keys(lastFiveDaysDataIntraday);
-      const riskRewards = days.map((day) => {
-        return {
-          risk: lastFiveDaysDataIntraday[day].risk,
-          reward: lastFiveDaysDataIntraday[day].reward,
-        };
-      });
-      setBarChartLabel(Object.keys(lastFiveDaysDataIntraday).reverse());
-      setBarChartValue(riskRewards.reverse());
-    }
-  }, [lastFiveDaysDataIntraday]);
 
   function loginrSignupHandler() {
     navigation.navigate("loginSignup");
@@ -56,10 +42,10 @@ function DashboardScreen() {
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
-      `/analysis/getAllFreeAnalysis?page=1`,
+      `/analysis/getAllFreeSwingAnalysis?page=1`,
       (response) => {
         if (response.status === 200) {
-          setAnalysisData(response.data);
+          setAnalysisData(response.data.allSwingAnalyses);
           setIsLoading(false);
         }
       },
@@ -107,7 +93,14 @@ function DashboardScreen() {
               <DonutChart
                 top={"34%"}
                 left={"25%"}
-                series={[10, 50]}
+                series={[
+                  authCtx.freeSwingAnalysisStats?.totalRisk > 0
+                    ? authCtx.freeSwingAnalysisStats.totalRisk
+                    : 10,
+                  authCtx.freeSwingAnalysisStats.totalReward > 0
+                    ? authCtx.freeSwingAnalysisStats.totalReward
+                    : 50,
+                ]}
                 height={102}
               />
             </View>
@@ -116,11 +109,45 @@ function DashboardScreen() {
                 <Text style={styles.freeAnalysisContTopLeftText}>Overall</Text>
                 <View style={styles.lineCont}>
                   <View style={styles.lineOut}>
-                    <View style={styles.lineIn1}>
-                      <Text style={styles.lineIn1Text}>1</Text>
+                    <View
+                      style={[
+                        styles.lineIn1,
+                        {
+                          width: `${
+                            authCtx.freeSwingAnalysisStats?.totalRisk
+                              ? authCtx.freeSwingAnalysisStats?.totalRisk * 3 >
+                                40
+                                ? 40
+                                : authCtx.freeSwingAnalysisStats?.totalRisk * 3
+                              : 20
+                          }%`,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.lineIn1Text}>
+                        {authCtx.freeSwingAnalysisStats?.totalRisk}
+                      </Text>
                     </View>
-                    <View style={styles.lineIn2}>
-                      <Text style={styles.lineIn2Text}>7</Text>
+                    <View
+                      style={[
+                        styles.lineIn2,
+                        {
+                          width: `${
+                            authCtx.freeSwingAnalysisStats?.totalReward
+                              ? authCtx.freeSwingAnalysisStats?.totalReward *
+                                  3 >
+                                60
+                                ? 60
+                                : authCtx.freeSwingAnalysisStats?.totalReward *
+                                  3
+                              : 80
+                          }%`,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.lineIn2Text}>
+                        {authCtx.freeSwingAnalysisStats?.totalReward}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -131,11 +158,49 @@ function DashboardScreen() {
                 </Text>
                 <View style={styles.lineCont}>
                   <View style={styles.lineOut}>
-                    <View style={styles.lineIn1}>
-                      <Text style={styles.lineIn1Text}>3</Text>
+                    <View
+                      style={[
+                        styles.lineIn1,
+                        {
+                          width: `${
+                            authCtx.freeSwingAnalysisStats?.totalRiskLastMonth
+                              ? authCtx.freeSwingAnalysisStats
+                                  ?.totalRiskLastMonth *
+                                  3 >
+                                40
+                                ? 40
+                                : authCtx.freeSwingAnalysisStats
+                                    ?.totalRiskLastMonth * 3
+                              : 20
+                          }%`,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.lineIn1Text}>
+                        {authCtx.freeSwingAnalysisStats?.totalRiskLastMonth}
+                      </Text>
                     </View>
-                    <View style={styles.lineIn2}>
-                      <Text style={styles.lineIn2Text}>12</Text>
+                    <View
+                      style={[
+                        styles.lineIn2,
+                        {
+                          width: `${
+                            authCtx.freeSwingAnalysisStats?.totalRewardLastMonth
+                              ? authCtx.freeSwingAnalysisStats
+                                  ?.totalRewardLastMonth *
+                                  3 >
+                                60
+                                ? 60
+                                : authCtx.freeSwingAnalysisStats
+                                    ?.totalRewardLastMonth * 3
+                              : 80
+                          }%`,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.lineIn2Text}>
+                        {authCtx.freeSwingAnalysisStats?.totalRewardLastMonth}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -161,12 +226,18 @@ function DashboardScreen() {
             >
               <Text style={styles.rrText}>Risk is</Text>
               <View style={styles.freeAnalysisContBottomSubBottomLeftSub}>
-                <Text style={styles.rrText1}>2000</Text>
+                <Text style={styles.rrText1}>
+                  {authCtx.freeSwingAnalysisStats?.totalRisk
+                    ? authCtx.freeSwingAnalysisStats?.totalRisk * 1000
+                    : 2000}
+                </Text>
               </View>
               <Text style={styles.rrText}>and the Reward is</Text>
               <View style={styles.freeAnalysisContBottomSubBottomLeftSub}>
                 <Text style={[styles.rrText1, { color: "#00563b" }]}>
-                  12,000
+                  {authCtx.freeSwingAnalysisStats?.totalReward
+                    ? authCtx.freeSwingAnalysisStats?.totalReward * 1000
+                    : 8000}
                 </Text>
               </View>
             </View>
@@ -192,60 +263,92 @@ function DashboardScreen() {
               <DonutChart
                 top={"-95%"}
                 left={"25%"}
-                series={[10, 50]}
+                series={[
+                  authCtx.swingAnalysisStats?.totalRisk > 0
+                    ? authCtx.swingAnalysisStats.totalRisk
+                    : 10,
+                  authCtx.swingAnalysisStats.totalReward > 0
+                    ? authCtx.swingAnalysisStats.totalReward
+                    : 50,
+                ]}
                 height={55}
               />
-              <Text style={styles.paidContSubText1}>1:2</Text>
-              <Text style={styles.paidContSubText2}>Today's</Text>
-            </View>
-            <View style={styles.paidContSub}>
-              <DonutChart
-                top={"-95%"}
-                left={"25%"}
-                series={[10, 50]}
-                height={55}
-              />
-              <Text style={styles.paidContSubText1}>1:2</Text>
-              <Text style={styles.paidContSubText2}>Yesterday's</Text>
-            </View>
-            <View style={styles.paidContSub}>
-              <DonutChart
-                top={"-95%"}
-                left={"25%"}
-                series={[10, 50]}
-                height={55}
-              />
-              <Text style={styles.paidContSubText1}>1:2</Text>
-              <Text style={styles.paidContSubText2}>Last week</Text>
+              <Text style={styles.paidContSubText1}>{`${
+                authCtx.swingAnalysisStats?.totalRisk > 0
+                  ? authCtx.swingAnalysisStats.totalRisk
+                  : 0
+              }:${
+                authCtx.swingAnalysisStats.totalReward > 0
+                  ? authCtx.swingAnalysisStats.totalReward
+                  : 0
+              }`}</Text>
+              <Text style={styles.paidContSubText2}>Overall</Text>
             </View>
             <View style={[styles.paidContSub, { width: 200 }]}>
-              {authCtx.intradayAnalysisLoader || authCtx.freeAnalysisLoader ? (
-                <ActivityIndicator
-                  size="small"
-                  color={Colors.clr4}
-                  style={{ marginTop: "25%" }}
-                />
-              ) : (
-                <View style={styles.lineChartContSub}>
-                  {barChartLabel.length > 0 &&
-                    barChartLabel.map((item, index) => (
-                      <View key={index} style={styles.lineContPaid}>
-                        <Text style={[styles.labelContText, { marginTop: 0 }]}>
-                          {`${barChartValue[index].risk}:${barChartValue[index].reward}`}
-                        </Text>
-                        <View style={styles.lineOutPaid}>
-                          <View
-                            style={[
-                              styles.lineIn,
-                              { height: `${barChartValue[index].reward * 5}%` },
-                            ]}
-                          ></View>
-                        </View>
-                      </View>
-                    ))}
+              <View style={styles.indicatorCont}>
+                <View style={styles.indicatorContSub}>
+                  <View style={styles.indicatorContSubOutlinedCircle}>
+                    <View style={styles.indicatorContSubDot}></View>
+                  </View>
+                  <Text style={[styles.paidContSubText2, { marginTop: 0 }]}>
+                    Breakout
+                  </Text>
                 </View>
-              )}
-              <Text style={styles.paidContSubText2}>Last five days</Text>
+                <View style={styles.indicatorContSub}>
+                  <View style={styles.indicatorContSubOutlinedCircle}>
+                    <View
+                      style={[
+                        styles.indicatorContSubDot,
+                        { backgroundColor: "#FF5F1F" },
+                      ]}
+                    ></View>
+                  </View>
+                  <Text style={[styles.paidContSubText2, { marginTop: 0 }]}>
+                    Trailing
+                  </Text>
+                </View>
+              </View>
+              <MarqueeView style={styles.marquee} autoPlay={true} speed={0.19}>
+                <View
+                  style={{
+                    width: authCtx.allBreakoutAnalyses.length * 50 || 200,
+                    height: "100%",
+                    flexDirection: "row",
+                  }}
+                >
+                  {authCtx.allBreakoutAnalyses.length > 0 ? (
+                    authCtx.allBreakoutAnalyses.map((item, index) => {
+                      return (
+                        <View
+                          style={[
+                            styles.analysisSubBtns,
+                            {
+                              width: "auto",
+                              flexDirection: "row",
+                              paddingHorizontal: 5,
+                              marginRight: 15,
+                            },
+                          ]}
+                          key={item?._id || index}
+                        >
+                          <BlinkingDot value={4} />
+                          <Text
+                            style={[
+                              styles.analysisSubBtnsText,
+                              { marginLeft: 3 },
+                            ]}
+                          >
+                            {item?.analysis?.stockName}
+                          </Text>
+                        </View>
+                      );
+                    })
+                  ) : (
+                    <Text>No Stocks</Text>
+                  )}
+                </View>
+              </MarqueeView>
+              <Text style={styles.paidContSubText2}>Stocks to watch</Text>
             </View>
           </ScrollView>
         </View>
@@ -263,6 +366,10 @@ function DashboardScreen() {
                 <Text style={styles.analysisSubBtnsText}>
                   {analysisData[0]?.analysis?.pattern}
                 </Text>
+              </View>
+
+              <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
+                {analysisData[0].result?.breakout && <BlinkingDot />}
               </View>
             </View>
 
@@ -647,8 +754,8 @@ const styles = StyleSheet.create({
     fontSize: CalculateFontSize(1.6),
     fontWeight: "400",
     position: "absolute",
-    top: "27%",
-    left: "45%",
+    top: "29.5%",
+    left: "43%",
     lineHeight: 19,
     color: Colors.clr4,
   },
@@ -658,6 +765,44 @@ const styles = StyleSheet.create({
     marginTop: "1%",
     lineHeight: 19,
     color: Colors.midWhite,
+  },
+
+  marquee: {
+    color: "#fff",
+    width: "100%",
+    height: 20,
+    marginTop: "3%",
+  },
+
+  indicatorCont: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+
+  indicatorContSub: {
+    width: "50%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  indicatorContSubOutlinedCircle: {
+    width: 13,
+    height: 13,
+    borderRadius: 13 / 2,
+    borderColor: "#666",
+    borderWidth: 1,
+    marginRight: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  indicatorContSubDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 3,
+    backgroundColor: "#00ff0a",
   },
   analysis: {
     width: "95%",

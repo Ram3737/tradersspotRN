@@ -15,6 +15,7 @@ import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import Colors from "../../../components/colors/colors";
 import DonutChart from "../../../components/charts/donutChart";
+import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 
@@ -46,10 +47,12 @@ function AnalysisScreen() {
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
-      `/analysis/getAllIntradayAnalysis?page=100`,
+      `/analysis/getAll${
+        contToDisplay ? "FreeSwing" : "Swing"
+      }AnalysisUser?page=100`,
       (response) => {
         if (response.status === 200) {
-          setAnalysisData(response.data);
+          setAnalysisData(response.data.allSwingAnalyses);
           setIsLoading(false);
         }
       },
@@ -62,13 +65,13 @@ function AnalysisScreen() {
 
   useEffect(() => {
     getAllAnalysis();
-  }, []);
+  }, [contToDisplay]);
 
   function viewResultHandler(index) {
     setViewResult(index);
   }
 
-  const renderItem = ({ item, index }) => (
+  const renderItemPaid = ({ item, index }) => (
     <View key={index} style={styles.analysis}>
       <View style={styles.analysisSub}>
         <View style={styles.analysisSubBtns}>
@@ -81,6 +84,127 @@ function AnalysisScreen() {
           <Text style={styles.analysisSubBtnsText}>
             {item?.analysis?.pattern}
           </Text>
+        </View>
+
+        <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
+          {item.result?.breakout && <BlinkingDot />}
+        </View>
+      </View>
+
+      <LinkPreview
+        enableAnimation={true}
+        containerStyle={{
+          // backgroundColor: "red",
+          width: "95%",
+        }}
+        metadataContainerStyle={{
+          display: "none",
+        }}
+        textContainerStyle={{
+          // backgroundColor: "#fff",
+          marginLeft: 0,
+          marginTop: 0,
+          marginBottom: 11,
+        }}
+        renderText={(text, props) => (
+          <Text
+            {...props}
+            style={{
+              color: Colors.clr4,
+              fontSize: CalculateFontSize(1.5),
+              fontWeight: "400",
+            }}
+          >
+            {text}
+          </Text>
+        )}
+        text={item.analysis.analysisLink}
+      />
+      <View style={styles.viewResultCont}>
+        <TouchableOpacity
+          style={styles.playBtn}
+          onPress={() => viewResultHandler(index)}
+        >
+          <Text style={styles.viewResultText}>View Result</Text>
+        </TouchableOpacity>
+      </View>
+      {viewResult === index &&
+        (item.result.resultLink &&
+        item.result.resultLink !== "none" &&
+        item.result.resultLink !== "sl" ? (
+          <>
+            <Text
+              style={styles.riskRewardText}
+            >{`${item.result.risk}:${item.result.reward} RR`}</Text>
+
+            <LinkPreview
+              enableAnimation={true}
+              containerStyle={{
+                // backgroundColor: "red",
+                width: "95%",
+              }}
+              metadataContainerStyle={{
+                display: "none",
+              }}
+              textContainerStyle={{
+                // backgroundColor: "#fff",
+                marginLeft: 0,
+                marginTop: 8,
+                marginBottom: 11,
+              }}
+              renderText={(text, props) => (
+                <Text
+                  {...props}
+                  style={{
+                    color: Colors.clr4,
+                    fontSize: CalculateFontSize(1.5),
+                    fontWeight: "400",
+                  }}
+                >
+                  {text}
+                </Text>
+              )}
+              text={item.result.resultLink}
+            />
+          </>
+        ) : (
+          <Text
+            style={[
+              styles.riskRewardText,
+              {
+                marginTop: -10,
+                marginLeft: 10,
+                fontSize: CalculateFontSize(1.2),
+              },
+            ]}
+          >
+            {item.result.resultLink == "none"
+              ? "No Result"
+              : item.result.resultLink == "sl"
+              ? "Stoploss hit"
+              : "Not yet updated..."}
+          </Text>
+        ))}
+    </View>
+  );
+
+  const renderItemFree = ({ item, index }) => (
+    <View key={index} style={styles.analysis}>
+      <View style={styles.analysisSub}>
+        <View style={styles.analysisSubBtns}>
+          <Text style={styles.analysisSubBtnsText}>
+            {item?.analysis?.stockName}
+          </Text>
+        </View>
+
+        <View style={[styles.analysisSubBtns, { marginLeft: 8 }]}>
+          <Text style={styles.analysisSubBtnsText}>
+            {item?.analysis?.pattern}
+          </Text>
+        </View>
+
+        <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
+          {item.result?.breakout && <BlinkingDot />}
         </View>
       </View>
 
@@ -197,10 +321,10 @@ function AnalysisScreen() {
                 value={contToDisplay}
                 onValueChange={toggleSwitch}
                 disabled={false}
-                activeText={"intraday"}
-                inActiveText={"swing"}
-                circleSize={19}
-                barHeight={28}
+                activeText={"swing"}
+                inActiveText={"free"}
+                circleSize={17}
+                barHeight={24}
                 // circleBorderWidth={3}
                 backgroundActive={Colors.clr2}
                 backgroundInactive={Colors.clr2}
@@ -217,7 +341,7 @@ function AnalysisScreen() {
                 renderInActiveText={true}
                 switchLeftPx={10} // denominator for logic when sliding to TRUE position. Higher number = more space from RIGHT of the circle to END of the slider
                 switchRightPx={10} // denominator for logic when sliding to FALSE position. Higher number = more space from LEFT of the circle to BEGINNING of the slider
-                switchWidthMultiplier={contToDisplay ? 4.5 : 3.8} // multiplied by the `circleSize` prop to calculate total width of the Switch
+                switchWidthMultiplier={contToDisplay ? 4.2 : 3.8} // multiplied by the `circleSize` prop to calculate total width of the Switch
                 switchBorderRadius={30} // Sets the border Radius of the switch slider. If unset, it remains the circleSize.
               />
             </View>
@@ -310,7 +434,7 @@ function AnalysisScreen() {
         {analysisData.length > 0 && !isLoading && (
           <FlatList
             data={analysisData}
-            renderItem={renderItem}
+            renderItem={contToDisplay ? renderItemFree : renderItemPaid}
             keyExtractor={(item, index) => index.toString()}
             style={styles.analysisScrollContSub}
             inverted={true}

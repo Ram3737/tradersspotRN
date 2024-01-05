@@ -11,10 +11,11 @@ export const AuthContext = createContext({
   triedToUpdate: "",
   registerSignupToggle: "",
   userSelectedCourse: "",
-  intradayAnalysisStats: "",
-  freeAnalysisStats: "",
-  intradayAnalysisLoader: "",
-  freeAnalysisLoader: "",
+  swingAnalysisStats: "",
+  freeSwingAnalysisStats: "",
+  allBreakoutAnalyses: "",
+  swingAnalysisLoader: "",
+  freeSwingAnalysisLoader: "",
   authenticationHandler: () => {},
   setToken: () => {},
   setPaid: () => {},
@@ -37,53 +38,64 @@ function AuthContextProvider({ children }) {
   const [registerSignupToggle, setRegisterSignupToggle] = useState(false);
   const [userSelectedCourse, setUserSelectedCourse] = useState(null);
   const [triedToUpdate, setTriedToUpdate] = useState(false);
-  const [intradayAnalysisStats, setIntradayAnalysisStats] = useState({});
-  const [freeAnalysisStats, setFreeAnalysisStats] = useState({});
-  const [intradayAnalysisLoader, setIntradayAnalysisLoader] = useState(false);
-  const [freeAnalysisLoader, setFreeAnalysisLoader] = useState(false);
+  const [swingAnalysisStats, setSwingAnalysisStats] = useState({});
+  const [freeSwingAnalysisStats, setFreeSwingAnalysisStats] = useState({});
+  const [allBreakoutAnalyses, setAllBreakoutAnalyses] = useState([]);
+  const [swingAnalysisLoader, setSwingAnalysisLoader] = useState(false);
+  const [freeSwingAnalysisLoader, setFreeSwingAnalysisLoader] = useState(false);
 
   function authenticationHandler() {
     setIsAuthenticated(!isAuthenticated);
   }
 
-  function intradayAnalysisStatsFn() {
-    setIntradayAnalysisLoader(true);
+  function swingAnalysisStatsFn() {
+    setSwingAnalysisLoader(true);
     CallGetApiServices(
-      `/analysis/sumRiskRewardIntraday`,
+      `/analysis/sumRiskRewardSwing`,
       (response) => {
         if (response.status === 200) {
-          setIntradayAnalysisStats(response.data);
-          setIntradayAnalysisLoader(false);
+          setSwingAnalysisStats(response.data);
+          setSwingAnalysisLoader(false);
         }
       },
       (err) => {
-        setIntradayAnalysisLoader(false);
+        setSwingAnalysisLoader(false);
         console.log("fetching intraday analysis stats err", err);
       }
     );
   }
 
-  function freeAnalysisStatsFn() {
-    setFreeAnalysisLoader(true);
+  function freeSwingAnalysisStatsFn() {
+    setFreeSwingAnalysisLoader(true);
     CallGetApiServices(
-      `/analysis/sumRiskRewardFree`,
+      `/analysis/sumRiskRewardFreeSwing`,
       (response) => {
         if (response.status === 200) {
-          setFreeAnalysisStats(response.data);
-          setFreeAnalysisLoader(false);
+          setFreeSwingAnalysisStats(response.data);
+          setFreeSwingAnalysisLoader(false);
         }
       },
       (err) => {
-        setFreeAnalysisLoader(false);
+        setFreeSwingAnalysisLoader(false);
         console.log("fetching free analysis stats err", err);
       }
     );
   }
 
   useEffect(() => {
-    intradayAnalysisStatsFn();
-    freeAnalysisStatsFn();
+    swingAnalysisStatsFn();
+    freeSwingAnalysisStatsFn();
   }, []);
+
+  useEffect(() => {
+    if (swingAnalysisStats.onlyBreakoutAnalyses && freeSwingAnalysisStats) {
+      const mergeAllBreakoutAnalyses =
+        swingAnalysisStats.onlyBreakoutAnalyses.concat(
+          freeSwingAnalysisStats.onlyBreakoutAnalyses
+        );
+      setAllBreakoutAnalyses(mergeAllBreakoutAnalyses);
+    }
+  }, [swingAnalysisStats, freeSwingAnalysisStats]);
 
   function logout() {
     setIsAuthenticated(false);
@@ -107,10 +119,11 @@ function AuthContextProvider({ children }) {
     triedToUpdate: triedToUpdate,
     registerSignupToggle: registerSignupToggle,
     userSelectedCourse: userSelectedCourse,
-    intradayAnalysisStats: intradayAnalysisStats,
-    freeAnalysisStats: freeAnalysisStats,
-    intradayAnalysisLoader: intradayAnalysisLoader,
-    freeAnalysisLoader: freeAnalysisLoader,
+    swingAnalysisStats: swingAnalysisStats,
+    freeSwingAnalysisStats: freeSwingAnalysisStats,
+    allBreakoutAnalyses: allBreakoutAnalyses,
+    swingAnalysisLoader: swingAnalysisLoader,
+    freeSwingAnalysisLoader: freeSwingAnalysisLoader,
     setUserEmail: setUserEmail,
     setToken: setToken,
     setPaid: setPaid,
