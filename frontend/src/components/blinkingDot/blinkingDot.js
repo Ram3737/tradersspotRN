@@ -31,7 +31,12 @@ const BlinkingDot = (props) => {
         width: props.value || 6,
         height: props.value || 6,
         borderRadius: 5,
-        backgroundColor: "#00ff0a",
+        backgroundColor:
+          props.color === "green"
+            ? "#00ff0a"
+            : props.color === "orange"
+            ? "#FF5F1F"
+            : "none",
         opacity: opacity,
       }}
     />

@@ -31,6 +31,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
   const [isBreakoutModalVisible, setIsBreakoutModalVisible] = useState(false);
 
   const arr = ["true", "false"];
+  const breakoutOptions = ["green", "orange"];
 
   const openModal = (id) => {
     const analysis = swingAnalysisData.find((item) => item._id === id);
@@ -289,7 +290,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
             </View>
             <View style={[styles.topTwo, { marginTop: "5%" }]}>
               <SelectDropdown
-                data={arr}
+                data={breakoutOptions}
                 onSelect={(selectedItem, index) => {
                   setBreakout(selectedItem || breakout);
                 }}
@@ -318,9 +319,9 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
                 defaultValueByIndex={
                   breakout === null
                     ? "none"
-                    : breakout === false
+                    : breakout === "orange"
                     ? 1
-                    : breakout === true
+                    : breakout === "green"
                     ? 0
                     : "none"
                 }
@@ -400,7 +401,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
               ]}
             >
               <SelectDropdown
-                data={arr}
+                data={breakoutOptions}
                 onSelect={(selectedItem, index) => {
                   setBreakout(selectedItem || breakout);
                 }}
@@ -429,9 +430,9 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
                 defaultValueByIndex={
                   breakout === null
                     ? "none"
-                    : breakout === false
+                    : breakout === "orange"
                     ? 1
-                    : breakout === true
+                    : breakout === "green"
                     ? 0
                     : "none"
                 }

@@ -35,7 +35,7 @@ const resultSchema = new mongoose.Schema(
       required: false,
     },
     breakout: {
-      type: Boolean,
+      type: String,
       required: false,
     },
     canSharetoAll: {

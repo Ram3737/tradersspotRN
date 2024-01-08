@@ -169,9 +169,14 @@ function MainScreen() {
   const authCtx = useContext(AuthContext);
   return (
     <NavigationContainer>
-      {authCtx.isAuthenticated && authCtx.courseType && authCtx.paid ? (
+      {authCtx.isAuthenticated &&
+      authCtx.token &&
+      authCtx.courseType &&
+      authCtx.paid ? (
         <AfterLogin />
-      ) : authCtx.userType === "admin" ? (
+      ) : authCtx.isAuthenticated &&
+        authCtx.token &&
+        authCtx.userType === "admin" ? (
         <AdminLogin />
       ) : (
         <BeforeLogin />

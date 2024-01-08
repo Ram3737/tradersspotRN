@@ -21,9 +21,34 @@ import { AuthContext } from "../../../components/stores/context/authContextProvi
 
 function ResourcesScreen() {
   const authCtx = useContext(AuthContext);
-  const [categories, setCategories] = useState([1, 2, 3, 4, 5, 6]);
   const [btnLoader, setBtnLoader] = useState(false);
   const [register, setRegister] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(0);
+  const [selectedBookLink, setSelectedBookLink] = useState(
+    "download-trading-in-the-zone-pdf"
+  );
+  const bookData = [
+    {
+      name: "Trading in the zone",
+      author: "Mark Douglas",
+      link: "/download-trading-in-the-zone-pdf",
+    },
+    {
+      name: "Day trade for living",
+      author: "Andrew Aziz",
+      link: "download-day-trade-for-a-living-pdf",
+    },
+    {
+      name: "The candlestick",
+      author: "Steve Nison",
+      link: "download-ultimate-candlesticks-pdf",
+    },
+    {
+      name: "Trading guide",
+      author: "Ashwin-Sriram",
+      link: "download-trading-guide-pdf",
+    },
+  ];
 
   useEffect(() => {
     if (register) {
@@ -33,13 +58,18 @@ function ResourcesScreen() {
     }
   }, [register]);
 
+  const bookHandler = (index, link) => {
+    setSelectedBook(index);
+    setSelectedBookLink(link);
+  };
+
   const downloadPdf = async () => {
-    if (!authCtx.isAuthenticated) {
+    if (!authCtx.token) {
       setRegister(true);
       return;
     }
     setBtnLoader(true);
-    const url = `${config.apiurl}/book/downloadPdf`;
+    const url = `${config.apiurl}/book/${selectedBookLink}`;
     Linking.openURL(url);
     // const url = "http://192.168.1.8:3000/api/book/downloadPdf";
     // const fileUri = FileSystem.documentDirectory + "Trading-guide.pdf";
@@ -69,45 +99,75 @@ function ResourcesScreen() {
         visible={register}
         message="please register for free to download"
       />
+
       <View style={styles.mainBookCont}>
-        <Image
-          source={require("../../../images/pictures/ebook.png")}
-          style={styles.bookImg}
-        />
-        <ButtonComponent
-          style={{ height: "13%", alignSelf: "center" }}
-          indicator={btnLoader}
-          text={"download"}
-          handler={downloadPdf}
-        />
+        <View style={styles.mainBookContLeft}>
+          {selectedBook === 0 ? (
+            <Image
+              source={require("../../../images/pictures/bookCover0.png")}
+              style={styles.bookImg}
+            />
+          ) : selectedBook === 1 ? (
+            <Image
+              source={require("../../../images/pictures/bookCover1.png")}
+              style={styles.bookImg}
+            />
+          ) : selectedBook === 2 ? (
+            <Image
+              source={require("../../../images/pictures/bookCover2.png")}
+              style={styles.bookImg}
+            />
+          ) : selectedBook === 3 ? (
+            <Image
+              source={require("../../../images/pictures/bookCover3.png")}
+              style={styles.bookImg}
+            />
+          ) : (
+            ""
+          )}
+          <ButtonComponent
+            style={{
+              height: "auto",
+              alignSelf: "center",
+              justifyContent: "center",
+              marginTop: "10%",
+              paddingHorizontal: 15,
+              paddingVertical: 6,
+            }}
+            indicator={btnLoader}
+            text={"download"}
+            handler={downloadPdf}
+          />
+        </View>
+        <View style={{ width: "50%", paddingVertical: 10 }}>
+          {/* <Text style={styles.contentHeadingText}>Resources</Text> */}
+          <ScrollView style={styles.contentSubCont}>
+            {bookData.map((book, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.contents,
+                  {
+                    backgroundColor:
+                      selectedBook === index ? "#333" : Colors.clr2,
+                  },
+                ]}
+                onPress={() => {
+                  bookHandler(index, book.link);
+                }}
+              >
+                <View style={styles.contentsCenter}>
+                  <Text style={styles.contentsCenterText1}>{book.name}</Text>
+                  <Text style={styles.contentsCenterText2}>{book.author}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </View>
 
       <View style={styles.contentCont}>
         <Text style={styles.contentHeadingText}>Resources</Text>
-        <ScrollView style={styles.contentSubCont}>
-          {categories.map((category, index) => (
-            <View
-              key={index}
-              style={[
-                styles.contents,
-                {
-                  backgroundColor:
-                    index === 0 ? Colors.transparentBg : Colors.clr2,
-                },
-              ]}
-            >
-              <View style={styles.contentsLeft}>
-                <Text style={styles.contentsLeftText}>1</Text>
-              </View>
-              <View style={styles.contentsCenter}>
-                <Text style={styles.contentsCenterText1}>
-                  Trading in the zone
-                </Text>
-                <Text style={styles.contentsCenterText2}>Mark Douglas</Text>
-              </View>
-            </View>
-          ))}
-        </ScrollView>
       </View>
     </View>
   );
@@ -117,20 +177,24 @@ export default ResourcesScreen;
 
 const styles = StyleSheet.create({
   mainBookCont: {
-    height: 300,
+    height: 330,
     width: "95%",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     borderRadius: 10,
     borderWidth: 0.5,
     borderColor: Colors.clr3,
     backgroundColor: Colors.transparentBg,
   },
+  mainBookContLeft: {
+    height: "100%",
+    width: "50%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   bookImg: {
-    width: "70%",
-    height: "95%",
-    marginLeft: "-13%",
-    marginTop: "3.5%",
+    width: "80%",
+    height: "70%",
   },
 
   contentCont: {
@@ -141,7 +205,8 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   contentHeadingText: {
-    fontSize: calculateFontSize(3),
+    alignSelf: "center",
+    fontSize: calculateFontSize(2.2),
     fontWeight: "500",
     color: Colors.clr4,
     paddingLeft: 10,
@@ -177,7 +242,7 @@ const styles = StyleSheet.create({
   },
 
   contentsLeftText: {
-    fontSize: calculateFontSize(2.2),
+    fontSize: calculateFontSize(2),
     fontWeight: "300",
     color: "#fff",
   },
@@ -190,7 +255,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "cyan",
   },
   contentsCenterText1: {
-    fontSize: calculateFontSize(2),
+    fontSize: calculateFontSize(1.8),
     fontWeight: "400",
     color: "#fff",
     marginBottom: 5,

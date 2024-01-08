@@ -28,6 +28,7 @@ function AnalysisScreen() {
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
   const [analysisData, setAnalysisData] = useState([]);
+  const [totalSwingAnalysis, setTotalSwingAnalysis] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleSwitch = () => {
@@ -53,6 +54,7 @@ function AnalysisScreen() {
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data.allSwingAnalyses);
+          setTotalSwingAnalysis(response.data.totalSwingAnalysis);
           setIsLoading(false);
         }
       },
@@ -87,7 +89,9 @@ function AnalysisScreen() {
         </View>
 
         <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
-          {item.result?.breakout && <BlinkingDot />}
+          {item.result?.breakout && (
+            <BlinkingDot color={item.result.breakout} />
+          )}
         </View>
       </View>
 
@@ -204,7 +208,9 @@ function AnalysisScreen() {
         </View>
 
         <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
-          {item.result?.breakout && <BlinkingDot />}
+          {item.result?.breakout && (
+            <BlinkingDot color={item.result.breakout} />
+          )}
         </View>
       </View>
 
@@ -346,81 +352,101 @@ function AnalysisScreen() {
               />
             </View>
           </View>
-          <View style={styles.topContSubBottom}>
-            {authCtx.intradayAnalysisStats && (
-              <DonutChart
-                top={"35%"}
-                left={"26%"}
-                marginTop={"8%"}
-                series={[
-                  authCtx.intradayAnalysisStats.totalRisk || 10,
-                  authCtx.intradayAnalysisStats.totalReward || 50,
-                ]}
-              />
-            )}
-            <View style={styles.topContSubBottomSub}>
-              {authCtx.intradayAnalysisLoader ? (
-                <ActivityIndicator
-                  size="small"
-                  color={Colors.clr4}
-                  style={{ marginTop: "25%" }}
+          {analysisData.length > 0 ? (
+            <View style={styles.topContSubBottom}>
+              {authCtx.swingAnalysisStats && (
+                <DonutChart
+                  top={"35%"}
+                  left={"26%"}
+                  marginTop={"8%"}
+                  series={[
+                    contToDisplay
+                      ? authCtx.freeSwingAnalysisStats?.totalRiskLastFiveMonth >
+                        0
+                        ? authCtx.freeSwingAnalysisStats.totalRiskLastFiveMonth
+                        : 10
+                      : (authCtx.swingAnalysisStats.totalRiskLastFiveMonth > 0
+                          ? authCtx.swingAnalysisStats.totalRiskLastFiveMonth
+                          : 10) || 10,
+                    contToDisplay
+                      ? authCtx.freeSwingAnalysisStats
+                          .totalRewardLastFiveMonth > 0
+                        ? authCtx.freeSwingAnalysisStats
+                            .totalRewardLastFiveMonth
+                        : 50
+                      : (authCtx.swingAnalysisStats.totalRewardLastFiveMonth > 0
+                          ? authCtx.swingAnalysisStats.totalRewardLastFiveMonth
+                          : 30) || 50,
+                  ]}
                 />
-              ) : (
-                <>
-                  <Text style={styles.topContSubBottomSubText1}>
-                    Total analysis shared:
-                  </Text>
-                  <Text style={styles.topContSubBottomSubText2}>
-                    {authCtx.intradayAnalysisStats.totalIntradayAnalysisCount ||
-                      0}
-                  </Text>
-                  <View style={styles.riskRewardStatMainCont}>
-                    {authCtx.intradayAnalysisStats && (
-                      <ScrollView
-                        style={{
-                          width: "100%",
-                        }}
-                        horizontal={true}
-                      >
-                        <View style={styles.riskRewardStatCont}>
-                          <Text style={styles.rrContSubBottomSubText1}>
-                            Today
-                          </Text>
-                          <Text
-                            style={styles.rrContSubBottomSubText2}
-                          >{`${authCtx.intradayAnalysisStats.totalRiskToday}:${authCtx.intradayAnalysisStats.totalRewardToday}`}</Text>
-                        </View>
-                        <View style={styles.riskRewardStatCont}>
-                          <Text style={styles.rrContSubBottomSubText1}>
-                            Yesterday
-                          </Text>
-                          <Text
-                            style={styles.rrContSubBottomSubText2}
-                          >{`${authCtx.intradayAnalysisStats.totalRiskYesterday}:${authCtx.intradayAnalysisStats.totalRewardYesterday}`}</Text>
-                        </View>
-                        <View style={styles.riskRewardStatCont}>
-                          <Text style={styles.rrContSubBottomSubText1}>
-                            This Week
-                          </Text>
-                          <Text
-                            style={styles.rrContSubBottomSubText2}
-                          >{`${authCtx.intradayAnalysisStats.totalRiskThisWeek}:${authCtx.intradayAnalysisStats.totalRewardThisWeek}`}</Text>
-                        </View>
-                        <View style={styles.riskRewardStatCont}>
-                          <Text style={styles.rrContSubBottomSubText1}>
-                            Last Month
-                          </Text>
-                          <Text
-                            style={styles.rrContSubBottomSubText2}
-                          >{`${authCtx.intradayAnalysisStats.totalRiskLastMonth}:${authCtx.intradayAnalysisStats.totalRewardLastMonth}`}</Text>
-                        </View>
-                      </ScrollView>
-                    )}
-                  </View>
-                </>
               )}
+              <View style={styles.topContSubBottomSub}>
+                {authCtx.intradayAnalysisLoader ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={Colors.clr4}
+                    style={{ marginTop: "25%" }}
+                  />
+                ) : (
+                  <>
+                    <Text style={styles.topContSubBottomSubText1}>
+                      Total analysis shared:
+                    </Text>
+                    <Text style={styles.topContSubBottomSubText2}>
+                      {totalSwingAnalysis || 0}
+                    </Text>
+                    <View style={styles.riskRewardStatMainCont}>
+                      {authCtx.intradayAnalysisStats && (
+                        <ScrollView
+                          style={{
+                            width: "100%",
+                          }}
+                          horizontal={true}
+                        >
+                          <View style={styles.riskRewardStatCont}>
+                            <Text style={styles.rrContSubBottomSubText1}>
+                              Today
+                            </Text>
+                            <Text
+                              style={styles.rrContSubBottomSubText2}
+                            >{`${authCtx.intradayAnalysisStats.totalRiskToday}:${authCtx.intradayAnalysisStats.totalRewardToday}`}</Text>
+                          </View>
+                          <View style={styles.riskRewardStatCont}>
+                            <Text style={styles.rrContSubBottomSubText1}>
+                              Yesterday
+                            </Text>
+                            <Text
+                              style={styles.rrContSubBottomSubText2}
+                            >{`${authCtx.intradayAnalysisStats.totalRiskYesterday}:${authCtx.intradayAnalysisStats.totalRewardYesterday}`}</Text>
+                          </View>
+                          <View style={styles.riskRewardStatCont}>
+                            <Text style={styles.rrContSubBottomSubText1}>
+                              This Week
+                            </Text>
+                            <Text
+                              style={styles.rrContSubBottomSubText2}
+                            >{`${authCtx.intradayAnalysisStats.totalRiskThisWeek}:${authCtx.intradayAnalysisStats.totalRewardThisWeek}`}</Text>
+                          </View>
+                          <View style={styles.riskRewardStatCont}>
+                            <Text style={styles.rrContSubBottomSubText1}>
+                              Last Month
+                            </Text>
+                            <Text
+                              style={styles.rrContSubBottomSubText2}
+                            >{`${authCtx.intradayAnalysisStats.totalRiskLastMonth}:${authCtx.intradayAnalysisStats.totalRewardLastMonth}`}</Text>
+                          </View>
+                        </ScrollView>
+                      )}
+                    </View>
+                  </>
+                )}
+              </View>
             </View>
-          </View>
+          ) : (
+            <View>
+              <Text style={styles.topContSubBottomSubText1}> No data</Text>
+            </View>
+          )}
         </View>
       </View>
       <View style={styles.analysisScrollCont}>
@@ -431,7 +457,7 @@ function AnalysisScreen() {
             style={{ marginTop: "60%" }}
           />
         )}
-        {analysisData.length > 0 && !isLoading && (
+        {analysisData.length > 0 && !isLoading ? (
           <FlatList
             data={analysisData}
             renderItem={contToDisplay ? renderItemFree : renderItemPaid}
@@ -439,6 +465,17 @@ function AnalysisScreen() {
             style={styles.analysisScrollContSub}
             inverted={true}
           />
+        ) : (
+          <View>
+            <Text
+              style={[
+                styles.topContSubBottomSubText1,
+                { marginTop: "50%", alignSelf: "center" },
+              ]}
+            >
+              No data
+            </Text>
+          </View>
         )}
         {/* <ScrollView
           ref={scrollViewRef}

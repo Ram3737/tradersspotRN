@@ -128,9 +128,9 @@ const sumRiskRewardFreeSwing = async (req, res) => {
     const totalSwingAnalysisCount =
       await FreeSwingAnalysisResult.countDocuments();
 
-    if (!allFreeSwingAnalyses || allFreeSwingAnalyses.length === 0) {
-      throw new Error("No analyses found to calculate sum");
-    }
+    // if (!allFreeSwingAnalyses || allFreeSwingAnalyses.length === 0) {
+    //   throw new Error("No analyses found to calculate sum");
+    // }
 
     const onlyBreakoutAnalyses = allFreeSwingAnalyses.filter(
       (analysis) => analysis.result.breakout !== null

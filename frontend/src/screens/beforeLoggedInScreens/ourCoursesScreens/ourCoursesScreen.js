@@ -126,7 +126,7 @@ function OurCoursesScreen() {
 
   function buyNowHandler(course) {
     authCtx.setUserSelectedCourse(course);
-    if (authCtx.isAuthenticated && !authCtx.paid) {
+    if (authCtx.token && !authCtx.paid) {
       console.log(1);
 
       CallPatchApiServices(
@@ -146,7 +146,7 @@ function OurCoursesScreen() {
           console.log("payerr", error.message);
         }
       );
-    } else if (authCtx.isAuthenticated && authCtx.paid) {
+    } else if (authCtx.token && authCtx.paid) {
       console.log(2);
 
       CallPatchApiServices(

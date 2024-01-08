@@ -5,6 +5,7 @@ import {
   ImageBackground,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
   StyleSheet,
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
@@ -69,12 +70,21 @@ function DashboardScreen() {
       >
         <View style={styles.headerCont}>
           <Text style={styles.headerText}>Hi there,</Text>
-          <ButtonComponent
-            text={"Login/Signup"}
-            style={{ paddingVertical: 5, paddingHorizontal: 5 }}
-            fontStyle={{ fontSize: CalculateFontSize(1.8) }}
-            handler={loginrSignupHandler}
-          />
+          {authCtx.token ? (
+            <View style={styles.userAvatar}>
+              <Image
+                source={require("../../../images/icons/userAvatar.png")}
+                style={{ width: 55, height: 55 }}
+              />
+            </View>
+          ) : (
+            <ButtonComponent
+              text={"Login/Signup"}
+              style={{ paddingVertical: 5, paddingHorizontal: 5 }}
+              fontStyle={{ fontSize: CalculateFontSize(1.8) }}
+              handler={loginrSignupHandler}
+            />
+          )}
         </View>
         <Text style={styles.headingText}>
           Risk Reward stats - Free analysis
@@ -90,19 +100,37 @@ function DashboardScreen() {
               >
                 Overall Stats
               </Text>
-              <DonutChart
-                top={"34%"}
-                left={"25%"}
-                series={[
-                  authCtx.freeSwingAnalysisStats?.totalRisk > 0
-                    ? authCtx.freeSwingAnalysisStats.totalRisk
-                    : 10,
-                  authCtx.freeSwingAnalysisStats.totalReward > 0
-                    ? authCtx.freeSwingAnalysisStats.totalReward
-                    : 50,
-                ]}
-                height={102}
-              />
+              {analysisData.length > 0 ? (
+                <DonutChart
+                  top={"34%"}
+                  left={"25%"}
+                  series={[
+                    authCtx.freeSwingAnalysisStats?.totalRisk > 0
+                      ? authCtx.freeSwingAnalysisStats.totalRisk
+                      : 10,
+                    authCtx.freeSwingAnalysisStats.totalReward > 0
+                      ? authCtx.freeSwingAnalysisStats.totalReward
+                      : 50,
+                  ]}
+                  height={102}
+                />
+              ) : (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: CalculateFontSize(1.8),
+                        marginTop: "50%",
+                        marginBottom: "20%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
             </View>
             <View style={styles.freeAnalysisContTopRight}>
               <View style={styles.freeAnalysisContTopRightTop}>
@@ -229,7 +257,7 @@ function DashboardScreen() {
                 <Text style={styles.rrText1}>
                   {authCtx.freeSwingAnalysisStats?.totalRisk
                     ? authCtx.freeSwingAnalysisStats?.totalRisk * 1000
-                    : 2000}
+                    : 0}
                 </Text>
               </View>
               <Text style={styles.rrText}>and the Reward is</Text>
@@ -237,7 +265,7 @@ function DashboardScreen() {
                 <Text style={[styles.rrText1, { color: "#00563b" }]}>
                   {authCtx.freeSwingAnalysisStats?.totalReward
                     ? authCtx.freeSwingAnalysisStats?.totalReward * 1000
-                    : 8000}
+                    : 0}
                 </Text>
               </View>
             </View>
@@ -252,39 +280,52 @@ function DashboardScreen() {
         <View style={styles.paidCont}>
           <ScrollView horizontal={true}>
             <View style={styles.paidContSub}>
-              {/*           <GaugeChart
-                id="gauge-chart5"
-                nrOfLevels={420}
-                arcsLength={[0.3, 0.5, 0.2]}
-                colors={["#5BE12C", "#F5CD19", "#EA4228"]}
-                percent={0.37}
-                arcPadding={0.02}
-              /> */}
-              <DonutChart
-                top={"-95%"}
-                left={"25%"}
-                series={[
-                  authCtx.swingAnalysisStats?.totalRisk > 0
-                    ? authCtx.swingAnalysisStats.totalRisk
-                    : 10,
-                  authCtx.swingAnalysisStats.totalReward > 0
-                    ? authCtx.swingAnalysisStats.totalReward
-                    : 50,
-                ]}
-                height={55}
-              />
-              <Text style={styles.paidContSubText1}>{`${
-                authCtx.swingAnalysisStats?.totalRisk > 0
-                  ? authCtx.swingAnalysisStats.totalRisk
-                  : 0
-              }:${
-                authCtx.swingAnalysisStats.totalReward > 0
-                  ? authCtx.swingAnalysisStats.totalReward
-                  : 0
-              }`}</Text>
+              {authCtx.swingAnalysisStats?.totalRisk > 0 ? (
+                <>
+                  <DonutChart
+                    top={"-95%"}
+                    left={"25%"}
+                    series={[
+                      authCtx.swingAnalysisStats?.totalRisk > 0
+                        ? authCtx.swingAnalysisStats.totalRisk
+                        : 10,
+                      authCtx.swingAnalysisStats.totalReward > 0
+                        ? authCtx.swingAnalysisStats.totalReward
+                        : 50,
+                    ]}
+                    height={55}
+                  />
+
+                  <Text style={styles.paidContSubText1}>{`${
+                    authCtx.swingAnalysisStats?.totalRisk > 0
+                      ? authCtx.swingAnalysisStats.totalRisk
+                      : 0
+                  }:${
+                    authCtx.swingAnalysisStats.totalReward > 0
+                      ? authCtx.swingAnalysisStats.totalReward
+                      : 0
+                  }`}</Text>
+                </>
+              ) : (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: CalculateFontSize(1.5),
+                        marginTop: "20%",
+                        marginBottom: "20%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
               <Text style={styles.paidContSubText2}>Overall</Text>
             </View>
-            <View style={[styles.paidContSub, { width: 200 }]}>
+            <View style={[styles.paidContSub, { width: 205 }]}>
               <View style={styles.indicatorCont}>
                 <View style={styles.indicatorContSub}>
                   <View style={styles.indicatorContSubOutlinedCircle}>
@@ -331,7 +372,10 @@ function DashboardScreen() {
                           ]}
                           key={item?._id || index}
                         >
-                          <BlinkingDot value={4} />
+                          <BlinkingDot
+                            value={4}
+                            color={item?.result?.breakout}
+                          />
                           <Text
                             style={[
                               styles.analysisSubBtnsText,
@@ -344,7 +388,17 @@ function DashboardScreen() {
                       );
                     })
                   ) : (
-                    <Text>No Stocks</Text>
+                    <Text
+                      style={[
+                        styles.labelContText,
+                        {
+                          fontSize: CalculateFontSize(1.5),
+                          alignSelf: "center",
+                        },
+                      ]}
+                    >
+                      No data
+                    </Text>
                   )}
                 </View>
               </MarqueeView>
@@ -353,7 +407,7 @@ function DashboardScreen() {
           </ScrollView>
         </View>
         <Text style={styles.headingTextPaidAndFree}>Today's Free analysis</Text>
-        {analysisData.length > 0 && (
+        {analysisData.length > 0 && !isLoading ? (
           <View style={styles.analysis}>
             <View style={styles.analysisSub}>
               <View style={styles.analysisSubBtns}>
@@ -369,7 +423,9 @@ function DashboardScreen() {
               </View>
 
               <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
-                {analysisData[0].result?.breakout && <BlinkingDot />}
+                {analysisData[0].result?.breakout && (
+                  <BlinkingDot color={analysisData[0].result?.breakout} />
+                )}
               </View>
             </View>
 
@@ -468,6 +524,22 @@ function DashboardScreen() {
                 </Text>
               ))}
           </View>
+        ) : (
+          <View>
+            <Text
+              style={[
+                styles.labelContText,
+                {
+                  fontSize: CalculateFontSize(1.5),
+                  marginTop: "10%",
+                  marginBottom: "20%",
+                  alignSelf: "center",
+                },
+              ]}
+            >
+              No data
+            </Text>
+          </View>
         )}
       </View>
       {/* <Text style={{ color: "#fff" }}>dashboard Screen screen</Text>
@@ -514,6 +586,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: "5.5%",
     color: Colors.midWhite,
+  },
+
+  userAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 40 / 2,
+    borderColor: Colors.transparentBg,
+    borderWidth: 1,
+    marginRight: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.transparentBg,
   },
   freeAnalysisCont: {
     width: "90%",
@@ -738,6 +822,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 5,
     marginBottom: 25,
+    marginTop: 3.2,
   },
   paidContSub: {
     height: "100%",
