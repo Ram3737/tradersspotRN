@@ -14,7 +14,14 @@ import { useState } from "react";
 import Colors from "../../../../components/colors/colors";
 import CalculateFontSize from "../../../../components/calculateFontSize/calculateFontSize";
 
-function VideoModal({ toggleModal, isModalVisible }) {
+function VideoModal({
+  content,
+  modalVideoContent,
+  selectedContent,
+  modalVideoHandler,
+  closeModal,
+  isModalVisible,
+}) {
   const [tab, setTab] = useState("contents");
   const [categories, setCategories] = useState([1, 2, 3]);
   return (
@@ -23,19 +30,19 @@ function VideoModal({ toggleModal, isModalVisible }) {
       transparent={true}
       visible={isModalVisible}
       onRequestClose={() => {
-        toggleModal();
+        closeModal();
       }}
     >
       <View style={styles.modalContainer}>
         <View style={styles.topBtnCont}>
-          <TouchableOpacity style={styles.topBtn} onPress={toggleModal}>
+          <TouchableOpacity style={styles.topBtn} onPress={closeModal}>
             <Text style={styles.topBtnText}>Back</Text>
           </TouchableOpacity>
 
           <View style={styles.videoCont}>
             <WebView
               source={{
-                html: '<iframe src="https://player.vimeo.com/video/887369863?badge=0&amp;autopause=0&amp;quality_selector=1&amp;player_id=0&amp;app_id=58479" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" title="stocktrading.mp4"></iframe>',
+                html: `${modalVideoContent?.link}`,
               }}
               allowsFullscreenVideo={true}
               style={styles.webV}
@@ -90,64 +97,55 @@ function VideoModal({ toggleModal, isModalVisible }) {
 
               <View style={styles.contentHeading}>
                 <Text style={styles.contentHeadingText}>
-                  What is stock trading ?
+                  {modalVideoContent?.name}
                 </Text>
               </View>
 
               <ScrollView style={styles.descriptionContent}>
                 <Text style={styles.descriptionContentText}>
-                  Stock trading in India refers to the buying and selling of
-                  shares or stocks of publicly listed companies on stock
-                  exchanges such as the National Stock Exchange (NSE) and the
-                  Bombay Stock Exchange (BSE). It is a way for investors to
-                  participate in the financial markets, potentially earn
-                  returns, and become partial owners of the companies whose
-                  stocks they hold.
+                  {modalVideoContent?.pointOne}
                 </Text>
 
                 <Text style={styles.descriptionContentText}>
-                  The two main stock exchanges in India are the National Stock
-                  Exchange (NSE) and the Bombay Stock Exchange (BSE). These
-                  exchanges provide a platform for buyers and sellers to trade
-                  stocks.
+                  {modalVideoContent?.pointTwo}
                 </Text>
 
                 <Text style={styles.descriptionContentText}>
-                  Companies that wish to raise capital from the public can get
-                  their shares listed on stock exchanges. These listed companies
-                  then issue shares that investors can buy and sell on the open
-                  market.
-                </Text>
-
-                <Text style={styles.descriptionContentText}>
-                  To trade stocks, investors typically use the services of
-                  stockbrokers. These can be traditional brokerage firms or
-                  online discount brokers. Investors place buy or sell orders
-                  through their chosen broker, who then executes the trade on
-                  their behalf. Investors need to open a Demat (Dematerialized)
-                  account and a trading account to participate in stock trading.
-                  The Demat account holds the electronic form of the shares,
-                  while the trading account facilitates the buying and selling
-                  of stocks.
+                  {modalVideoContent?.pointThree}
                 </Text>
               </ScrollView>
 
               <ScrollView style={styles.contentSubCont}>
-                {categories.map((category, index) => (
-                  <View key={index} style={styles.contents}>
+                {content.map((content, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.contents,
+                      {
+                        backgroundColor:
+                          selectedContent === index ? "#222" : Colors.clr5,
+                      },
+                    ]}
+                  >
                     <View style={styles.contentsLeft}>
-                      <Text style={styles.contentsLeftText}>1</Text>
+                      <Text style={styles.contentsLeftText}>{index + 1}</Text>
                     </View>
                     <View style={styles.contentsCenter}>
-                      <Text style={styles.contentsCenterText1}>
-                        What is stock market ?
+                      <Text
+                        style={styles.contentsCenterText1}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {content.name}
                       </Text>
-                      <Text style={styles.contentsCenterText2}>1hr:30mins</Text>
+                      <Text style={styles.contentsCenterText2}>
+                        {content.duration}
+                      </Text>
                     </View>
                     <View style={styles.contentsRight}>
                       <TouchableOpacity
                         style={styles.playBtn}
-                        onPress={toggleModal}
+                        onPress={() => modalVideoHandler(content, index)}
                       >
                         <Image
                           source={require("../../../../images/icons/play.png")}

@@ -60,7 +60,7 @@ function AnalysisScreen() {
       },
       (err) => {
         setIsLoading(false);
-        console.log("err getting getallanalysis", err);
+        console.log("err getting analysis screnn", err);
       }
     );
   }

@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 
 import WebView from "react-native-webview";
 
@@ -17,6 +17,7 @@ import CommonStyles from "../../../components/css/commonStyles";
 import Colors from "../../../components/colors/colors";
 import VideoModal from "./components/videoModal";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
+import { CallGetApiServices } from "../../../webServices/apiCalls";
 
 //FOR FONT RESPONSIVE HEIGHT
 const { height } = Dimensions.get("window");
@@ -29,12 +30,45 @@ function MyCoursesScreen() {
   const navigation = useNavigation();
   const authCtx = useContext(AuthContext);
 
-  const [categories, setCategories] = useState([1, 2, 3]);
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
+  const [mainTopics, setMainTopics] = useState([
+    {
+      name: "BASICS",
+      duration: `15:29 mins`,
+      link: "basicsContent",
+    },
+    {
+      name: "CORE",
+      duration: `15:29 mins`,
+      link: "coreContent",
+    },
+    // {
+    //   name: "INDICATORS",
+    //   duration: `15:29 mins`,
+    //   link: "indicatorsContent",
+    // },
+    // {
+    //   name: "PATTERNS",
+    //   duration: `15:29 mins`,
+    //   link: "patternsContent",
+    // },
+    // {
+    //   name: "STARTEGIES",
+    //   duration: `15:29 mins`,
+    //   link: "startegiesContent",
+    // },
+    // {
+    //   name: "RISK MANAGEMENT",
+    //   duration: `15:29 mins`,
+    //   link: "riskContent",
+    // },
+  ]);
+
+  const [allContent, setAllContent] = useState();
+  const [content, setContent] = useState([]);
+  const [modalVideoContent, setModalVideoContent] = useState(null);
+  const [selectedContent, setSelectedContent] = useState(0);
 
   const tradingViewWidget = `
   <div class="tradingview-widget-container" >
@@ -73,6 +107,46 @@ function MyCoursesScreen() {
     </script>
   </div>
 `;
+
+  useEffect(() => {
+    CallGetApiServices(
+      `/course/getCourseContent`,
+      (response) => {
+        if (response.status === 200) {
+          setAllContent(response.data);
+          setContent(response.data.basicsContent);
+        }
+      },
+      (err) => {
+        console.log("err getting allCourseContents", err);
+      }
+    );
+  }, []);
+
+  function modalVideoHandler(content, selectedContent) {
+    setModalVideoContent(content);
+    setSelectedContent(selectedContent);
+  }
+
+  const toggleModal = (content, selectedContent) => {
+    setModalVisible(!isModalVisible);
+    setModalVideoContent(content);
+    setSelectedContent(selectedContent);
+  };
+
+  const closeModal = () => {
+    setModalVideoContent(null);
+    setModalVisible(!isModalVisible);
+    setSelectedContent(selectedContent);
+  };
+
+  function logout() {
+    authCtx.logout();
+
+    setTimeout(() => {
+      navigation.navigate("beforeLoggedIn");
+    }, 200);
+  }
 
   return (
     <View
@@ -163,7 +237,7 @@ function MyCoursesScreen() {
       <View style={styles.categoryCont}>
         <Text style={styles.categoryHeadingText}>Categories</Text>
         <ScrollView style={styles.categorySubCont} horizontal={true}>
-          {categories.map((category, index) => (
+          {mainTopics.map((topic, index) => (
             <ImageBackground
               key={index}
               style={styles.categories}
@@ -171,24 +245,23 @@ function MyCoursesScreen() {
               imageStyle={styles.categoriesPic}
             >
               <View style={styles.categoriesTop}>
-                <Text style={styles.categoriesTopText}>Discuss</Text>
+                <Text style={styles.categoriesTopText}>{topic.name}</Text>
               </View>
               <View style={styles.categoriesBottom}>
                 <View style={styles.categoriesBottomLeft}>
                   <Text style={styles.categoriesBottomText1}>Total Hours</Text>
                 </View>
                 <View style={styles.categoriesBottomCenter}>
-                  <Text style={styles.categoriesBottomText2}>1hr 20mins</Text>
+                  <Text style={styles.categoriesBottomText2}>
+                    {topic.duration}
+                  </Text>
                 </View>
                 <View style={styles.categoriesBottomRight}>
                   <TouchableOpacity
                     style={styles.viewBtn}
                     onPress={() => {
-                      authCtx.logout();
-
-                      setTimeout(() => {
-                        navigation.navigate("beforeLoggedIn");
-                      }, 200);
+                      setContent(allContent?.[topic.link] || []);
+                      setSelectedContent(0);
                     }}
                   >
                     <Text style={styles.viewBtnText}>view</Text>
@@ -203,31 +276,60 @@ function MyCoursesScreen() {
       <View style={styles.contentCont}>
         <Text style={styles.contentHeadingText}>Contents</Text>
         <ScrollView style={styles.contentSubCont}>
-          {categories.map((category, index) => (
-            <View key={index} style={styles.contents}>
-              <View style={styles.contentsLeft}>
-                <Text style={styles.contentsLeftText}>1</Text>
+          {content.length > 0 ? (
+            content.map((content, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.contents,
+                  {
+                    backgroundColor:
+                      selectedContent === index ? "#222" : Colors.clr2,
+                  },
+                ]}
+              >
+                <View style={styles.contentsLeft}>
+                  <Text style={styles.contentsLeftText}>{index + 1}</Text>
+                </View>
+                <View style={styles.contentsCenter}>
+                  <Text
+                    style={styles.contentsCenterText1}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {content.name}
+                  </Text>
+                  <Text style={styles.contentsCenterText2}>
+                    {content.duration}
+                  </Text>
+                </View>
+                <View style={styles.contentsRight}>
+                  <TouchableOpacity
+                    style={styles.playBtn}
+                    onPress={() => toggleModal(content, index)}
+                  >
+                    <Image
+                      source={require("../../../images/icons/play.png")}
+                      style={styles.playBtnImg}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.contentsCenter}>
-                <Text style={styles.contentsCenterText1}>
-                  What is stock market ?
-                </Text>
-                <Text style={styles.contentsCenterText2}>1hr:30mins</Text>
-              </View>
-              <View style={styles.contentsRight}>
-                <TouchableOpacity style={styles.playBtn} onPress={toggleModal}>
-                  <Image
-                    source={require("../../../images/icons/play.png")}
-                    style={styles.playBtnImg}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+            ))
+          ) : (
+            <Text>No data</Text>
+          )}
         </ScrollView>
       </View>
 
-      <VideoModal toggleModal={toggleModal} isModalVisible={isModalVisible} />
+      <VideoModal
+        content={content}
+        modalVideoContent={modalVideoContent}
+        selectedContent={selectedContent}
+        modalVideoHandler={modalVideoHandler}
+        closeModal={closeModal}
+        isModalVisible={isModalVisible}
+      />
     </View>
   );
 }
