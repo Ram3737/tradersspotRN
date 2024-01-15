@@ -110,7 +110,7 @@ function AdminAnalysisScreen() {
           risk: null,
           reward: null,
           percentage: null,
-          breakout: null,
+          breakout: "none",
           canSharetoAll: null,
           resultLink: null,
         },

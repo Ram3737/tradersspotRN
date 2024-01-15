@@ -43,11 +43,11 @@ function MyCoursesScreen() {
       duration: `15:29 mins`,
       link: "coreContent",
     },
-    // {
-    //   name: "INDICATORS",
-    //   duration: `15:29 mins`,
-    //   link: "indicatorsContent",
-    // },
+    {
+      name: "INDICATORS",
+      duration: `15:29 mins`,
+      link: "indicatorsContent",
+    },
     // {
     //   name: "PATTERNS",
     //   duration: `15:29 mins`,

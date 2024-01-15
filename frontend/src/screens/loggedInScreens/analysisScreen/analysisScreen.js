@@ -133,13 +133,19 @@ function AnalysisScreen() {
         </TouchableOpacity>
       </View>
       {viewResult === index &&
-        (item.result.resultLink &&
-        item.result.resultLink !== "none" &&
-        item.result.resultLink !== "sl" ? (
+        (item.result.resultLink && item.result.resultLink !== "none" ? (
           <>
-            <Text
-              style={styles.riskRewardText}
-            >{`${item.result.risk}:${item.result.reward} RR`}</Text>
+            <Text style={styles.riskRewardText}>
+              {`${
+                item.result?.reward === 0
+                  ? "stoploss hit"
+                  : `${item.result.risk}:${item.result.reward} RR`
+              }    ${
+                item.result?.reward === 0
+                  ? -item.result?.percentage
+                  : item.result?.percentage
+              }%`}
+            </Text>
 
             <LinkPreview
               enableAnimation={true}
@@ -184,8 +190,6 @@ function AnalysisScreen() {
           >
             {item.result.resultLink == "none"
               ? "No Result"
-              : item.result.resultLink == "sl"
-              ? "Stoploss hit"
               : "Not yet updated..."}
           </Text>
         ))}
@@ -252,13 +256,19 @@ function AnalysisScreen() {
         </TouchableOpacity>
       </View>
       {viewResult === index &&
-        (item.result.resultLink &&
-        item.result.resultLink !== "none" &&
-        item.result.resultLink !== "sl" ? (
+        (item.result.resultLink && item.result.resultLink !== "none" ? (
           <>
-            <Text
-              style={styles.riskRewardText}
-            >{`${item.result.risk}:${item.result.reward} RR`}</Text>
+            <Text style={styles.riskRewardText}>
+              {`${
+                item.result?.reward === 0
+                  ? "stoploss hit"
+                  : `${item.result.risk}:${item.result.reward} RR`
+              }      ${
+                item.result?.reward === 0
+                  ? -item.result?.percentage
+                  : item.result?.percentage
+              }%`}
+            </Text>
 
             <LinkPreview
               enableAnimation={true}
@@ -303,8 +313,6 @@ function AnalysisScreen() {
           >
             {item.result.resultLink == "none"
               ? "No Result"
-              : item.result.resultLink == "sl"
-              ? "Stoploss hit"
               : "Not yet updated..."}
           </Text>
         ))}

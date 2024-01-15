@@ -31,7 +31,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
   const [isBreakoutModalVisible, setIsBreakoutModalVisible] = useState(false);
 
   const arr = ["true", "false"];
-  const breakoutOptions = ["green", "orange"];
+  const breakoutOptions = ["green", "orange", "none"];
 
   const openModal = (id) => {
     const analysis = swingAnalysisData.find((item) => item._id === id);
@@ -58,7 +58,6 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
 
   const openBreakoutModal = (id) => {
     const analysis = swingAnalysisData.find((item) => item._id === id);
-    console.log(analysis.result.breakout);
     setSelectedAnalysis(analysis);
     setRisk(analysis.result.risk);
     setReward(analysis.result.reward);
@@ -115,10 +114,10 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
   function analysisResultBtnHandler() {
     if (
       !selectedAnalysis ||
-      (risk !== 0 && !risk) ||
-      (reward !== 0 && !reward) ||
+      (!risk === 0 && !risk) ||
+      (!reward === 0 && !reward) ||
       !analysisResultLink ||
-      !percentage ||
+      (!percentage === 0 && !percentage) ||
       !breakout === null ||
       !shareToAll === null
     ) {
@@ -197,12 +196,24 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
                       paddingLeft: 10,
                     }}
                   >
-                    {`${analysis.result?.risk || "null"}:${
-                      analysis.result.reward || "null"
+                    {`${
+                      analysis.result?.risk >= 0
+                        ? analysis.result?.risk
+                        : "null"
+                    }:${
+                      analysis.result?.reward >= 0
+                        ? analysis.result?.reward
+                        : "null"
                     }`}
                   </DataTable.Cell>
                   <DataTable.Cell style={{ minWidth: 30, paddingLeft: 6 }}>
-                    {analysis.result.percentage || "null"}
+                    {analysis.result?.risk === 0 &&
+                    analysis.result?.reward === 0
+                      ? analysis.result?.percentage
+                      : analysis.result?.risk > 0 &&
+                        analysis.result?.reward === 0
+                      ? -analysis.result?.percentage
+                      : analysis.result.percentage || "null"}
                   </DataTable.Cell>
                   <DataTable.Cell style={{ minWidth: 30, paddingLeft: 2 }}>
                     {analysis.result.breakout === null

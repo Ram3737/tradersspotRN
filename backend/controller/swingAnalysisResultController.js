@@ -129,7 +129,7 @@ const sumRiskRewardSwing = async (req, res) => {
     // }
 
     const onlyBreakoutAnalyses = allSwingAnalyses.filter(
-      (analysis) => analysis.result.breakout !== null
+      (analysis) => analysis.result.breakout !== "none"
     );
 
     const currentDate = new Date();

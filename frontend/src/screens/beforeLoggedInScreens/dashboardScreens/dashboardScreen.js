@@ -468,12 +468,19 @@ function DashboardScreen() {
             </View>
             {viewResult &&
               (analysisData[0]?.result.resultLink &&
-              analysisData[0]?.result.resultLink !== "none" &&
-              analysisData[0]?.result.resultLink !== "sl" ? (
+              analysisData[0]?.result.resultLink !== "none" ? (
                 <>
-                  <Text
-                    style={styles.riskRewardText}
-                  >{`${analysisData[0]?.result.risk}:${analysisData[0]?.result.reward} RR`}</Text>
+                  <Text style={styles.riskRewardText}>
+                    {`${
+                      analysisData[0]?.result?.reward === 0
+                        ? "stoploss hit"
+                        : `${analysisData[0]?.result.risk}:${analysisData[0]?.result.reward} RR`
+                    }      ${
+                      analysisData[0]?.result?.reward === 0
+                        ? -analysisData[0]?.result?.percentage
+                        : analysisData[0]?.result?.percentage
+                    }%`}
+                  </Text>
 
                   <LinkPreview
                     enableAnimation={true}
@@ -518,8 +525,6 @@ function DashboardScreen() {
                 >
                   {analysisData[0]?.result.resultLink == "none"
                     ? "No Result"
-                    : analysisData[0]?.result.resultLink == "sl"
-                    ? "Stoploss hit"
                     : "Not yet updated..."}
                 </Text>
               ))}

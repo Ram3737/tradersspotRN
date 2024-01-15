@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
 
   contentHeading: {
     width: "100%",
-    height: "7%",
+    height: "auto",
     justifyContent: "center",
     // backgroundColor: "red",
   },
