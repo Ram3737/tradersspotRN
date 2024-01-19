@@ -47,7 +47,7 @@ const courseContent = async (req, res) => {
         pointThree: `A range of prices where a financial instrument has historically struggled to rise above. It represents an area where selling interest tends to increase, preventing the price from advancing further.`,
       },
       {
-        name: "What is a trendline, and how to draw a perfect trendline? ?",
+        name: "What is a trendline and how to draw a perfect trendline? ?",
         link: `<iframe src="https://player.vimeo.com/video/901877040?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="trendlines.mp4"></iframe>`,
         duration: `36:35 mins`,
         pointOne: `Trendline is a straight line that connects two or more price points on a chart. These price points are typically lows in an uptrend or highs in a downtrend. Trendlines are used to visually represent the direction and strength of a trend.`,
@@ -74,7 +74,7 @@ const courseContent = async (req, res) => {
         pointThree: `It's important to note that while leading indicators can offer valuable insights, no indicator or combination of indicators is foolproof. Traders often use a mix of leading and lagging indicators along with other analysis tools to make informed decisions. Additionally, leading indicators may sometimes produce false signals, so risk management is crucial when incorporating them into a trading strategy.`,
       },
       {
-        name: "What is volume profile, and how is it used ?",
+        name: "What is volume profile and how is it used ?",
         link: `<iframe src="https://player.vimeo.com/video/901940197?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="volumeprofile.mp4"></iframe>`,
         duration: `29:14 mins`,
         pointOne: `Volume profile is a charting analysis technique used to display the distribution of trading volume over a specified price range. It provides insights into how much trading activity has occurred at different price levels during a given period.`,
@@ -110,10 +110,161 @@ const courseContent = async (req, res) => {
       },
     ];
 
+    const patternsContent = [
+      {
+        name: "What are patterns ?",
+        link: `<iframe src="https://player.vimeo.com/video/902565374?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="whatarepatterns.mp4"></iframe>`,
+        duration: `07:27 mins`,
+        pointOne: `Patterns refer to recognizable formations or configurations on price charts that traders use to make predictions about future price movements.`,
+        pointTwo: `These patterns are based on the idea that historical price movements tend to repeat themselves, and traders can gain insights into potential future price directions by identifying and understanding these patterns.`,
+        pointThree: `Technical analysts often rely on chart patterns to make informed decisions about buying or selling assets.`,
+      },
+      {
+        name: "Triangle patterns and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902567690?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="trianglepattern.mp4"></iframe>`,
+        duration: `58:42 mins`,
+        pointOne: `Triangle pattern is a technical analysis pattern that can be formed on price charts. Triangle patterns are typically continuation patterns, indicating that the existing trend is likely to continue after a period of consolidation or indecision. There are three main types of triangle patterns: ascending triangles, descending triangles, and symmetrical triangles.`,
+        pointTwo: `Traders often use triangle patterns as potential signals for future price movements. The breakout direction (up or down) is crucial in determining the likely trend continuation. Typically, traders wait for the price to break above the upper trendline in an ascending triangle or below the lower trendline in a descending triangle to confirm the pattern.`,
+        pointThree: `It's important to note that while triangle patterns can be useful, they should not be used in isolation, and other technical indicators and analysis tools should be considered for a comprehensive understanding of market conditions. Additionally, false breakouts can occur, so risk management strategies are essential for successful trading.`,
+      },
+      {
+        name: "Channel patterns and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902575272?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="channelpattern"></iframe>`,
+        duration: `30:24 mins`,
+        pointOne: `Channel pattern refers to a technical analysis pattern that is formed by two parallel trendlines, one representing a line of support and the other a line of resistance. The price of an asset tends to oscillate between these two trendlines, creating a channel-like structure on the price chart. Channel patterns can provide traders with insights into potential future price movements and trends.`,
+        pointTwo: `Channels can provide traders with potential entry and exit points based on the interaction of the price with the trendlines. Traders often look for buying opportunities near the lower trendline in an ascending channel and selling opportunities near the upper trendline in a descending channel.`,
+        pointThree: `It's important to note that channels, like other technical patterns, should be used in conjunction with other technical analysis tools and indicators for a more comprehensive analysis. Additionally, traders should be cautious of false breakouts or breakdowns and consider implementing risk management strategies to mitigate potential losses.`,
+      },
+      {
+        name: "Flag patterns and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902574785?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="flagpattern.mp4"></iframe>`,
+        duration: `20:31 mins`,
+        pointOne: `Flag pattern is a technical analysis pattern that is considered a continuation pattern. It is named "flag" due to its visual resemblance to a flag on a flagpole. The pattern consists of a sharp, strong price movement (referred to as the "flagpole") followed by a consolidation phase (the "flag") that is usually characterized by a rectangular-shaped price range.`,
+        pointTwo: `Traders often look for specific entry and exit points based on the breakout direction of the flag pattern. A breakout above the upper boundary of the flag in a bullish flag or below the lower boundary in a bearish flag is considered a signal for a potential continuation of the trend.`,
+        pointThree: `As with any technical analysis pattern, it's essential for traders to use flags in conjunction with other indicators and tools to confirm signals and manage risk effectively. False breakouts can occur, so risk management is crucial in trading flag patterns.`,
+      },
+      {
+        name: "Wedge patterns and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902566922?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="wedgepattern.mp4"></iframe>`,
+        duration: `33:05 mins`,
+        pointOne: `Wedge pattern is a technical analysis pattern characterized by converging trendlines that form a wedge shape on a price chart. Wedge patterns are typically considered reversal patterns, meaning they may signal a potential change in the existing trend. There are two main types of wedge patterns: rising wedge and falling wedge.`,
+        pointTwo: `Wedge patterns are often associated with decreasing volatility as the price approaches the apex (the point where the two trendlines converge). Traders use wedge patterns to anticipate potential breakout or breakdown points, indicating the start of a new trend.`,
+        pointThree: `It's important to note that not all wedge patterns result in a reversal, and false breakouts or breakdowns can occur. Therefore, traders often use additional technical indicators and analysis tools to confirm signals and manage risks. As with any trading pattern, risk management strategies are crucial to mitigate potential losses.`,
+      },
+      {
+        name: "Double top pattern and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902578598?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="doubletop.mp4"></iframe>`,
+        duration: `29:11 mins`,
+        pointOne: `Double top pattern is a technical analysis pattern that signals a potential trend reversal. It is considered a bearish reversal pattern and typically forms at the end of an uptrend. The double top pattern is characterized by two peaks (highs) at approximately the same price level, separated by a trough or a pullback between them. The pattern resembles the letter "M" on a price chart.`,
+        pointTwo: `Traders often use the height of the pattern (distance from the peaks to the trough) to estimate the potential downside target once the pattern is confirmed.`,
+        pointThree: `It's important to note that while the double top pattern is a widely recognized reversal pattern, traders should always exercise caution and use other technical indicators or analysis tools to confirm signals. False breakouts or breakdowns can occur, and risk management strategies are crucial in trading to minimize potential losses. Additionally, the double top pattern is just one of many patterns and signals that traders use to make informed decisions in the financial markets.`,
+      },
+      {
+        name: "Double bottom pattern and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902577859?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="doublebottom.mp4"></iframe>`,
+        duration: `18:08 mins`,
+        pointOne: ` double bottom pattern is a technical analysis pattern that signals a potential trend reversal. It is considered a bullish reversal pattern and typically forms at the end of a downtrend. The double bottom pattern is characterized by two troughs or lows at approximately the same price level, separated by a peak or a rally between them. The pattern resembles the letter "W" on a price chart.`,
+        pointTwo: `Traders often use the height of the pattern (distance from the troughs to the peak) to estimate the potential upside target once the pattern is confirmed.`,
+        pointThree: `As with any technical analysis pattern, traders should exercise caution and use other technical indicators or analysis tools to confirm signals. False breakouts or breakdowns can occur, and risk management strategies are crucial in trading to minimize potential losses. The double bottom pattern is just one of many patterns and signals that traders use to make informed decisions in the financial markets.`,
+      },
+      {
+        name: "Head & Shoulder pattern and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902576927?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="headandshoulder.mp4"></iframe>`,
+        duration: `24:42 mins`,
+        pointOne: `Head and Shoulders pattern is a significant and widely recognized technical analysis pattern that is often considered a reversal pattern. It typically forms after an uptrend and signals a potential trend reversal to the downside. The pattern is named for its appearance, which resembles a human head and shoulders.`,
+        pointTwo: `It's important to note that the Head and Shoulders pattern is considered a reliable reversal pattern, but like any technical analysis tool, it is not foolproof. Traders often use other technical indicators and analysis tools to confirm signals and manage risks. Additionally, false breakouts or breakdowns can occur, emphasizing the importance of risk management in trading.`,
+        pointThree: `There is also an inverse pattern called the Inverse Head and Shoulders, which is a bullish reversal pattern that forms after a downtrend and signals a potential upward reversal.`,
+      },
+      {
+        name: "Inverse Head & Shoulder pattern and cheatsheet",
+        link: `<iframe src="https://player.vimeo.com/video/902576167?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="inverseheadandshoulder.mp4"></iframe>`,
+        duration: `21:17 mins`,
+        pointOne: `Inverse Head and Shoulders pattern is a significant and widely recognized technical analysis pattern that is considered a reversal pattern. It typically forms after a downtrend and signals a potential trend reversal to the upside. The pattern is the opposite of the regular Head and Shoulders pattern and is named for its appearance, which resembles an inverted human head and shoulders.`,
+        pointTwo: `Similar to the regular Head and Shoulders pattern, the Inverse Head and Shoulders pattern is considered a reliable reversal pattern. Traders often use other technical indicators and analysis tools to confirm signals and manage risks.`,
+        pointThree: `False breakouts or breakdowns can occur, so it's essential for traders to exercise caution and use risk management strategies when incorporating this pattern into their trading decisions.`,
+      },
+      {
+        name: "Major patterns for living",
+        link: `<iframe src="https://player.vimeo.com/video/902565775?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="majorpatternsforliving.mp4"></iframe>`,
+        duration: `19:32 mins`,
+        pointOne: `Patterns refer to recognizable formations or configurations on price charts that traders use to make predictions about future price movements.`,
+        pointTwo: `These patterns are based on the idea that historical price movements tend to repeat themselves, and traders can gain insights into potential future price directions by identifying and understanding these patterns.`,
+        pointThree: `Technical analysts often rely on chart patterns to make informed decisions about buying or selling assets.`,
+      },
+    ];
+
+    const strategiesContent = [
+      {
+        name: "Strategies for intraday",
+        link: `<iframe src="https://player.vimeo.com/video/904366425?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="strategy_for_intraday.mp4"></iframe>`,
+        duration: `1:29:37 mins`,
+        pointOne: `Intraday trading refers to buying and selling financial instruments within the same trading day. Intraday traders aim to capitalize on short-term price movements and typically do not hold positions overnight. Various intraday strategies are employed by traders to navigate the fast-paced and volatile nature of intraday markets.`,
+        pointTwo: `It's important to note that intraday trading carries inherent risks due to the short time frames involved and the potential for rapid market movements.`,
+        pointThree: `Traders should use risk management strategies, set stop-loss orders, and stay informed about market conditions to improve their chances of success. Additionally, selecting the right strategy often depends on individual preferences, risk tolerance, and market conditions.`,
+      },
+      {
+        name: "Strategies for swing",
+        link: `<iframe src="https://player.vimeo.com/video/904369266?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="strategy_for_swing1.mp4"></iframe>`,
+        duration: `1:15:27 mins`,
+        pointOne: `Swing trading is a style of trading that aims to capture short to medium-term price movements within a larger trend. Unlike day trading, swing trading involves holding positions for more than one trading day but typically for a shorter duration compared to longer-term investments.`,
+        pointTwo: `Swing trading requires a combination of technical analysis, risk management, and market awareness. Traders need to be patient, as swing trades typically last several days to a few weeks.`,
+        pointThree: `Additionally, it's crucial to use proper risk management techniques, including setting stop-loss orders and position sizing, to protect against adverse market movements.`,
+      },
+    ];
+
+    const riskManagementContent = [
+      {
+        name: "what is Position sizing ?",
+        link: `<iframe src="https://player.vimeo.com/video/904371903?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="positionsizing.mp4"></iframe>`,
+        duration: `09:39 mins`,
+        pointOne: `Position sizing is a critical component of risk management in trading. It refers to determining the amount of capital or the number of units (shares, contracts, lots, etc.) to invest or trade in a particular position. Proper position sizing helps traders control risk, manage their capital effectively, and avoid significant losses.`,
+        pointTwo: `Before determining position size, traders need to assess their risk tolerance. This involves defining the maximum amount or percentage of their trading capital they are willing to risk on a single trade. The placement of a stop-loss order is crucial in position sizing. The stop-loss represents the maximum acceptable loss on a trade. Traders typically place it based on technical levels, volatility, or other relevant factors.`,
+        pointThree: `Trade risk is the difference between the entry price and the stop-loss level. Traders may express this risk as a percentage of their trading capital. For example, if a trader is willing to risk 1% on a trade and the trade risk is $100, the position size would be adjusted accordingly. Traders should adapt their position sizes to changes in market conditions, volatility, and their own risk tolerance. As these factors evolve, so should the approach to position sizing.`,
+      },
+      {
+        name: "Risk/Reward",
+        link: `<iframe src="https://player.vimeo.com/video/904374255?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="riskmanagement.mp4"></iframe>`,
+        duration: `09:56 mins`,
+        pointOne: `Risk-reward ratio is a key concept in trading that compares the potential profit of a trade to the potential loss. It is a ratio that helps traders assess the potential return on investment relative to the amount of risk undertaken. The risk-reward ratio is expressed as a numerical value, typically as a ratio of the potential reward to the potential risk.`,
+        pointTwo: `The risk-reward ratio is closely tied to risk management. By establishing a risk-reward ratio before entering a trade, traders can determine the appropriate position size and ensure that potential losses are limited to an acceptable level.`,
+        pointThree: `It's important to note that a high risk-reward ratio alone does not guarantee success. Traders should also consider other factors, such as the probability of success, market conditions, and the overall trading strategy. The risk-reward ratio is a tool to assist in making informed decisions, but it should be used in conjunction with a comprehensive trading plan.`,
+      },
+    ];
+
+    const bonusContent = [
+      {
+        name: "Breakout vs Fakeout",
+        link: `<iframe src="https://player.vimeo.com/video/904375380?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="breakoutvsfakeout.mp4"></iframe>`,
+        duration: `10:04 mins`,
+        pointOne: `Breakouts and fakeouts are common occurrences in trading, particularly in technical analysis. Understanding these concepts is crucial for traders who aim to identify potential entry and exit points in the market.`,
+        pointTwo: `A breakout occurs when the price of a financial instrument moves above or below a significant level of support or resistance. This movement is often accompanied by increased volume, signaling a potential change in the prevailing trend or the continuation of an existing one. Traders often see breakouts as opportunities to enter trades in the direction of the breakout.`,
+        pointThree: `A fakeout, also known as a false breakout, occurs when the price briefly moves beyond a support or resistance level but then quickly reverses, failing to sustain the breakout. Fakeouts can trap traders who entered positions based on the initial breakout signal.`,
+      },
+      {
+        name: "Perfect & Confluence entry",
+        link: `<iframe src="https://player.vimeo.com/video/904373179?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="perfectandconfluenceentry.mp4"></iframe>`,
+        duration: `27:25 mins`,
+        pointOne: `Perfect entry refers to an entry point into a trade that aligns with a trader's analysis and strategy, providing a high probability of success. Achieving a perfect entry often involves identifying a confluence of multiple factors that support the trade idea.`,
+        pointTwo: `Confluence refers to the coming together or convergence of different technical or fundamental elements that strengthen the conviction in a particular trade.`,
+        pointThree: `Achieving a perfect entry with confluence involves a holistic approach to trading, considering a combination of technical, fundamental, and risk management factors. Traders often develop their unique trading plans and methodologies based on their preferences and experiences. Regularly reviewing and refining your approach is essential for long-term success in the markets.`,
+      },
+      {
+        name: "Trail your trade",
+        link: `<iframe src="https://player.vimeo.com/video/904370632?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="trailyourtrade.mp4"></iframe>`,
+        duration: `21:18 mins`,
+        pointOne: `Trailing a trade refers to adjusting the stop-loss level as the market price moves in a favorable direction. The purpose of trailing a trade is to lock in profits and protect against potential reversals while allowing the trade to capture additional gains. This technique is often used by traders to maximize returns during trending markets.`,
+        pointTwo: `When entering a trade, traders set an initial stop-loss level. This stop-loss order is placed to limit potential losses in case the market moves against the trade. As the market price moves in the desired direction and generates profits, traders may adjust the stop-loss level to "trail" behind the current market price. The new stop-loss level is set at a predetermined distance from the current market price.`,
+        pointThree: `Trailing a trade is a proactive approach to risk management and profit maximization. However, traders should be mindful of market conditions and use trailing stops in conjunction with other aspects of their trading strategy. It's important to strike a balance between locking in profits and giving the trade enough room to develop in line with the overall market trend.`,
+      },
+    ];
     res.status(200).json({
       basicsContent,
       coreContent,
       indicatorsContent,
+      patternsContent,
+      strategiesContent,
+      riskManagementContent,
+      bonusContent,
     });
   } catch (error) {
     console.error("courseContentError", error.message);

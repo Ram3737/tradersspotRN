@@ -18,6 +18,7 @@ function VideoModal({
   content,
   modalVideoContent,
   selectedContent,
+  selectedCategory,
   modalVideoHandler,
   closeModal,
   isModalVisible,
@@ -92,7 +93,9 @@ function VideoModal({
 
             <View style={styles.descriptionBox}>
               <View style={styles.descriptionHeadingCont}>
-                <Text style={styles.descriptionHeadingText}>Basics</Text>
+                <Text style={styles.descriptionHeadingText}>
+                  {selectedCategory || ""}
+                </Text>
               </View>
 
               <View style={styles.contentHeading}>
@@ -307,10 +310,12 @@ const styles = StyleSheet.create({
   },
 
   descriptionHeadingCont: {
-    width: "25%",
-    height: "8%",
+    width: "auto",
+    height: "7%",
     backgroundColor: Colors.clr3,
     padding: 4,
+    paddingHorizontal: 8,
+    alignSelf: "flex-start",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
@@ -318,7 +323,7 @@ const styles = StyleSheet.create({
   },
 
   descriptionHeadingText: {
-    fontSize: CalculateFontSize(2),
+    fontSize: CalculateFontSize(1.8),
     color: "#000",
     fontWeight: "600",
   },

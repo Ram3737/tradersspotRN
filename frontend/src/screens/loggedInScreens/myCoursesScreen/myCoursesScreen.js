@@ -48,26 +48,32 @@ function MyCoursesScreen() {
       duration: `15:29 mins`,
       link: "indicatorsContent",
     },
-    // {
-    //   name: "PATTERNS",
-    //   duration: `15:29 mins`,
-    //   link: "patternsContent",
-    // },
-    // {
-    //   name: "STARTEGIES",
-    //   duration: `15:29 mins`,
-    //   link: "startegiesContent",
-    // },
-    // {
-    //   name: "RISK MANAGEMENT",
-    //   duration: `15:29 mins`,
-    //   link: "riskContent",
-    // },
+    {
+      name: "PATTERNS",
+      duration: `15:29 mins`,
+      link: "patternsContent",
+    },
+    {
+      name: "STARTEGIES",
+      duration: `15:29 mins`,
+      link: "strategiesContent",
+    },
+    {
+      name: "MANAGE RISK",
+      duration: `15:29 mins`,
+      link: "riskManagementContent",
+    },
+    {
+      name: "BONUS",
+      duration: `15:29 mins`,
+      link: "bonusContent",
+    },
   ]);
 
   const [allContent, setAllContent] = useState();
   const [content, setContent] = useState([]);
   const [modalVideoContent, setModalVideoContent] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedContent, setSelectedContent] = useState(0);
 
   const tradingViewWidget = `
@@ -261,6 +267,7 @@ function MyCoursesScreen() {
                     style={styles.viewBtn}
                     onPress={() => {
                       setContent(allContent?.[topic.link] || []);
+                      setSelectedCategory(topic.name);
                       setSelectedContent(0);
                     }}
                   >
@@ -326,6 +333,7 @@ function MyCoursesScreen() {
         content={content}
         modalVideoContent={modalVideoContent}
         selectedContent={selectedContent}
+        selectedCategory={selectedCategory}
         modalVideoHandler={modalVideoHandler}
         closeModal={closeModal}
         isModalVisible={isModalVisible}

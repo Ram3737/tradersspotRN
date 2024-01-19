@@ -30,6 +30,7 @@ function AnalysisScreen() {
   const [analysisData, setAnalysisData] = useState([]);
   const [totalSwingAnalysis, setTotalSwingAnalysis] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [analysisStat, setAnalysisStat] = useState("swingAnalysisStats");
 
   const toggleSwitch = () => {
     if (Platform.OS === "ios") {
@@ -67,6 +68,9 @@ function AnalysisScreen() {
 
   useEffect(() => {
     getAllAnalysis();
+    contToDisplay
+      ? setAnalysisStat("freeSwingAnalysisStats")
+      : setAnalysisStat("swingAnalysisStats");
   }, [contToDisplay]);
 
   function viewResultHandler(index) {
@@ -329,7 +333,7 @@ function AnalysisScreen() {
       <View style={styles.topCont}>
         <View style={styles.topContSub}>
           <View style={styles.topContSubTop}>
-            <Text style={styles.headingText}>Intraday Stats</Text>
+            <Text style={styles.headingText}>Swing Stats</Text>
             <View style={styles.toggleContainer}>
               <Switch
                 value={contToDisplay}
@@ -369,27 +373,24 @@ function AnalysisScreen() {
                   marginTop={"8%"}
                   series={[
                     contToDisplay
-                      ? authCtx.freeSwingAnalysisStats?.totalRiskLastFiveMonth >
-                        0
-                        ? authCtx.freeSwingAnalysisStats.totalRiskLastFiveMonth
+                      ? authCtx.freeSwingAnalysisStats?.totalRisk > 0
+                        ? authCtx.freeSwingAnalysisStats.totalRisk
                         : 10
-                      : (authCtx.swingAnalysisStats.totalRiskLastFiveMonth > 0
-                          ? authCtx.swingAnalysisStats.totalRiskLastFiveMonth
+                      : (authCtx.swingAnalysisStats.totalRisk > 0
+                          ? authCtx.swingAnalysisStats.totalRisk
                           : 10) || 10,
                     contToDisplay
-                      ? authCtx.freeSwingAnalysisStats
-                          .totalRewardLastFiveMonth > 0
-                        ? authCtx.freeSwingAnalysisStats
-                            .totalRewardLastFiveMonth
+                      ? authCtx.freeSwingAnalysisStats.totalReward > 0
+                        ? authCtx.freeSwingAnalysisStats.totalReward
                         : 50
-                      : (authCtx.swingAnalysisStats.totalRewardLastFiveMonth > 0
-                          ? authCtx.swingAnalysisStats.totalRewardLastFiveMonth
+                      : (authCtx.swingAnalysisStats.totalReward > 0
+                          ? authCtx.swingAnalysisStats.totalReward
                           : 30) || 50,
                   ]}
                 />
               )}
               <View style={styles.topContSubBottomSub}>
-                {authCtx.intradayAnalysisLoader ? (
+                {authCtx.swingAnalysisLoader ? (
                   <ActivityIndicator
                     size="small"
                     color={Colors.clr4}
@@ -404,7 +405,7 @@ function AnalysisScreen() {
                       {totalSwingAnalysis || 0}
                     </Text>
                     <View style={styles.riskRewardStatMainCont}>
-                      {authCtx.intradayAnalysisStats && (
+                      {authCtx[analysisStat] && (
                         <ScrollView
                           style={{
                             width: "100%",
@@ -413,35 +414,35 @@ function AnalysisScreen() {
                         >
                           <View style={styles.riskRewardStatCont}>
                             <Text style={styles.rrContSubBottomSubText1}>
-                              Today
+                              Last month
                             </Text>
                             <Text
                               style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx.intradayAnalysisStats.totalRiskToday}:${authCtx.intradayAnalysisStats.totalRewardToday}`}</Text>
+                            >{`${authCtx[analysisStat].totalRiskLastMonth}:${authCtx[analysisStat].totalRewardLastMonth}`}</Text>
                           </View>
                           <View style={styles.riskRewardStatCont}>
                             <Text style={styles.rrContSubBottomSubText1}>
-                              Yesterday
+                              Five months
                             </Text>
                             <Text
                               style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx.intradayAnalysisStats.totalRiskYesterday}:${authCtx.intradayAnalysisStats.totalRewardYesterday}`}</Text>
+                            >{`${authCtx[analysisStat].totalRiskLastFiveMonth}:${authCtx[analysisStat].totalRewardLastFiveMonth}`}</Text>
                           </View>
                           <View style={styles.riskRewardStatCont}>
                             <Text style={styles.rrContSubBottomSubText1}>
-                              This Week
+                              Last year
                             </Text>
                             <Text
                               style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx.intradayAnalysisStats.totalRiskThisWeek}:${authCtx.intradayAnalysisStats.totalRewardThisWeek}`}</Text>
+                            >{`${authCtx[analysisStat].totalRiskLastYear}:${authCtx[analysisStat].totalRewardLastYear}`}</Text>
                           </View>
                           <View style={styles.riskRewardStatCont}>
                             <Text style={styles.rrContSubBottomSubText1}>
-                              Last Month
+                              Overall
                             </Text>
                             <Text
                               style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx.intradayAnalysisStats.totalRiskLastMonth}:${authCtx.intradayAnalysisStats.totalRewardLastMonth}`}</Text>
+                            >{`${authCtx[analysisStat].totalRisk}:${authCtx[analysisStat].totalReward}`}</Text>
                           </View>
                         </ScrollView>
                       )}

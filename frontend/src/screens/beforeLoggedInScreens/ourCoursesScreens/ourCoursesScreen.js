@@ -477,6 +477,9 @@ function OurCoursesScreen() {
                 <Text style={styles.contentsName}>
                   - Inverse Head and Shoulder & cheatsheet
                 </Text>
+                <Text style={styles.contentsName}>
+                  - Major patterns to trade
+                </Text>
               </View>
 
               <View style={styles.contentsSub}>
@@ -497,6 +500,17 @@ function OurCoursesScreen() {
                 </View>
                 <Text style={styles.contentsName}>- Position sizing</Text>
                 <Text style={styles.contentsName}>- Risk / Reward</Text>
+              </View>
+
+              <View style={styles.contentsSub}>
+                <View style={styles.contentsSideHeadingCont}>
+                  <Text style={styles.contentsSideHeading}>Bonus</Text>
+                </View>
+                <Text style={styles.contentsName}>- Breakout vs Fakeout</Text>
+                <Text style={styles.contentsName}>
+                  - Perfect & Confluence entry
+                </Text>
+                <Text style={styles.contentsName}>- Trail your trade</Text>
               </View>
             </View>
           </ScrollView>
@@ -661,7 +675,7 @@ const styles = StyleSheet.create({
 
   contents: {
     width: "100%",
-    height: 1010,
+    height: 1180,
     marginTop: "6%",
     // backgroundColor: "red",
   },
