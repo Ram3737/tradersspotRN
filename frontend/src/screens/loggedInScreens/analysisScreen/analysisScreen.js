@@ -364,98 +364,111 @@ function AnalysisScreen() {
               />
             </View>
           </View>
-          {analysisData.length > 0 ? (
-            <View style={styles.topContSubBottom}>
-              {authCtx.swingAnalysisStats && (
-                <DonutChart
-                  top={"35%"}
-                  left={"26%"}
-                  marginTop={"8%"}
-                  series={[
-                    contToDisplay
-                      ? authCtx.freeSwingAnalysisStats?.totalRisk > 0
-                        ? authCtx.freeSwingAnalysisStats.totalRisk
-                        : 10
-                      : (authCtx.swingAnalysisStats.totalRisk > 0
-                          ? authCtx.swingAnalysisStats.totalRisk
-                          : 10) || 10,
-                    contToDisplay
-                      ? authCtx.freeSwingAnalysisStats.totalReward > 0
-                        ? authCtx.freeSwingAnalysisStats.totalReward
-                        : 50
-                      : (authCtx.swingAnalysisStats.totalReward > 0
-                          ? authCtx.swingAnalysisStats.totalReward
-                          : 30) || 50,
-                  ]}
-                />
-              )}
-              <View style={styles.topContSubBottomSub}>
-                {authCtx.swingAnalysisLoader ? (
-                  <ActivityIndicator
-                    size="small"
-                    color={Colors.clr4}
-                    style={{ marginTop: "25%" }}
-                  />
-                ) : (
-                  <>
-                    <Text style={styles.topContSubBottomSubText1}>
-                      Total analysis shared:
-                    </Text>
-                    <Text style={styles.topContSubBottomSubText2}>
-                      {totalSwingAnalysis || 0}
-                    </Text>
-                    <View style={styles.riskRewardStatMainCont}>
-                      {authCtx[analysisStat] && (
-                        <ScrollView
-                          style={{
-                            width: "100%",
-                          }}
-                          horizontal={true}
-                        >
-                          <View style={styles.riskRewardStatCont}>
-                            <Text style={styles.rrContSubBottomSubText1}>
-                              Last month
-                            </Text>
-                            <Text
-                              style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx[analysisStat].totalRiskLastMonth}:${authCtx[analysisStat].totalRewardLastMonth}`}</Text>
-                          </View>
-                          <View style={styles.riskRewardStatCont}>
-                            <Text style={styles.rrContSubBottomSubText1}>
-                              Five months
-                            </Text>
-                            <Text
-                              style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx[analysisStat].totalRiskLastFiveMonth}:${authCtx[analysisStat].totalRewardLastFiveMonth}`}</Text>
-                          </View>
-                          <View style={styles.riskRewardStatCont}>
-                            <Text style={styles.rrContSubBottomSubText1}>
-                              Last year
-                            </Text>
-                            <Text
-                              style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx[analysisStat].totalRiskLastYear}:${authCtx[analysisStat].totalRewardLastYear}`}</Text>
-                          </View>
-                          <View style={styles.riskRewardStatCont}>
-                            <Text style={styles.rrContSubBottomSubText1}>
-                              Overall
-                            </Text>
-                            <Text
-                              style={styles.rrContSubBottomSubText2}
-                            >{`${authCtx[analysisStat].totalRisk}:${authCtx[analysisStat].totalReward}`}</Text>
-                          </View>
-                        </ScrollView>
-                      )}
-                    </View>
-                  </>
-                )}
-              </View>
-            </View>
-          ) : (
-            <View>
-              <Text style={styles.topContSubBottomSubText1}> No data</Text>
-            </View>
+          {isLoading && (
+            <ActivityIndicator
+              size="small"
+              color={Colors.clr4}
+              style={{ marginTop: "20%" }}
+            />
           )}
+          {analysisData.length > 0 &&
+            (!authCtx.swingAnalysisLoader ||
+              !authCtx.freeSwingAnalysisLoader) && (
+              <View style={styles.topContSubBottom}>
+                {authCtx.swingAnalysisStats && (
+                  <DonutChart
+                    top={"35%"}
+                    left={"26%"}
+                    marginTop={"8%"}
+                    series={[
+                      contToDisplay
+                        ? authCtx.freeSwingAnalysisStats?.totalRisk > 0
+                          ? authCtx.freeSwingAnalysisStats.totalRisk
+                          : 10
+                        : (authCtx.swingAnalysisStats.totalRisk > 0
+                            ? authCtx.swingAnalysisStats.totalRisk
+                            : 10) || 10,
+                      contToDisplay
+                        ? authCtx.freeSwingAnalysisStats.totalReward > 0
+                          ? authCtx.freeSwingAnalysisStats.totalReward
+                          : 50
+                        : (authCtx.swingAnalysisStats.totalReward > 0
+                            ? authCtx.swingAnalysisStats.totalReward
+                            : 30) || 50,
+                    ]}
+                  />
+                )}
+                <View style={styles.topContSubBottomSub}>
+                  {authCtx.swingAnalysisLoader ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={Colors.clr4}
+                      style={{ marginTop: "25%" }}
+                    />
+                  ) : (
+                    <>
+                      <Text style={styles.topContSubBottomSubText1}>
+                        Total analysis shared:
+                      </Text>
+                      <Text style={styles.topContSubBottomSubText2}>
+                        {totalSwingAnalysis || 0}
+                      </Text>
+                      <View style={styles.riskRewardStatMainCont}>
+                        {authCtx[analysisStat] && (
+                          <ScrollView
+                            style={{
+                              width: "100%",
+                            }}
+                            horizontal={true}
+                          >
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Last month
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRiskLastMonth}:${authCtx[analysisStat].totalRewardLastMonth}`}</Text>
+                            </View>
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Five months
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRiskLastFiveMonth}:${authCtx[analysisStat].totalRewardLastFiveMonth}`}</Text>
+                            </View>
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Last year
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRiskLastYear}:${authCtx[analysisStat].totalRewardLastYear}`}</Text>
+                            </View>
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Overall
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRisk}:${authCtx[analysisStat].totalReward}`}</Text>
+                            </View>
+                          </ScrollView>
+                        )}
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+            )}
+          {analysisData.length === 0 &&
+            (!authCtx.swingAnalysisLoader ||
+              !authCtx.freeSwingAnalysisLoader) &&
+            !isLoading && (
+              <View>
+                <Text style={styles.topContSubBottomSubText1}> No data</Text>
+              </View>
+            )}
         </View>
       </View>
       <View style={styles.analysisScrollCont}>
@@ -466,7 +479,7 @@ function AnalysisScreen() {
             style={{ marginTop: "60%" }}
           />
         )}
-        {analysisData.length > 0 && !isLoading ? (
+        {analysisData.length > 0 && !isLoading && (
           <FlatList
             data={analysisData}
             renderItem={contToDisplay ? renderItemFree : renderItemPaid}
@@ -474,7 +487,8 @@ function AnalysisScreen() {
             style={styles.analysisScrollContSub}
             inverted={true}
           />
-        ) : (
+        )}
+        {analysisData.length === 0 && !isLoading && (
           <View>
             <Text
               style={[

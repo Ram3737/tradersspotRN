@@ -100,7 +100,14 @@ function DashboardScreen() {
               >
                 Overall Stats
               </Text>
-              {analysisData.length > 0 ? (
+              {authCtx.freeSwingAnalysisLoader && (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "50%" }}
+                />
+              )}
+              {!authCtx.freeSwingAnalysisLoader && analysisData.length > 0 ? (
                 <DonutChart
                   top={"34%"}
                   left={"25%"}
@@ -146,7 +153,7 @@ function DashboardScreen() {
                               ? authCtx.freeSwingAnalysisStats?.totalRisk * 3 >
                                 40
                                 ? 40
-                                : authCtx.freeSwingAnalysisStats?.totalRisk * 3
+                                : authCtx.freeSwingAnalysisStats?.totalRisk * 10
                               : 20
                           }%`,
                         },
@@ -167,7 +174,7 @@ function DashboardScreen() {
                                 60
                                 ? 60
                                 : authCtx.freeSwingAnalysisStats?.totalReward *
-                                  3
+                                  10
                               : 80
                           }%`,
                         },
@@ -280,7 +287,15 @@ function DashboardScreen() {
         <View style={styles.paidCont}>
           <ScrollView horizontal={true}>
             <View style={styles.paidContSub}>
-              {authCtx.swingAnalysisStats?.totalRisk > 0 ? (
+              {authCtx.swingAnalysisLoader && (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "20%" }}
+                />
+              )}
+              {!authCtx.swingAnalysisLoader &&
+              authCtx.swingAnalysisStats?.totalRisk > 0 ? (
                 <>
                   <DonutChart
                     top={"-95%"}
@@ -349,65 +364,89 @@ function DashboardScreen() {
                   </Text>
                 </View>
               </View>
-              <MarqueeView style={styles.marquee} autoPlay={true} speed={0.19}>
-                <View
-                  style={{
-                    width: authCtx.allBreakoutAnalyses.length * 50 || 200,
-                    height: "100%",
-                    flexDirection: "row",
-                  }}
+              {authCtx.swingAnalysisLoader ||
+              authCtx.freeSwingAnalysisLoader ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "2%" }}
+                />
+              ) : (
+                <MarqueeView
+                  style={styles.marquee}
+                  autoPlay={true}
+                  speed={0.19}
                 >
-                  {authCtx.allBreakoutAnalyses.length > 0 ? (
-                    authCtx.allBreakoutAnalyses.map((item, index) => {
-                      return (
-                        <View
+                  <View
+                    style={{
+                      width: authCtx.allBreakoutAnalyses.length * 50 || 200,
+                      height: "100%",
+                      flexDirection: "row",
+                    }}
+                  >
+                    {authCtx.allBreakoutAnalyses.length > 0 &&
+                      (!authCtx.swingAnalysisLoader ||
+                        !authCtx.freeSwingAnalysisLoader) &&
+                      authCtx.allBreakoutAnalyses.map((item, index) => {
+                        return (
+                          <View
+                            style={[
+                              styles.analysisSubBtns,
+                              {
+                                width: "auto",
+                                flexDirection: "row",
+                                paddingHorizontal: 5,
+                                marginRight: 15,
+                              },
+                            ]}
+                            key={item?._id || index}
+                          >
+                            <BlinkingDot
+                              value={4}
+                              color={item?.result?.breakout}
+                            />
+                            <Text
+                              style={[
+                                styles.analysisSubBtnsText,
+                                { marginLeft: 3 },
+                              ]}
+                            >
+                              {item?.analysis?.stockName}
+                            </Text>
+                          </View>
+                        );
+                      })}
+                    {authCtx.allBreakoutAnalyses.length === 0 &&
+                      (!authCtx.swingAnalysisLoader ||
+                        !authCtx.freeSwingAnalysisLoader) && (
+                        <Text
                           style={[
-                            styles.analysisSubBtns,
+                            styles.labelContText,
                             {
-                              width: "auto",
-                              flexDirection: "row",
-                              paddingHorizontal: 5,
-                              marginRight: 15,
+                              fontSize: CalculateFontSize(1.5),
+                              alignSelf: "center",
                             },
                           ]}
-                          key={item?._id || index}
                         >
-                          <BlinkingDot
-                            value={4}
-                            color={item?.result?.breakout}
-                          />
-                          <Text
-                            style={[
-                              styles.analysisSubBtnsText,
-                              { marginLeft: 3 },
-                            ]}
-                          >
-                            {item?.analysis?.stockName}
-                          </Text>
-                        </View>
-                      );
-                    })
-                  ) : (
-                    <Text
-                      style={[
-                        styles.labelContText,
-                        {
-                          fontSize: CalculateFontSize(1.5),
-                          alignSelf: "center",
-                        },
-                      ]}
-                    >
-                      No data
-                    </Text>
-                  )}
-                </View>
-              </MarqueeView>
+                          No data
+                        </Text>
+                      )}
+                  </View>
+                </MarqueeView>
+              )}
               <Text style={styles.paidContSubText2}>Stocks to watch</Text>
             </View>
           </ScrollView>
         </View>
         <Text style={styles.headingTextPaidAndFree}>Today's Free analysis</Text>
-        {analysisData.length > 0 && !isLoading ? (
+        {isLoading && (
+          <ActivityIndicator
+            size="small"
+            color={Colors.clr4}
+            style={{ marginTop: "8%" }}
+          />
+        )}
+        {analysisData.length > 0 && !isLoading && (
           <View style={styles.analysis}>
             <View style={styles.analysisSub}>
               <View style={styles.analysisSubBtns}>
@@ -529,7 +568,8 @@ function DashboardScreen() {
                 </Text>
               ))}
           </View>
-        ) : (
+        )}
+        {analysisData.length === 0 && !isLoading && (
           <View>
             <Text
               style={[

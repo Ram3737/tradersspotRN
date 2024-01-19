@@ -6,6 +6,7 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
+  ActivityIndicator,
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -75,6 +76,7 @@ function MyCoursesScreen() {
   const [modalVideoContent, setModalVideoContent] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedContent, setSelectedContent] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const tradingViewWidget = `
   <div class="tradingview-widget-container" >
@@ -115,15 +117,18 @@ function MyCoursesScreen() {
 `;
 
   useEffect(() => {
+    setIsLoading(true);
     CallGetApiServices(
       `/course/getCourseContent`,
       (response) => {
         if (response.status === 200) {
           setAllContent(response.data);
           setContent(response.data.basicsContent);
+          setIsLoading(false);
         }
       },
       (err) => {
+        setIsLoading(false);
         console.log("err getting allCourseContents", err);
       }
     );
@@ -283,7 +288,14 @@ function MyCoursesScreen() {
       <View style={styles.contentCont}>
         <Text style={styles.contentHeadingText}>Contents</Text>
         <ScrollView style={styles.contentSubCont}>
-          {content.length > 0 ? (
+          {content.length === 0 && isLoading && (
+            <ActivityIndicator
+              size="small"
+              color={Colors.clr4}
+              style={{ marginTop: "20%" }}
+            />
+          )}
+          {content.length > 0 && !isLoading ? (
             content.map((content, index) => (
               <View
                 key={index}

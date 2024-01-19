@@ -369,46 +369,55 @@ function AnalysisStatsScreen() {
 
           <View style={styles.statContTop2}>
             <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
-              {analysisData.length > 0 ? (
-                <DonutChart
-                  top={"36%"}
-                  left={"24%"}
-                  series={[
-                    contToDisplay
-                      ? authCtx.freeSwingAnalysisStats?.totalRiskLastFiveMonth >
-                        0
-                        ? authCtx.freeSwingAnalysisStats.totalRiskLastFiveMonth
-                        : 10
-                      : (authCtx.swingAnalysisStats.totalRiskLastFiveMonth > 0
-                          ? authCtx.swingAnalysisStats.totalRiskLastFiveMonth
-                          : 10) || 10,
-                    contToDisplay
-                      ? authCtx.freeSwingAnalysisStats
-                          .totalRewardLastFiveMonth > 0
+              {analysisData.length > 0 &&
+                (!authCtx.swingAnalysisLoader ||
+                  !authCtx.freeSwingAnalysisLoader) && (
+                  <DonutChart
+                    top={"36%"}
+                    left={"24%"}
+                    series={[
+                      contToDisplay
                         ? authCtx.freeSwingAnalysisStats
-                            .totalRewardLastFiveMonth
-                        : 50
-                      : (authCtx.swingAnalysisStats.totalRewardLastFiveMonth > 0
-                          ? authCtx.swingAnalysisStats.totalRewardLastFiveMonth
-                          : 30) || 50,
-                  ]}
-                />
-              ) : (
-                <View>
-                  <Text
-                    style={[
-                      styles.labelContText,
-                      {
-                        fontSize: CalculateFontSize(1.8),
-                        marginTop: "30%",
-                        alignSelf: "center",
-                      },
+                            ?.totalRiskLastFiveMonth > 0
+                          ? authCtx.freeSwingAnalysisStats
+                              .totalRiskLastFiveMonth
+                          : 10
+                        : (authCtx.swingAnalysisStats.totalRiskLastFiveMonth > 0
+                            ? authCtx.swingAnalysisStats.totalRiskLastFiveMonth
+                            : 10) || 10,
+                      contToDisplay
+                        ? authCtx.freeSwingAnalysisStats
+                            .totalRewardLastFiveMonth > 0
+                          ? authCtx.freeSwingAnalysisStats
+                              .totalRewardLastFiveMonth
+                          : 50
+                        : (authCtx.swingAnalysisStats.totalRewardLastFiveMonth >
+                          0
+                            ? authCtx.swingAnalysisStats
+                                .totalRewardLastFiveMonth
+                            : 30) || 50,
                     ]}
-                  >
-                    No data
-                  </Text>
-                </View>
-              )}
+                  />
+                )}
+
+              {analysisData.length === 0 &&
+                (!authCtx.swingAnalysisLoader ||
+                  !authCtx.freeSwingAnalysisLoader) && (
+                  <View>
+                    <Text
+                      style={[
+                        styles.labelContText,
+                        {
+                          fontSize: CalculateFontSize(1.8),
+                          marginTop: "10%",
+                          alignSelf: "center",
+                        },
+                      ]}
+                    >
+                      No data
+                    </Text>
+                  </View>
+                )}
             </View>
             <View style={styles.lineChartCont}>
               {authCtx.swingAnalysisLoader ||
@@ -420,7 +429,7 @@ function AnalysisStatsScreen() {
                 />
               ) : (
                 <View style={styles.lineChartContSub}>
-                  {barChartValue.length > 0 &&
+                  {barChartValue.length > 0 ? (
                     barChartValue.map((item, index) => (
                       <View key={index} style={styles.lineCont}>
                         <Text style={[styles.labelContText, { marginTop: 0 }]}>
@@ -440,7 +449,23 @@ function AnalysisStatsScreen() {
                         </View>
                         <Text style={[styles.labelContText]}>{item.month}</Text>
                       </View>
-                    ))}
+                    ))
+                  ) : (
+                    <View>
+                      <Text
+                        style={[
+                          styles.labelContText,
+                          {
+                            fontSize: CalculateFontSize(1.8),
+                            marginTop: "30%",
+                            alignSelf: "center",
+                          },
+                        ]}
+                      >
+                        No data
+                      </Text>
+                    </View>
+                  )}
                 </View>
               )}
             </View>
@@ -455,7 +480,7 @@ function AnalysisStatsScreen() {
             style={{ marginTop: "60%" }}
           />
         )}
-        {analysisData.length > 0 && !isLoading ? (
+        {analysisData.length > 0 && !isLoading && (
           <FlatList
             data={analysisData}
             renderItem={contToDisplay ? renderItemFree : renderItemPaid}
@@ -463,7 +488,8 @@ function AnalysisStatsScreen() {
             style={styles.analysisScrollContSub}
             inverted={true}
           />
-        ) : (
+        )}
+        {analysisData.length === 0 && !isLoading && (
           <View>
             <Text
               style={[
