@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
   KeyboardAvoidingView,
 } from "react-native";
 import { useState, useEffect } from "react";
@@ -31,6 +32,8 @@ function AdminAnalysisScreen() {
   const [tab, setTab] = useState("Swing");
   const [totalAnalysis, setTotalAnalysis] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [analysisLoader, setAnalysisLoader] = useState(false);
+  const [allAnalysisLoader, setAllAnalysisLoader] = useState(false);
 
   const patternArr = [
     "PRICE ACTION",
@@ -76,18 +79,20 @@ function AdminAnalysisScreen() {
         }
       );
     } else {
+      setAllAnalysisLoader(true);
       CallGetApiServices(
         `/analysis/getAll${
           tab === "Swing" ? tab : tab + "Swing"
         }Analysis?page=${page}`,
         (response) => {
           if (response.status === 200) {
-            // console.log("free an", response.data);
+            setAllAnalysisLoader(false);
             setAnalysisData(response.data.allSwingAnalyses);
             setTotalAnalysis(response.data.totalSwingAnalysis);
           }
         },
         (err) => {
+          setAllAnalysisLoader(false);
           console.log("err getting getallanalysis", err);
         }
       );
@@ -98,6 +103,7 @@ function AdminAnalysisScreen() {
     if (!selectedStockName || !selectedPattern || !analysisLink) {
       return;
     }
+    setAnalysisLoader(true);
     CallPostApiServices(
       `/analysis/create${tab === "Swing" ? tab : tab + "Swing"}Analysis`,
       {
@@ -117,6 +123,7 @@ function AdminAnalysisScreen() {
       },
       (response) => {
         if (response.status === 201) {
+          setAnalysisLoader(false);
           setSelectedStockName(null);
           setSelectedPattern(null);
           setAnalysisLink(null);
@@ -125,6 +132,7 @@ function AdminAnalysisScreen() {
         }
       },
       (err) => {
+        setAnalysisLoader(false);
         console.log(err);
       }
     );
@@ -387,7 +395,12 @@ function AdminAnalysisScreen() {
                   onChangeText={(text) => setAnalysisLink(text)}
                 />
 
-                <ButtonComponent text={"Post"} handler={analysisBtnHandler} />
+                <ButtonComponent
+                  indicator={analysisLoader}
+                  disabled={analysisLoader}
+                  text={"Post"}
+                  handler={analysisBtnHandler}
+                />
               </View>
 
               <Text
@@ -405,11 +418,35 @@ function AdminAnalysisScreen() {
                 value={searchedText}
                 onChangeText={(text) => setSearchedText(text.toLowerCase())}
               />
-              <SwingAnalysisTable
-                swingAnalysisData={analysisData}
-                getAllAnalysis={getAllAnalysis}
-              />
-
+              {allAnalysisLoader ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "20%" }}
+                />
+              ) : (
+                <SwingAnalysisTable
+                  swingAnalysisData={analysisData}
+                  getAllAnalysis={getAllAnalysis}
+                />
+              )}
+              {analysisData.length === 0 && (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: CalculateFontSize(1.8),
+                        marginTop: "50%",
+                        marginBottom: "20%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
               <View style={styles.paginationCont}>
                 <ButtonComponent
                   text={"<"}
@@ -482,7 +519,12 @@ function AdminAnalysisScreen() {
                   onChangeText={(text) => setAnalysisLink(text)}
                 />
 
-                <ButtonComponent text={"Post"} handler={analysisBtnHandler} />
+                <ButtonComponent
+                  indicator={analysisLoader}
+                  disabled={analysisLoader}
+                  text={"Post"}
+                  handler={analysisBtnHandler}
+                />
               </View>
 
               <Text
@@ -500,12 +542,36 @@ function AdminAnalysisScreen() {
                 value={searchedText}
                 onChangeText={(text) => setSearchedText(text.toLowerCase())}
               />
-              <SwingAnalysisTable
-                swingAnalysisData={analysisData}
-                getAllAnalysis={getAllAnalysis}
-                tab={tab}
-              />
-
+              {allAnalysisLoader ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "20%" }}
+                />
+              ) : (
+                <SwingAnalysisTable
+                  swingAnalysisData={analysisData}
+                  getAllAnalysis={getAllAnalysis}
+                  tab={tab}
+                />
+              )}
+              {analysisData.length === 0 && (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: CalculateFontSize(1.8),
+                        marginTop: "50%",
+                        marginBottom: "20%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
               <View style={styles.paginationCont}>
                 <ButtonComponent
                   text={"<"}

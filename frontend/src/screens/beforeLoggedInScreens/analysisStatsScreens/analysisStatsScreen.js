@@ -371,7 +371,8 @@ function AnalysisStatsScreen() {
             <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
               {analysisData.length > 0 &&
                 (!authCtx.swingAnalysisLoader ||
-                  !authCtx.freeSwingAnalysisLoader) && (
+                  !authCtx.freeSwingAnalysisLoader) &&
+                !isLoading && (
                   <DonutChart
                     top={"36%"}
                     left={"24%"}
@@ -402,7 +403,8 @@ function AnalysisStatsScreen() {
 
               {analysisData.length === 0 &&
                 (!authCtx.swingAnalysisLoader ||
-                  !authCtx.freeSwingAnalysisLoader) && (
+                  !authCtx.freeSwingAnalysisLoader) &&
+                !isLoading && (
                   <View>
                     <Text
                       style={[
@@ -418,14 +420,23 @@ function AnalysisStatsScreen() {
                     </Text>
                   </View>
                 )}
-            </View>
-            <View style={styles.lineChartCont}>
-              {authCtx.swingAnalysisLoader ||
-              authCtx.freeSwingAnalysisLoader ? (
+
+              {isLoading && (
                 <ActivityIndicator
                   size="small"
                   color={Colors.clr4}
-                  style={{ marginTop: "25%" }}
+                  style={{ marginTop: "40%" }}
+                />
+              )}
+            </View>
+            <View style={styles.lineChartCont}>
+              {(authCtx.swingAnalysisLoader ||
+                authCtx.freeSwingAnalysisLoader) &&
+              isLoading ? (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "25%", marginRight: "50%" }}
                 />
               ) : (
                 <View style={styles.lineChartContSub}>

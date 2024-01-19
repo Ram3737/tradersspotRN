@@ -368,12 +368,13 @@ function AnalysisScreen() {
             <ActivityIndicator
               size="small"
               color={Colors.clr4}
-              style={{ marginTop: "20%" }}
+              style={{ marginTop: "18%" }}
             />
           )}
           {analysisData.length > 0 &&
             (!authCtx.swingAnalysisLoader ||
-              !authCtx.freeSwingAnalysisLoader) && (
+              !authCtx.freeSwingAnalysisLoader) &&
+            !isLoading && (
               <View style={styles.topContSubBottom}>
                 {authCtx.swingAnalysisStats && (
                   <DonutChart
@@ -403,7 +404,7 @@ function AnalysisScreen() {
                     <ActivityIndicator
                       size="small"
                       color={Colors.clr4}
-                      style={{ marginTop: "25%" }}
+                      style={{ marginTop: "25%", marginRight: "30%" }}
                     />
                   ) : (
                     <>

@@ -29,6 +29,8 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isBreakoutModalVisible, setIsBreakoutModalVisible] = useState(false);
+  const [resultUpdateLoader, setResultUpdateLoader] = useState(false);
+  const [breakoutLoader, setBreakoutLoader] = useState(false);
 
   const arr = ["true", "false"];
   const breakoutOptions = ["green", "orange", "none"];
@@ -81,7 +83,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
 
   function breakoutBtnHandler() {
     if (breakout !== null) {
-      console.log("hi");
+      setBreakoutLoader(true);
       CallPatchApiServices(
         `/analysis/${
           tab === "Free" ? "updateFreeSwingResults" : "updateSwingResults"
@@ -99,12 +101,14 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
         (response) => {
           if (response.status === 201) {
             // console.log(response.data);
+            setBreakoutLoader(false);
             console.log("analysis updated");
             closeBreakoutModal();
             getAllAnalysis();
           }
         },
         (err) => {
+          setBreakoutLoader(false);
           console.log("result update err", err);
         }
       );
@@ -124,6 +128,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
       return;
     }
 
+    setResultUpdateLoader(true);
     CallPatchApiServices(
       `/analysis/${
         tab === "Free" ? "updateFreeSwingResults" : "updateSwingResults"
@@ -141,12 +146,14 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
       (response) => {
         if (response.status === 201) {
           // console.log(response.data);
+          setResultUpdateLoader(false);
           console.log("analysis updated");
           closeModal();
           getAllAnalysis();
         }
       },
       (err) => {
+        setResultUpdateLoader(false);
         console.log("result update err", err);
       }
     );
@@ -387,6 +394,8 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
             />
 
             <ButtonComponent
+              indicator={resultUpdateLoader}
+              disabled={resultUpdateLoader}
               text={"Update"}
               handler={analysisResultBtnHandler}
             />
@@ -449,7 +458,12 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
                 }
               />
             </View>
-            <ButtonComponent text={"Update"} handler={breakoutBtnHandler} />
+            <ButtonComponent
+              indicator={breakoutLoader}
+              disabled={breakoutLoader}
+              text={"Update"}
+              handler={breakoutBtnHandler}
+            />
           </View>
         </View>
       </Modal>

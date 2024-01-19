@@ -92,52 +92,57 @@ function DashboardScreen() {
         <View style={styles.freeAnalysisCont}>
           <View style={styles.freeAnalysisContTop}>
             <View style={styles.freeAnalysisContTopLeft}>
-              <Text
-                style={[
-                  styles.freeAnalysisContTopLeftText,
-                  { marginBottom: 14 },
-                ]}
-              >
-                Overall Stats
-              </Text>
               {authCtx.freeSwingAnalysisLoader && (
                 <ActivityIndicator
                   size="small"
                   color={Colors.clr4}
-                  style={{ marginTop: "50%" }}
+                  style={{ marginTop: "20%" }}
                 />
               )}
-              {!authCtx.freeSwingAnalysisLoader && analysisData.length > 0 ? (
-                <DonutChart
-                  top={"34%"}
-                  left={"25%"}
-                  series={[
-                    authCtx.freeSwingAnalysisStats?.totalRisk > 0
-                      ? authCtx.freeSwingAnalysisStats.totalRisk
-                      : 10,
-                    authCtx.freeSwingAnalysisStats.totalReward > 0
-                      ? authCtx.freeSwingAnalysisStats.totalReward
-                      : 50,
-                  ]}
-                  height={102}
-                />
-              ) : (
-                <View>
+              {!authCtx.freeSwingAnalysisLoader && analysisData.length > 0 && (
+                <>
                   <Text
                     style={[
-                      styles.labelContText,
-                      {
-                        fontSize: CalculateFontSize(1.8),
-                        marginTop: "50%",
-                        marginBottom: "20%",
-                        alignSelf: "center",
-                      },
+                      styles.freeAnalysisContTopLeftText,
+                      { marginBottom: 14 },
                     ]}
                   >
-                    No data
+                    Overall Stats
                   </Text>
-                </View>
+                  <DonutChart
+                    top={"34%"}
+                    left={"25%"}
+                    series={[
+                      authCtx.freeSwingAnalysisStats?.totalRisk > 0
+                        ? authCtx.freeSwingAnalysisStats.totalRisk
+                        : 10,
+                      authCtx.freeSwingAnalysisStats.totalReward > 0
+                        ? authCtx.freeSwingAnalysisStats.totalReward
+                        : 50,
+                    ]}
+                    height={102}
+                  />
+                </>
               )}
+              {authCtx.freeSwingAnalysisLoader &&
+                !isLoading &&
+                analysisData.length === 0 && (
+                  <View>
+                    <Text
+                      style={[
+                        styles.labelContText,
+                        {
+                          fontSize: CalculateFontSize(1.8),
+                          marginTop: "50%",
+                          marginBottom: "20%",
+                          alignSelf: "center",
+                        },
+                      ]}
+                    >
+                      No data
+                    </Text>
+                  </View>
+                )}
             </View>
             <View style={styles.freeAnalysisContTopRight}>
               <View style={styles.freeAnalysisContTopRightTop}>
@@ -295,49 +300,52 @@ function DashboardScreen() {
                 />
               )}
               {!authCtx.swingAnalysisLoader &&
-              authCtx.swingAnalysisStats?.totalRisk > 0 ? (
-                <>
-                  <DonutChart
-                    top={"-95%"}
-                    left={"25%"}
-                    series={[
+                authCtx.swingAnalysisStats?.totalRisk > 0 && (
+                  <>
+                    <DonutChart
+                      top={"-95%"}
+                      left={"25%"}
+                      series={[
+                        authCtx.swingAnalysisStats?.totalRisk > 0
+                          ? authCtx.swingAnalysisStats.totalRisk
+                          : 10,
+                        authCtx.swingAnalysisStats.totalReward > 0
+                          ? authCtx.swingAnalysisStats.totalReward
+                          : 50,
+                      ]}
+                      height={55}
+                    />
+
+                    <Text style={styles.paidContSubText1}>{`${
                       authCtx.swingAnalysisStats?.totalRisk > 0
                         ? authCtx.swingAnalysisStats.totalRisk
-                        : 10,
+                        : 0
+                    }:${
                       authCtx.swingAnalysisStats.totalReward > 0
                         ? authCtx.swingAnalysisStats.totalReward
-                        : 50,
-                    ]}
-                    height={55}
-                  />
-
-                  <Text style={styles.paidContSubText1}>{`${
-                    authCtx.swingAnalysisStats?.totalRisk > 0
-                      ? authCtx.swingAnalysisStats.totalRisk
-                      : 0
-                  }:${
-                    authCtx.swingAnalysisStats.totalReward > 0
-                      ? authCtx.swingAnalysisStats.totalReward
-                      : 0
-                  }`}</Text>
-                </>
-              ) : (
-                <View>
-                  <Text
-                    style={[
-                      styles.labelContText,
-                      {
-                        fontSize: CalculateFontSize(1.5),
-                        marginTop: "20%",
-                        marginBottom: "20%",
-                        alignSelf: "center",
-                      },
-                    ]}
-                  >
-                    No data
-                  </Text>
-                </View>
-              )}
+                        : 0
+                    }`}</Text>
+                  </>
+                )}
+              {authCtx.freeSwingAnalysisLoader &&
+                !isLoading &&
+                analysisData.length === 0 && (
+                  <View>
+                    <Text
+                      style={[
+                        styles.labelContText,
+                        {
+                          fontSize: CalculateFontSize(1.8),
+                          marginTop: "50%",
+                          marginBottom: "20%",
+                          alignSelf: "center",
+                        },
+                      ]}
+                    >
+                      No data
+                    </Text>
+                  </View>
+                )}
               <Text style={styles.paidContSubText2}>Overall</Text>
             </View>
             <View style={[styles.paidContSub, { width: 205 }]}>
