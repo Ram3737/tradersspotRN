@@ -21,6 +21,7 @@ import { AuthContext } from "../../../components/stores/context/authContextProvi
 import DonutChart from "../../../components/charts/donutChart";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
 import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
+import UserProfileModal from "../../../components/modal/userProfileModal";
 
 function DashboardScreen() {
   const navigation = useNavigation();
@@ -31,6 +32,7 @@ function DashboardScreen() {
   const [barChartValue, setBarChartValue] = useState([]);
   const [stocksToWatch, setStocksToWatch] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   function loginrSignupHandler() {
     navigation.navigate("loginSignup");
@@ -57,6 +59,14 @@ function DashboardScreen() {
     );
   }
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const closeModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   useEffect(() => {
     getAllAnalysis();
   }, []);
@@ -71,12 +81,15 @@ function DashboardScreen() {
         <View style={styles.headerCont}>
           <Text style={styles.headerText}>Hi there,</Text>
           {authCtx.token ? (
-            <View style={styles.userAvatar}>
+            <TouchableOpacity
+              style={styles.userAvatar}
+              onPress={() => toggleModal()}
+            >
               <Image
                 source={require("../../../images/icons/userAvatar.png")}
                 style={{ width: 55, height: 55 }}
               />
-            </View>
+            </TouchableOpacity>
           ) : (
             <ButtonComponent
               text={"Login/Signup"}
@@ -124,25 +137,22 @@ function DashboardScreen() {
                   />
                 </>
               )}
-              {authCtx.freeSwingAnalysisLoader &&
-                !isLoading &&
-                analysisData.length === 0 && (
-                  <View>
-                    <Text
-                      style={[
-                        styles.labelContText,
-                        {
-                          fontSize: CalculateFontSize(1.8),
-                          marginTop: "50%",
-                          marginBottom: "20%",
-                          alignSelf: "center",
-                        },
-                      ]}
-                    >
-                      No data
-                    </Text>
-                  </View>
-                )}
+              {!isLoading && analysisData.length === 0 && (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: CalculateFontSize(1.5),
+                        marginBottom: "35%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
             </View>
             <View style={styles.freeAnalysisContTopRight}>
               <View style={styles.freeAnalysisContTopRightTop}>
@@ -290,8 +300,8 @@ function DashboardScreen() {
           Risk Reward stats - Paid analysis
         </Text>
         <View style={styles.paidCont}>
-          <ScrollView horizontal={true}>
-            <View style={styles.paidContSub}>
+          <View style={{ width: "100%", flexDirection: "row", height: 98 }}>
+            <View style={[styles.paidContSub, { width: "25%" }]}>
               {authCtx.swingAnalysisLoader && (
                 <ActivityIndicator
                   size="small"
@@ -327,28 +337,25 @@ function DashboardScreen() {
                     }`}</Text>
                   </>
                 )}
-              {authCtx.freeSwingAnalysisLoader &&
-                !isLoading &&
-                analysisData.length === 0 && (
-                  <View>
-                    <Text
-                      style={[
-                        styles.labelContText,
-                        {
-                          fontSize: CalculateFontSize(1.8),
-                          marginTop: "50%",
-                          marginBottom: "20%",
-                          alignSelf: "center",
-                        },
-                      ]}
-                    >
-                      No data
-                    </Text>
-                  </View>
-                )}
+              {!isLoading && analysisData.length === 0 && (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: CalculateFontSize(1.5),
+                        marginTop: "30%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
               <Text style={styles.paidContSubText2}>Overall</Text>
             </View>
-            <View style={[styles.paidContSub, { width: 205 }]}>
+            <View style={[styles.paidContSub, { width: "70%" }]}>
               <View style={styles.indicatorCont}>
                 <View style={styles.indicatorContSub}>
                   <View style={styles.indicatorContSubOutlinedCircle}>
@@ -444,9 +451,11 @@ function DashboardScreen() {
               )}
               <Text style={styles.paidContSubText2}>Stocks to watch</Text>
             </View>
-          </ScrollView>
+          </View>
         </View>
-        <Text style={styles.headingTextPaidAndFree}>Today's Free analysis</Text>
+        <Text style={[styles.headingTextPaidAndFree, { marginTop: "2%" }]}>
+          Weekly Free analysis
+        </Text>
         {isLoading && (
           <ActivityIndicator
             size="small"
@@ -598,6 +607,10 @@ function DashboardScreen() {
       {/* <Text style={{ color: "#fff" }}>dashboard Screen screen</Text>
       <ButtonComponent text={"login/signup"} handler={loginrSignupHandler} />
       <ButtonComponent text={"logout"} handler={authCtx.logout} /> */}
+      <UserProfileModal
+        closeModal={closeModal}
+        isModalVisible={isModalVisible}
+      />
     </ScrollView>
   );
 }
@@ -859,21 +872,22 @@ const styles = StyleSheet.create({
   },
   paidAndFreeAnalysisCont: {
     height: "auto",
-    padding: 10,
+    padding: 8,
     marginTop: "27%",
   },
   headingTextPaidAndFree: {
     fontSize: CalculateFontSize(1.6),
     fontWeight: "600",
-    marginLeft: "3.5%",
+    marginLeft: "3.2%",
     marginBottom: "4%",
     color: Colors.midWhite,
   },
   paidCont: {
     height: 103,
-    width: "100%",
+    width: "98%",
     paddingHorizontal: 7,
     paddingVertical: 5,
+    marginLeft: "1%",
     marginBottom: 25,
     marginTop: 3.2,
   },

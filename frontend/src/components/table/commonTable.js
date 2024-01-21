@@ -17,6 +17,8 @@ const CommonTable = ({ usersData, getAllUsers }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isPaidModalVisible, setIsPaidModalVisible] = useState(false);
+  const [updateBtnLoader, setUpdateBtnLoader] = useState(false);
+  const [paidBtnLoader, setPaidBtnLoader] = useState(false);
 
   const openModal = (id) => {
     const user = usersData.find((item) => item._id === id);
@@ -32,6 +34,7 @@ const CommonTable = ({ usersData, getAllUsers }) => {
   };
 
   function updateBtnHandler() {
+    setUpdateBtnLoader(true);
     CallPatchApiServices(
       `/user/updateUser/${selectedUser._id}`,
       {
@@ -40,12 +43,14 @@ const CommonTable = ({ usersData, getAllUsers }) => {
       },
       (response) => {
         if (response.status === 201) {
+          setUpdateBtnLoader(false);
           // console.log("res from update user", response.data.message);
           getAllUsers();
           closeModal();
         }
       },
       (err) => {
+        setUpdateBtnLoader(false);
         console.log("err", err);
       }
     );
@@ -64,6 +69,7 @@ const CommonTable = ({ usersData, getAllUsers }) => {
   };
 
   function updatePaidBtnHandler() {
+    setPaidBtnLoader(true);
     CallPatchApiServices(
       `/user/updateUser/${selectedUser._id}`,
       {
@@ -71,12 +77,14 @@ const CommonTable = ({ usersData, getAllUsers }) => {
       },
       (response) => {
         if (response.status === 201) {
+          setPaidBtnLoader(false);
           console.log("res from update user", response.data.message);
           getAllUsers();
           closePaidModal();
         }
       },
       (err) => {
+        setPaidBtnLoader(false);
         console.log("err", err);
       }
     );
@@ -197,7 +205,12 @@ const CommonTable = ({ usersData, getAllUsers }) => {
             }}
             defaultButtonText="Tt update"
           />
-          <ButtonComponent text={"Update"} handler={updateBtnHandler} />
+          <ButtonComponent
+            indicator={updateBtnLoader}
+            disabled={updateBtnLoader}
+            text={"Update"}
+            handler={updateBtnHandler}
+          />
         </View>
       </Modal>
 
@@ -230,7 +243,12 @@ const CommonTable = ({ usersData, getAllUsers }) => {
             }}
             defaultButtonText="Paid status"
           />
-          <ButtonComponent text={"Update"} handler={updatePaidBtnHandler} />
+          <ButtonComponent
+            indicator={paidBtnLoader}
+            disabled={paidBtnLoader}
+            text={"Update"}
+            handler={updatePaidBtnHandler}
+          />
         </View>
       </Modal>
     </>

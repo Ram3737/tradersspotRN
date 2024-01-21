@@ -1,4 +1,4 @@
-import { View, StyleSheet, Modal } from "react-native";
+import { View, StyleSheet, Modal, ScrollView } from "react-native";
 
 import WebView from "react-native-webview";
 import BottomSheet from "react-native-simple-bottom-sheet";
@@ -59,76 +59,88 @@ function MarketScreen() {
  `;
 
   return (
-    <View
-      style={[
-        CommonStyles.mainContainer,
-        { padding: 0, justifyContent: "flex-start" },
-      ]}
+    <ScrollView
+      style={styles.scrollMainContainer}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
     >
-      <View style={styles.chartCont}>
-        <TradingViewChartWidget />
-        <ButtonComponent
-          style={styles.fullChartBtn}
-          text={"view full chart"}
-          handler={toggleModal}
-        />
-      </View>
-      <View style={styles.newsTechWidCont}>
-        <View style={styles.mtr1Cont}>
-          <WebView
-            style={styles.webV}
-            source={{ html: newsWidget }}
-            scalesPageToFit={false}
-            scrollEnabled={false}
-            javaScriptEnabled={true}
-            originWhitelist={["*"]}
+      <View
+        style={[
+          CommonStyles.mainContainer,
+          { padding: 0, justifyContent: "flex-start" },
+        ]}
+      >
+        <View style={styles.chartCont}>
+          <TradingViewChartWidget />
+          <ButtonComponent
+            style={styles.fullChartBtn}
+            text={"view full chart"}
+            handler={toggleModal}
           />
         </View>
-      </View>
-
-      <BottomSheet
-        isOpen={false}
-        sliderMinHeight={45}
-        sliderMaxHeight={700}
-        wrapperStyle={{
-          backgroundColor: Colors.mainBgClr,
-          paddingHorizontal: 0,
-          paddingTop: 0,
-        }}
-      >
-        {(onScrollEndDrag) => (
-          <View style={styles.mtrCont}>
+        <View style={styles.newsTechWidCont}>
+          <View style={styles.mtr1Cont}>
             <WebView
-              style={styles.webVSlider}
-              source={{ html: techanalysisWidget }}
+              style={styles.webV}
+              source={{ html: newsWidget }}
               scalesPageToFit={false}
               scrollEnabled={false}
               javaScriptEnabled={true}
               originWhitelist={["*"]}
             />
           </View>
-        )}
-      </BottomSheet>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          toggleModal();
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <TradingViewFullChart />
         </View>
-      </Modal>
-    </View>
+
+        <BottomSheet
+          isOpen={false}
+          sliderMinHeight={45}
+          sliderMaxHeight={700}
+          wrapperStyle={{
+            backgroundColor: Colors.mainBgClr,
+            paddingHorizontal: 0,
+            paddingTop: 0,
+          }}
+        >
+          {(onScrollEndDrag) => (
+            <View style={styles.mtrCont}>
+              <WebView
+                style={styles.webVSlider}
+                source={{ html: techanalysisWidget }}
+                scalesPageToFit={false}
+                scrollEnabled={false}
+                javaScriptEnabled={true}
+                originWhitelist={["*"]}
+              />
+            </View>
+          )}
+        </BottomSheet>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            toggleModal();
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <TradingViewFullChart />
+          </View>
+        </Modal>
+      </View>
+    </ScrollView>
   );
 }
 
 export default MarketScreen;
 
 const styles = StyleSheet.create({
+  scrollMainContainer: {
+    width: "100%",
+    height: "100%",
+    flexGrow: 1,
+    backgroundColor: Colors.mainBgClr,
+  },
   chartCont: {
     width: "93%",
     height: "32%",
@@ -144,7 +156,7 @@ const styles = StyleSheet.create({
     paddingVertical: "4%",
     paddingBottom: "8.5%",
     marginTop: "3%",
-    backgroundColor: Colors.clr2,
+    backgroundColor: Colors.transparentBg,
     position: "relative",
   },
 

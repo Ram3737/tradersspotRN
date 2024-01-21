@@ -367,120 +367,158 @@ function AnalysisStatsScreen() {
             />
           </View>
 
-          <View style={styles.statContTop2}>
-            <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
-              {analysisData.length > 0 &&
-                (!authCtx.swingAnalysisLoader ||
-                  !authCtx.freeSwingAnalysisLoader) &&
-                !isLoading && (
-                  <DonutChart
-                    top={"36%"}
-                    left={"24%"}
-                    series={[
-                      contToDisplay
-                        ? authCtx.freeSwingAnalysisStats
-                            ?.totalRiskLastFiveMonth > 0
-                          ? authCtx.freeSwingAnalysisStats
-                              .totalRiskLastFiveMonth
-                          : 10
-                        : (authCtx.swingAnalysisStats.totalRiskLastFiveMonth > 0
-                            ? authCtx.swingAnalysisStats.totalRiskLastFiveMonth
-                            : 10) || 10,
-                      contToDisplay
-                        ? authCtx.freeSwingAnalysisStats
-                            .totalRewardLastFiveMonth > 0
-                          ? authCtx.freeSwingAnalysisStats
-                              .totalRewardLastFiveMonth
-                          : 50
-                        : (authCtx.swingAnalysisStats.totalRewardLastFiveMonth >
-                          0
-                            ? authCtx.swingAnalysisStats
-                                .totalRewardLastFiveMonth
-                            : 30) || 50,
-                    ]}
-                  />
-                )}
+          {isLoading && (
+            <ActivityIndicator
+              size="small"
+              color={Colors.clr4}
+              style={{ marginTop: "10%" }}
+            />
+          )}
 
-              {analysisData.length === 0 &&
-                (!authCtx.swingAnalysisLoader ||
-                  !authCtx.freeSwingAnalysisLoader) &&
-                !isLoading && (
-                  <View>
-                    <Text
-                      style={[
-                        styles.labelContText,
-                        {
-                          fontSize: CalculateFontSize(1.8),
-                          marginTop: "10%",
-                          alignSelf: "center",
-                        },
-                      ]}
-                    >
-                      No data
-                    </Text>
-                  </View>
-                )}
+          {analysisData.length > 0 &&
+            !isLoading &&
+            (!authCtx.swingAnalysisLoader ||
+              !authCtx.freeSwingAnalysisLoader) && (
+              <View style={styles.statContTop2}>
+                <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
+                  {analysisData.length > 0 &&
+                    (!authCtx.swingAnalysisLoader ||
+                      !authCtx.freeSwingAnalysisLoader) &&
+                    !isLoading && (
+                      <DonutChart
+                        top={"36%"}
+                        left={"24%"}
+                        series={[
+                          contToDisplay
+                            ? authCtx.freeSwingAnalysisStats
+                                ?.totalRiskLastFiveMonth > 0
+                              ? authCtx.freeSwingAnalysisStats
+                                  .totalRiskLastFiveMonth
+                              : 10
+                            : (authCtx.swingAnalysisStats
+                                .totalRiskLastFiveMonth > 0
+                                ? authCtx.swingAnalysisStats
+                                    .totalRiskLastFiveMonth
+                                : 10) || 10,
+                          contToDisplay
+                            ? authCtx.freeSwingAnalysisStats
+                                .totalRewardLastFiveMonth > 0
+                              ? authCtx.freeSwingAnalysisStats
+                                  .totalRewardLastFiveMonth
+                              : 50
+                            : (authCtx.swingAnalysisStats
+                                .totalRewardLastFiveMonth > 0
+                                ? authCtx.swingAnalysisStats
+                                    .totalRewardLastFiveMonth
+                                : 30) || 50,
+                        ]}
+                      />
+                    )}
 
-              {isLoading && (
-                <ActivityIndicator
-                  size="small"
-                  color={Colors.clr4}
-                  style={{ marginTop: "40%" }}
-                />
-              )}
-            </View>
-            <View style={styles.lineChartCont}>
-              {(authCtx.swingAnalysisLoader ||
-                authCtx.freeSwingAnalysisLoader) &&
-              isLoading ? (
-                <ActivityIndicator
-                  size="small"
-                  color={Colors.clr4}
-                  style={{ marginTop: "25%", marginRight: "50%" }}
-                />
-              ) : (
-                <View style={styles.lineChartContSub}>
-                  {barChartValue.length > 0 ? (
-                    barChartValue.map((item, index) => (
-                      <View key={index} style={styles.lineCont}>
-                        <Text style={[styles.labelContText, { marginTop: 0 }]}>
-                          {`${item.risk}:${item.reward}`}
+                  {analysisData.length === 0 &&
+                    (!authCtx.swingAnalysisLoader ||
+                      !authCtx.freeSwingAnalysisLoader) &&
+                    !isLoading && (
+                      <View>
+                        <Text
+                          style={[
+                            styles.labelContText,
+                            {
+                              fontSize: CalculateFontSize(1.8),
+                              marginTop: "10%",
+                              alignSelf: "center",
+                            },
+                          ]}
+                        >
+                          No data
                         </Text>
-                        <View style={styles.lineOut}>
-                          <View
+                      </View>
+                    )}
+
+                  {isLoading && (
+                    <ActivityIndicator
+                      size="small"
+                      color={Colors.clr4}
+                      style={{ marginTop: "40%" }}
+                    />
+                  )}
+                </View>
+                <View style={styles.lineChartCont}>
+                  {(authCtx.swingAnalysisLoader ||
+                    authCtx.freeSwingAnalysisLoader) &&
+                  isLoading ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={Colors.clr4}
+                      style={{ marginTop: "35%", marginRight: "50%" }}
+                    />
+                  ) : (
+                    <View style={styles.lineChartContSub}>
+                      {barChartValue.length > 0 ? (
+                        barChartValue.map((item, index) => (
+                          <View key={index} style={styles.lineCont}>
+                            <Text
+                              style={[styles.labelContText, { marginTop: 0 }]}
+                            >
+                              {`${item.risk}:${item.reward}`}
+                            </Text>
+                            <View style={styles.lineOut}>
+                              <View
+                                style={[
+                                  styles.lineIn,
+                                  {
+                                    height: `${
+                                      item.reward * 5 >= 100
+                                        ? 100
+                                        : item.reward * 5
+                                    }%`,
+                                  },
+                                ]}
+                              ></View>
+                            </View>
+                            <Text style={[styles.labelContText]}>
+                              {item.month}
+                            </Text>
+                          </View>
+                        ))
+                      ) : (
+                        <View>
+                          <Text
                             style={[
-                              styles.lineIn,
+                              styles.labelContText,
                               {
-                                height: `${
-                                  item.reward * 5 >= 100 ? 100 : item.reward * 5
-                                }%`,
+                                fontSize: CalculateFontSize(1.8),
+                                marginTop: "30%",
+                                alignSelf: "center",
                               },
                             ]}
-                          ></View>
+                          >
+                            No data
+                          </Text>
                         </View>
-                        <Text style={[styles.labelContText]}>{item.month}</Text>
-                      </View>
-                    ))
-                  ) : (
-                    <View>
-                      <Text
-                        style={[
-                          styles.labelContText,
-                          {
-                            fontSize: CalculateFontSize(1.8),
-                            marginTop: "30%",
-                            alignSelf: "center",
-                          },
-                        ]}
-                      >
-                        No data
-                      </Text>
+                      )}
                     </View>
                   )}
                 </View>
-              )}
+              </View>
+            )}
+
+          {analysisData.length === 0 && !isLoading && (
+            <View>
+              <Text
+                style={[
+                  styles.labelContText,
+                  {
+                    fontSize: CalculateFontSize(1.8),
+                    marginTop: "30%",
+                    alignSelf: "center",
+                  },
+                ]}
+              >
+                No data
+              </Text>
             </View>
-          </View>
+          )}
         </View>
       </View>
       <View style={styles.analysisScrollCont}>

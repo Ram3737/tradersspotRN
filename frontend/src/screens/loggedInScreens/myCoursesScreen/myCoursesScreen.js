@@ -19,6 +19,7 @@ import Colors from "../../../components/colors/colors";
 import VideoModal from "./components/videoModal";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
+import UserProfileModal from "../../../components/modal/userProfileModal";
 
 //FOR FONT RESPONSIVE HEIGHT
 const { height } = Dimensions.get("window");
@@ -32,6 +33,7 @@ function MyCoursesScreen() {
   const authCtx = useContext(AuthContext);
 
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
 
   const [mainTopics, setMainTopics] = useState([
     {
@@ -74,7 +76,7 @@ function MyCoursesScreen() {
   const [allContent, setAllContent] = useState();
   const [content, setContent] = useState([]);
   const [modalVideoContent, setModalVideoContent] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("BASICS");
   const [selectedContent, setSelectedContent] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -151,13 +153,13 @@ function MyCoursesScreen() {
     setSelectedContent(selectedContent);
   };
 
-  function logout() {
-    authCtx.logout();
+  const toggleProfileModal = () => {
+    setIsProfileModalVisible(!isProfileModalVisible);
+  };
 
-    setTimeout(() => {
-      navigation.navigate("beforeLoggedIn");
-    }, 200);
-  }
+  const closeProfileModal = () => {
+    setIsProfileModalVisible(!isProfileModalVisible);
+  };
 
   return (
     <View
@@ -204,13 +206,16 @@ function MyCoursesScreen() {
               </Text>
             </View>
 
-            <View style={styles.topInfoContFloatTopSub}>
+            <TouchableOpacity
+              style={styles.topInfoContFloatTopSub}
+              onPress={() => toggleProfileModal()}
+            >
               <Image
                 source={require("../../../images/icons/user.png")}
                 style={styles.topInfoContFloatTopSubImg}
               />
               <Text style={styles.topInfoContFloatTopSubText}>Profile</Text>
-            </View>
+            </TouchableOpacity>
           </View>
 
           {/* <View style={{ height: "36%" }}>
@@ -295,7 +300,8 @@ function MyCoursesScreen() {
               style={{ marginTop: "20%" }}
             />
           )}
-          {content.length > 0 && !isLoading ? (
+          {content.length > 0 &&
+            !isLoading &&
             content.map((content, index) => (
               <View
                 key={index}
@@ -334,9 +340,24 @@ function MyCoursesScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-            ))
-          ) : (
-            <Text>No data</Text>
+            ))}
+
+          {content.length === 0 && !isLoading && (
+            <View>
+              <Text
+                style={[
+                  styles.labelContText,
+                  {
+                    fontSize: calculateFontSize(1.5),
+                    marginTop: "10%",
+                    marginBottom: "20%",
+                    alignSelf: "center",
+                  },
+                ]}
+              >
+                No data
+              </Text>
+            </View>
           )}
         </ScrollView>
       </View>
@@ -349,6 +370,11 @@ function MyCoursesScreen() {
         modalVideoHandler={modalVideoHandler}
         closeModal={closeModal}
         isModalVisible={isModalVisible}
+      />
+
+      <UserProfileModal
+        closeModal={closeProfileModal}
+        isModalVisible={isProfileModalVisible}
       />
     </View>
   );
@@ -467,7 +493,7 @@ const styles = StyleSheet.create({
   },
 
   categoryCont: {
-    height: "28%",
+    height: 200,
     width: "100%",
     marginTop: "7%",
     // backgroundColor: "red",
@@ -480,7 +506,7 @@ const styles = StyleSheet.create({
     marginBottom: "2%",
   },
   categorySubCont: {
-    height: "25%",
+    height: "100%",
     width: "100%",
     paddingVertical: 10,
     flexDirection: "row",
@@ -664,5 +690,9 @@ const styles = StyleSheet.create({
   playBtnImg: {
     width: 10,
     height: 10,
+  },
+  labelContText: {
+    fontSize: calculateFontSize(1.2),
+    color: "#c9c8c7",
   },
 });

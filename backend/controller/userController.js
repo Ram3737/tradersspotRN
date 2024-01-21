@@ -70,6 +70,7 @@ const signInUser = async (req, res) => {
 
     res.status(200).json({
       email: user.email,
+      mobileNumber: user.mobileNumber,
       userType: user.userType,
       courseType: user.courseType,
       paid: user.paid,
@@ -163,10 +164,61 @@ const updateUser = async (req, res) => {
   }
 };
 
+const checkUserPassword = async (req, res) => {
+  try {
+    const { email, enteredPassword } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(
+      enteredPassword,
+      user.password
+    );
+
+    if (!isPasswordMatch) {
+      return res
+        .status(401)
+        .json({ message: "Entered password does not match" });
+    }
+
+    res.status(200).json({ message: "Password is correct" });
+  } catch (error) {
+    console.error("checkUserPassword", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("resetPassword", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createUser,
   signInUser,
   getAllUsers,
   buyCourse,
   updateUser,
+  checkUserPassword,
+  resetPassword,
 };

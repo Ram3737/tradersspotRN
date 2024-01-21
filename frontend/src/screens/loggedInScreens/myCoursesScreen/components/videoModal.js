@@ -85,7 +85,11 @@ function VideoModal({
         </View> */}
 
         <View style={styles.belowCont}>
-          <View style={styles.belowSubCont}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            style={styles.belowSubCont}
+          >
             {/* <Image
               source={require("../../.././../images/pictures/descriptionTop.png")}
               style={styles.modalFloatImg}
@@ -160,7 +164,7 @@ function VideoModal({
                 ))}
               </ScrollView>
             </View>
-          </View>
+          </ScrollView>
         </View>
       </View>
     </Modal>

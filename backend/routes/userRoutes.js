@@ -30,5 +30,6 @@ router.post("/signin", userController.signInUser);
 router.get("/getAllUsers", userController.getAllUsers);
 router.patch("/buyCourse", userController.buyCourse);
 router.patch("/updateUser/:id", userController.updateUser);
-
+router.post("/checkPassword", userController.checkUserPassword);
+router.post("/resetPassword", userController.resetPassword);
 module.exports = router;

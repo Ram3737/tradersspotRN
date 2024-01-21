@@ -3,7 +3,6 @@ import {
   Text,
   Image,
   ImageBackground,
-  TouchableOpacity,
   ScrollView,
   Modal,
   ActivityIndicator,
@@ -300,16 +299,21 @@ function OurCoursesScreen() {
   };
 
   return (
-    <View
-      style={[CommonStyles.mainContainer, { justifyContent: "flex-start" }]}
+    <ScrollView
+      style={styles.scrollMainContainer}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
     >
-      <CustomAlertBox
-        visible={alertVisible}
-        onClose={hideAlert}
-        message="Purchased successfully"
-        needCancelBtn={false}
-      />
-      {/* <View style={styles.tabCont}>
+      <View
+        style={[CommonStyles.mainContainer, { justifyContent: "flex-start" }]}
+      >
+        <CustomAlertBox
+          visible={alertVisible}
+          onClose={hideAlert}
+          message="Purchased successfully"
+          needCancelBtn={false}
+        />
+        {/* <View style={styles.tabCont}>
         <TouchableOpacity
           style={[
             { backgroundColor: tab === "basic" ? Colors.clr3 : Colors.clr2 },
@@ -341,188 +345,204 @@ function OurCoursesScreen() {
         </TouchableOpacity>
       </View>*/}
 
-      <View style={{ height: "80%", marginTop: "8%" }}>
-        <Carousel
-          layout="default"
-          layoutCardOffset={9}
-          ref={isCarousel}
-          data={data}
-          renderItem={CarouselCardItem}
-          sliderWidth={SLIDER_WIDTH - 20}
-          itemWidth={ITEM_WIDTH - 20}
-          onSnapToItem={(index) => setTab(index)}
-          useScrollView={true}
-        />
-        <Pagination
-          dotsLength={data.length}
-          activeDotIndex={tab}
-          carouselRef={isCarousel}
-          dotStyle={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            marginHorizontal: 0,
-            backgroundColor: "#555",
-          }}
-          inactiveDotOpacity={0.4}
-          inactiveDotScale={0.6}
-          tappableDots={true}
-        />
-      </View>
-
-      <Text style={styles.SwipeText}>Swipe up for course contents</Text>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          toggleModal();
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <ButtonComponent text={"Make Payment"} handler={makePaymentHandler} />
-          {isLoading && <ActivityIndicator size="large" color={Colors.clr4} />}
+        <View style={{ height: "80%", marginTop: "8%" }}>
+          <Carousel
+            layout="default"
+            layoutCardOffset={9}
+            ref={isCarousel}
+            data={data}
+            renderItem={CarouselCardItem}
+            sliderWidth={SLIDER_WIDTH - 20}
+            itemWidth={ITEM_WIDTH - 20}
+            onSnapToItem={(index) => setTab(index)}
+            useScrollView={true}
+          />
+          <Pagination
+            dotsLength={data.length}
+            activeDotIndex={tab}
+            carouselRef={isCarousel}
+            dotStyle={{
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              marginHorizontal: 0,
+              backgroundColor: "#555",
+            }}
+            inactiveDotOpacity={0.4}
+            inactiveDotScale={0.6}
+            tappableDots={true}
+          />
         </View>
-      </Modal>
-      <BottomSheet
-        isOpen={false}
-        sliderMinHeight={40}
-        sliderMaxHeight={680}
-        wrapperStyle={{
-          backgroundColor: Colors.clr2,
-          paddingHorizontal: 0,
-          paddingTop: 0,
-          paddingBottom: 15,
-        }}
-      >
-        {(onScrollEndDrag) => (
-          <ScrollView style={styles.courseContentCont}>
-            {/* <Text style={styles.headingText}>Course Content</Text> */}
-            <View style={styles.contents}>
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>BASICS</Text>
-                </View>
-                <Text style={styles.contentsName}>
-                  - What is Stock Trading ?
-                </Text>
-                <Text style={styles.contentsName}>- Charts & Candlesticks</Text>
-                <Text style={styles.contentsName}>
-                  - Fundamental vs Technical analysis
-                </Text>
-              </View>
 
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>CORE</Text>
-                </View>
-                <Text style={styles.contentsName}>
-                  - Support & Resistance (Supply & Demand)
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Zones and how to identify zone ?
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Trendlines and how to draw a perfect trendline ?
-                </Text>
-              </View>
-
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>INDICTORS</Text>
-                </View>
-                <Text style={styles.contentsName}>
-                  - Lagging vs Leading indicator
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Volume Profile and how to use it ?
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Golden Fibonacci rule (0.618)
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Relative Strength Index (RSI) & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Moving Averages (9ma, 20ma, 50ma) & cheatsheet
-                </Text>
-              </View>
-
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>PATTERNS</Text>
-                </View>
-                <Text style={styles.contentsName}>- What are Patterns ?</Text>
-                <Text style={styles.contentsName}>
-                  - Triangle pattern & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Channel pattern & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Flag pattern & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Wedge pattern & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Double Top pattern & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Double Bottom pattern & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Head and Shoulder & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Inverse Head and Shoulder & cheatsheet
-                </Text>
-                <Text style={styles.contentsName}>
-                  - Major patterns to trade
-                </Text>
-              </View>
-
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>STARTEGIES</Text>
-                </View>
-                <Text style={styles.contentsName}>
-                  - #1 strategy for Intraday
-                </Text>
-                <Text style={styles.contentsName}>- #1 strategy for Swing</Text>
-              </View>
-
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>
-                    RISK MANAGEMENT
+        <Text style={styles.SwipeText}>Swipe up for course contents</Text>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            toggleModal();
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <ButtonComponent
+              text={"Make Payment"}
+              handler={makePaymentHandler}
+            />
+            {isLoading && (
+              <ActivityIndicator size="large" color={Colors.clr4} />
+            )}
+          </View>
+        </Modal>
+        <BottomSheet
+          isOpen={false}
+          sliderMinHeight={40}
+          sliderMaxHeight={680}
+          wrapperStyle={{
+            backgroundColor: Colors.clr2,
+            paddingHorizontal: 0,
+            paddingTop: 0,
+            paddingBottom: 15,
+          }}
+        >
+          {(onScrollEndDrag) => (
+            <ScrollView style={styles.courseContentCont}>
+              {/* <Text style={styles.headingText}>Course Content</Text> */}
+              <View style={styles.contents}>
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>BASICS</Text>
+                  </View>
+                  <Text style={styles.contentsName}>
+                    - What is Stock Trading ?
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Charts & Candlesticks
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Fundamental vs Technical analysis
                   </Text>
                 </View>
-                <Text style={styles.contentsName}>- Position sizing</Text>
-                <Text style={styles.contentsName}>- Risk / Reward</Text>
-              </View>
 
-              <View style={styles.contentsSub}>
-                <View style={styles.contentsSideHeadingCont}>
-                  <Text style={styles.contentsSideHeading}>Bonus</Text>
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>CORE</Text>
+                  </View>
+                  <Text style={styles.contentsName}>
+                    - Support & Resistance (Supply & Demand)
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Zones and how to identify zone ?
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Trendlines and how to draw a perfect trendline ?
+                  </Text>
                 </View>
-                <Text style={styles.contentsName}>- Breakout vs Fakeout</Text>
-                <Text style={styles.contentsName}>
-                  - Perfect & Confluence entry
-                </Text>
-                <Text style={styles.contentsName}>- Trail your trade</Text>
+
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>INDICTORS</Text>
+                  </View>
+                  <Text style={styles.contentsName}>
+                    - Lagging vs Leading indicator
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Volume Profile and how to use it ?
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Golden Fibonacci rule (0.618)
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Relative Strength Index (RSI) & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Moving Averages (9ma, 20ma, 50ma) & cheatsheet
+                  </Text>
+                </View>
+
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>PATTERNS</Text>
+                  </View>
+                  <Text style={styles.contentsName}>- What are Patterns ?</Text>
+                  <Text style={styles.contentsName}>
+                    - Triangle pattern & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Channel pattern & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Flag pattern & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Wedge pattern & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Double Top pattern & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Double Bottom pattern & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Head and Shoulder & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Inverse Head and Shoulder & cheatsheet
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - Major patterns to trade
+                  </Text>
+                </View>
+
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>STARTEGIES</Text>
+                  </View>
+                  <Text style={styles.contentsName}>
+                    - #1 strategy for Intraday
+                  </Text>
+                  <Text style={styles.contentsName}>
+                    - #1 strategy for Swing
+                  </Text>
+                </View>
+
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>
+                      RISK MANAGEMENT
+                    </Text>
+                  </View>
+                  <Text style={styles.contentsName}>- Position sizing</Text>
+                  <Text style={styles.contentsName}>- Risk / Reward</Text>
+                </View>
+
+                <View style={styles.contentsSub}>
+                  <View style={styles.contentsSideHeadingCont}>
+                    <Text style={styles.contentsSideHeading}>Bonus</Text>
+                  </View>
+                  <Text style={styles.contentsName}>- Breakout vs Fakeout</Text>
+                  <Text style={styles.contentsName}>
+                    - Perfect & Confluence entry
+                  </Text>
+                  <Text style={styles.contentsName}>- Trail your trade</Text>
+                </View>
               </View>
-            </View>
-          </ScrollView>
-        )}
-      </BottomSheet>
-    </View>
+            </ScrollView>
+          )}
+        </BottomSheet>
+      </View>
+    </ScrollView>
   );
 }
 
 export default OurCoursesScreen;
 
 const styles = StyleSheet.create({
+  scrollMainContainer: {
+    width: "100%",
+    height: "100%",
+    flexGrow: 1,
+    backgroundColor: Colors.mainBgClr,
+  },
   container: {
     backgroundColor: Colors.transparentBg,
     height: "90%",

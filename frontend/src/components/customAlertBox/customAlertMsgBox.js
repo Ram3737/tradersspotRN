@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   alertBox: {
     width: "85%",
     padding: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backgroundColor: "#303030",
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",

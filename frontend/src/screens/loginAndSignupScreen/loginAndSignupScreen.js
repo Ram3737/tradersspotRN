@@ -145,6 +145,7 @@ function LoginAndSignupScreen() {
           authCtx.setCourseType(response.data.courseType);
           authCtx.setUserType(response.data.userType);
           authCtx.setUserEmail(response.data.email);
+          authCtx.setMblNo(response.data.mobileNumber);
           authCtx.setPaid(response.data.paid);
           authCtx.setTriedToUpdate(response.data.triedToUpdate);
           authCtx.authenticationHandler();
@@ -168,7 +169,6 @@ function LoginAndSignupScreen() {
       },
       (err) => {
         setBtnLoader(false);
-        console.log(3);
         console.log(
           "errr",
           err.message || err.response?.data.message || "hiiiii"
@@ -311,6 +311,7 @@ function LoginAndSignupScreen() {
                 <ButtonComponent
                   style={{ marginTop: 20 }}
                   indicator={btnLoader}
+                  disabled={btnLoader}
                   text={"Login"}
                   handler={loginClickHandler}
                 />
@@ -372,6 +373,7 @@ function LoginAndSignupScreen() {
                 <ButtonComponent
                   style={{ marginTop: 20 }}
                   indicator={btnLoader}
+                  disabled={btnLoader}
                   text={"SignUp"}
                   handler={signUpClickHandler}
                 />

@@ -8,6 +8,7 @@ export const AuthContext = createContext({
   courseType: "",
   userType: "",
   userEmail: "",
+  mblNo: "",
   triedToUpdate: "",
   registerSignupToggle: "",
   userSelectedCourse: "",
@@ -22,6 +23,7 @@ export const AuthContext = createContext({
   setCourseType: () => {},
   setUserType: () => {},
   setUserEmail: () => {},
+  setMblNo: () => {},
   setTriedToUpdate: () => {},
   setRegisterSignupToggle: () => {},
   setUserSelectedCourse: () => {},
@@ -35,6 +37,7 @@ function AuthContextProvider({ children }) {
   const [courseType, setCourseType] = useState(null);
   const [userType, setUserType] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const [mblNo, setMblNo] = useState(null);
   const [registerSignupToggle, setRegisterSignupToggle] = useState(false);
   const [userSelectedCourse, setUserSelectedCourse] = useState(null);
   const [triedToUpdate, setTriedToUpdate] = useState(false);
@@ -100,9 +103,10 @@ function AuthContextProvider({ children }) {
   function logout() {
     setIsAuthenticated(false);
     setPaid(false);
-    setCourseType(false);
+    setCourseType(null);
     setUserType(false);
     setUserEmail(false);
+    setMblNo(null);
     setUserSelectedCourse(null);
     setToken(null);
     setTriedToUpdate(false);
@@ -116,6 +120,7 @@ function AuthContextProvider({ children }) {
     courseType: courseType,
     userType: userType,
     userEmail: userEmail,
+    mblNo: mblNo,
     triedToUpdate: triedToUpdate,
     registerSignupToggle: registerSignupToggle,
     userSelectedCourse: userSelectedCourse,
@@ -125,6 +130,7 @@ function AuthContextProvider({ children }) {
     swingAnalysisLoader: swingAnalysisLoader,
     freeSwingAnalysisLoader: freeSwingAnalysisLoader,
     setUserEmail: setUserEmail,
+    setMblNo: setMblNo,
     setToken: setToken,
     setPaid: setPaid,
     setCourseType: setCourseType,

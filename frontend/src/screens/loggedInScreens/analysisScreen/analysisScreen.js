@@ -379,7 +379,7 @@ function AnalysisScreen() {
                 {authCtx.swingAnalysisStats && (
                   <DonutChart
                     top={"35%"}
-                    left={"26%"}
+                    left={"20%"}
                     marginTop={"8%"}
                     series={[
                       contToDisplay

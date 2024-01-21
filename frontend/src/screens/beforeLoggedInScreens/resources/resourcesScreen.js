@@ -4,7 +4,9 @@ import {
   Linking,
   Image,
   ScrollView,
+  TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
   StyleSheet,
 } from "react-native";
 import { useState, useContext, useEffect } from "react";
@@ -24,6 +26,9 @@ function ResourcesScreen() {
   const [btnLoader, setBtnLoader] = useState(false);
   const [register, setRegister] = useState(false);
   const [selectedBook, setSelectedBook] = useState(0);
+  const [msg, setMsg] = useState("");
+  const [mobileNo, setMobileNo] = useState("8248189924");
+  const phoneNumber = "8248189924";
   const [selectedBookLink, setSelectedBookLink] = useState(
     "download-trading-in-the-zone-pdf"
   );
@@ -71,29 +76,45 @@ function ResourcesScreen() {
     setBtnLoader(true);
     const url = `${config.apiurl}/book/${selectedBookLink}`;
     Linking.openURL(url);
-    // const url = "http://192.168.1.8:3000/api/book/downloadPdf";
-    // const fileUri = FileSystem.documentDirectory + "Trading-guide.pdf";
-
-    // try {
-    //   const { uri } = await FileSystem.downloadAsync(url, fileUri);
-
-    //   // Open the downloaded PDF file
-    //   await Sharing.shareAsync(uri, {
-    //     mimeType: "application/pdf",
-    //     dialogTitle: "Share PDF",
-    //   });
-    // } catch (error) {
-    //   console.error("Error downloading PDF:", error);
-    // }
     setBtnLoader(false);
   };
 
+  const handleCallClick = () => {
+    const url = `tel:${phoneNumber}`;
+    Linking.openURL(url)
+      .then((supported) => {
+        if (!supported) {
+          console.error("Phone number is not supported");
+        }
+      })
+      .catch((err) => console.error("An error occurred", err));
+  };
+
+  const sendOnWhatsApp = () => {
+    if (msg) {
+      let url = "whatsapp://send?phone=91" + mobileNo + "&text=" + msg;
+      Linking.openURL(url)
+        .then(() => {
+          setTimeout(() => {
+            setMsg("");
+          }, 3000);
+        })
+        .catch(() => {
+          Alert.alert(
+            "Error",
+            "Make sure WhatsApp is installed on your device"
+          );
+        });
+    } else {
+      Alert.alert("Error", "Please type a message to send");
+    }
+  };
+
   return (
-    <View
-      style={[
-        CommonStyles.mainContainer,
-        { justifyContent: "flex-start", paddingHorizontal: 0 },
-      ]}
+    <ScrollView
+      style={styles.scrollMainContainer}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
     >
       <CustomAlertMsgBox
         visible={register}
@@ -166,21 +187,76 @@ function ResourcesScreen() {
         </View>
       </View>
 
-      <View style={styles.contentCont}>
-        <Text style={styles.contentHeadingText}>Resources</Text>
+      <View style={styles.doubtsCont}>
+        <Text style={styles.contentHeadingText}>
+          Ask us any trading related doubts, we'll clear your doubts
+        </Text>
+        <View style={styles.doubtsContSub}>
+          {/* <Text style={styles.contentsCenterText1}>
+            Ask us any trading related doubts, we'll clear your doubts
+          </Text> */}
+          <View style={styles.callCont}>
+            <Text style={[styles.contentsCenterText1, { width: "65%" }]}>
+              Feel free to call us...
+            </Text>
+            <ButtonComponent
+              text={"Call"}
+              style={{
+                paddingVertical: 5,
+                paddingHorizontal: 15,
+              }}
+              fontStyle={{ fontSize: calculateFontSize(1.8) }}
+              handler={handleCallClick}
+            />
+          </View>
+          <Text
+            style={[
+              styles.contentsCenterText1,
+              { marginTop: "5%", marginBottom: "4%" },
+            ]}
+          >
+            or send your doubts here,
+          </Text>
+
+          <View style={styles.loginSubCont2}>
+            <TextInput
+              style={styles.input}
+              autoCorrect={false}
+              placeholder="Enter your doubts"
+              placeholderTextColor="#999"
+              textAlignVertical="top"
+              multiline={true}
+              numberOfLines={4} // You can adjust the number of lines displayed
+              value={msg}
+              onChangeText={(text) => setMsg(text)}
+            />
+            <ButtonComponent
+              style={{ paddingVertical: 5, paddingHorizontal: 15 }}
+              text={"Send"}
+              handler={sendOnWhatsApp}
+            />
+          </View>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 export default ResourcesScreen;
 
 const styles = StyleSheet.create({
+  scrollMainContainer: {
+    width: "100%",
+    height: "100%",
+    flexGrow: 1,
+    backgroundColor: Colors.mainBgClr,
+  },
   mainBookCont: {
     height: 330,
     width: "95%",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignSelf: "center",
     borderRadius: 10,
     borderWidth: 0.5,
     borderColor: Colors.clr3,
@@ -197,19 +273,12 @@ const styles = StyleSheet.create({
     height: "70%",
   },
 
-  contentCont: {
-    flex: 1,
-    width: "100%",
-    marginTop: "7%",
-    paddingBottom: 10,
-    // backgroundColor: "red",
-  },
   contentHeadingText: {
-    alignSelf: "center",
-    fontSize: calculateFontSize(2.2),
+    width: "100%",
+    alignSelf: "flex-end",
+    fontSize: calculateFontSize(2),
     fontWeight: "500",
     color: Colors.clr4,
-    paddingLeft: 10,
     marginBottom: "2%",
   },
 
@@ -273,18 +342,51 @@ const styles = StyleSheet.create({
     // backgroundColor: "blue",
   },
 
-  playBtn: {
-    width: 25,
-    height: 25,
+  doubtsCont: {
+    height: "auto",
+    width: "95%",
+    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.clr4,
-    borderRadius: 50,
-    // padding: 15,
+    alignSelf: "center",
+    marginTop: "10%",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 30,
+    backgroundColor: Colors.transparentBg,
+  },
+  doubtsContSub: {
+    width: "100%",
+    height: "auto",
+    // backgroundColor: "blue",
+  },
+  callCont: {
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: "5%",
+    // backgroundColor: "red",
   },
 
-  playBtnImg: {
-    width: 10,
-    height: 10,
+  loginSubCont2: {
+    width: "100%",
+    height: "auto",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    zIndex: 10,
+  },
+
+  input: {
+    width: "65%",
+    height: 100,
+    borderColor: "gray",
+    borderWidth: 0.3,
+    borderRadius: 5,
+    backgroundColor: "#333",
+    color: "#fff",
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
 });
