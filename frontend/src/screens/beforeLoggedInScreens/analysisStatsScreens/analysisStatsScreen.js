@@ -37,7 +37,14 @@ function AnalysisStatsScreen() {
       }AnalysisUser?page=100`,
       (response) => {
         if (response.status === 200) {
-          setAnalysisData(response.data.allSwingAnalyses);
+          if (!contToDisplay) {
+            const filteredData = response.data.allSwingAnalyses.filter(
+              (data) => data.result.resultLink !== null
+            );
+            setAnalysisData(filteredData);
+          } else {
+            setAnalysisData(response.data.allSwingAnalyses);
+          }
           setIsLoading(false);
         }
       },
@@ -80,129 +87,128 @@ function AnalysisStatsScreen() {
     setContToDisplay(!contToDisplay);
   };
 
-  const renderItemPaid = ({ item, index }) =>
-    item?.result?.resultLink && (
-      <View key={index} style={styles.analysis}>
-        <View style={styles.analysisSub}>
-          <View style={styles.analysisSubBtns}>
-            <Text style={styles.analysisSubBtnsText}>
-              {item?.analysis?.stockName}
-            </Text>
-          </View>
-
-          <View style={[styles.analysisSubBtns, { marginLeft: 8 }]}>
-            <Text style={styles.analysisSubBtnsText}>
-              {item?.analysis?.pattern}
-            </Text>
-          </View>
-
-          <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
-            {item.result?.breakout && (
-              <BlinkingDot color={item.result.breakout} />
-            )}
-          </View>
+  const renderItemPaid = ({ item, index }) => (
+    <View key={index} style={styles.analysis}>
+      <View style={styles.analysisSub}>
+        <View style={styles.analysisSubBtns}>
+          <Text style={styles.analysisSubBtnsText}>
+            {item?.analysis?.stockName}
+          </Text>
         </View>
 
-        <LinkPreview
-          enableAnimation={true}
-          containerStyle={{
-            // backgroundColor: "red",
-            width: "95%",
-          }}
-          metadataContainerStyle={{
-            display: "none",
-          }}
-          textContainerStyle={{
-            // backgroundColor: "#fff",
-            marginLeft: 0,
-            marginTop: 0,
-            marginBottom: 11,
-          }}
-          renderText={(text, props) => (
-            <Text
-              {...props}
-              style={{
-                color: Colors.clr4,
-                fontSize: CalculateFontSize(1.5),
-                fontWeight: "400",
-              }}
-            >
-              {text}
-            </Text>
+        <View style={[styles.analysisSubBtns, { marginLeft: 8 }]}>
+          <Text style={styles.analysisSubBtnsText}>
+            {item?.analysis?.pattern}
+          </Text>
+        </View>
+
+        <View style={{ marginLeft: "auto", alignSelf: "flex-start" }}>
+          {item.result?.breakout && (
+            <BlinkingDot color={item.result.breakout} />
           )}
-          text={item.analysis.analysisLink}
-        />
-        <View style={styles.viewResultCont}>
-          <TouchableOpacity
-            style={styles.playBtn}
-            onPress={() => viewResultHandler(index)}
-          >
-            <Text style={styles.viewResultText}>View Result</Text>
-          </TouchableOpacity>
         </View>
-        {viewResult === index &&
-          (item.result.resultLink && item.result.resultLink !== "none" ? (
-            <>
-              <Text style={styles.riskRewardText}>
-                {`${
-                  item.result?.reward === 0
-                    ? "stoploss hit"
-                    : `${item.result.risk}:${item.result.reward} RR`
-                }    ${
-                  item.result?.reward === 0
-                    ? -item.result?.percentage
-                    : item.result?.percentage
-                }%`}
-              </Text>
-
-              <LinkPreview
-                enableAnimation={true}
-                containerStyle={{
-                  // backgroundColor: "red",
-                  width: "95%",
-                }}
-                metadataContainerStyle={{
-                  display: "none",
-                }}
-                textContainerStyle={{
-                  // backgroundColor: "#fff",
-                  marginLeft: 0,
-                  marginTop: 8,
-                  marginBottom: 11,
-                }}
-                renderText={(text, props) => (
-                  <Text
-                    {...props}
-                    style={{
-                      color: Colors.clr4,
-                      fontSize: CalculateFontSize(1.5),
-                      fontWeight: "400",
-                    }}
-                  >
-                    {text}
-                  </Text>
-                )}
-                text={item.result.resultLink}
-              />
-            </>
-          ) : (
-            <Text
-              style={[
-                styles.riskRewardText,
-                {
-                  marginTop: -10,
-                  marginLeft: 10,
-                  fontSize: CalculateFontSize(1.2),
-                },
-              ]}
-            >
-              {item.result.resultLink == "none"
-                ? "No Result"
-                : "Not yet updated..."}
-            </Text>
-          ))}
       </View>
-    );
+
+      <LinkPreview
+        enableAnimation={true}
+        containerStyle={{
+          // backgroundColor: "red",
+          width: "95%",
+        }}
+        metadataContainerStyle={{
+          display: "none",
+        }}
+        textContainerStyle={{
+          // backgroundColor: "#fff",
+          marginLeft: 0,
+          marginTop: 0,
+          marginBottom: 11,
+        }}
+        renderText={(text, props) => (
+          <Text
+            {...props}
+            style={{
+              color: Colors.clr4,
+              fontSize: CalculateFontSize(1.5),
+              fontWeight: "400",
+            }}
+          >
+            {text}
+          </Text>
+        )}
+        text={item.analysis.analysisLink}
+      />
+      <View style={styles.viewResultCont}>
+        <TouchableOpacity
+          style={styles.playBtn}
+          onPress={() => viewResultHandler(index)}
+        >
+          <Text style={styles.viewResultText}>View Result</Text>
+        </TouchableOpacity>
+      </View>
+      {viewResult === index &&
+        (item.result.resultLink && item.result.resultLink !== "none" ? (
+          <>
+            <Text style={styles.riskRewardText}>
+              {`${
+                item.result?.reward === 0
+                  ? "stoploss hit"
+                  : `${item.result.risk}:${item.result.reward} RR`
+              }    ${
+                item.result?.reward === 0
+                  ? -item.result?.percentage
+                  : item.result?.percentage
+              }%`}
+            </Text>
+
+            <LinkPreview
+              enableAnimation={true}
+              containerStyle={{
+                // backgroundColor: "red",
+                width: "95%",
+              }}
+              metadataContainerStyle={{
+                display: "none",
+              }}
+              textContainerStyle={{
+                // backgroundColor: "#fff",
+                marginLeft: 0,
+                marginTop: 8,
+                marginBottom: 11,
+              }}
+              renderText={(text, props) => (
+                <Text
+                  {...props}
+                  style={{
+                    color: Colors.clr4,
+                    fontSize: CalculateFontSize(1.5),
+                    fontWeight: "400",
+                  }}
+                >
+                  {text}
+                </Text>
+              )}
+              text={item.result.resultLink}
+            />
+          </>
+        ) : (
+          <Text
+            style={[
+              styles.riskRewardText,
+              {
+                marginTop: -10,
+                marginLeft: 10,
+                fontSize: CalculateFontSize(1.2),
+              },
+            ]}
+          >
+            {item.result.resultLink == "none"
+              ? "No Result"
+              : "Not yet updated..."}
+          </Text>
+        ))}
+    </View>
+  );
 
   const renderItemFree = ({ item, index }) => (
     <View key={index} style={styles.analysis}>

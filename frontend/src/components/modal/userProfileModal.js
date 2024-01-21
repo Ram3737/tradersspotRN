@@ -79,15 +79,32 @@ function UserProfileModal({ closeModal, isModalVisible }) {
     setOldPassword(text);
   }
 
+  function isLengthValid(password) {
+    return password.length >= 6;
+  }
+
+  function hasDigit(password) {
+    return /\d/.test(password);
+  }
+
+  function hasSpecialCharacter(password) {
+    return /[!@#$%^&*]/.test(password);
+  }
+
+  function isValidPassword(password) {
+    return (
+      isLengthValid(password) &&
+      hasDigit(password) &&
+      hasSpecialCharacter(password)
+    );
+  }
+
   function newPasswordHandler(text) {
     setNewPassword(text);
-    if (
-      !text ||
-      text.length < 6 ||
-      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(text)
-    ) {
+
+    if (!text || !isValidPassword(text)) {
       setNewPasswordErrMsg(
-        "Password - least 6 characters - at least one digit - one special character."
+        "Password - at least 6 characters - at least one digit - one special character."
       );
     } else {
       setNewPasswordErrMsg(null);

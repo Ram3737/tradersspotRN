@@ -64,12 +64,15 @@ const getAllSwingAnalysis = async (req, res) => {
 const getAllSwingAnalysisUser = async (req, res) => {
   try {
     const page = req.query.page;
-    const limit = req.query.limit || 100;
+    const limit = 100;
     const skip = (page - 1) * limit;
 
     const allSwingAnalyses = await SwingAnalysisResult.find()
-      .sort({ createdAt: -1 })
+      .sort({
+        createdAt: -1,
+      })
       .limit(limit);
+
     const totalSwingAnalysis = await SwingAnalysisResult.countDocuments();
 
     res.status(200).json({ totalSwingAnalysis, allSwingAnalyses });
