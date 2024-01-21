@@ -79,39 +79,11 @@ function UserProfileModal({ closeModal, isModalVisible }) {
     setOldPassword(text);
   }
 
-  function isLengthValid(password) {
-    return password.length >= 6;
-  }
-
-  function hasDigit(password) {
-    return /\d/.test(password);
-  }
-
-  function hasSpecialCharacter(password) {
-    return /[!@#$%^&*]/.test(password);
-  }
-
-  function isValidPassword(password) {
-    return (
-      isLengthValid(password) &&
-      hasDigit(password) &&
-      hasSpecialCharacter(password)
-    );
-  }
-
   function newPasswordHandler(text) {
     setNewPassword(text);
-
-    if (!text || !isValidPassword(text)) {
-      setNewPasswordErrMsg(
-        "Password - at least 6 characters - at least one digit - one special character."
-      );
-    } else {
-      setNewPasswordErrMsg(null);
-    }
   }
 
-  function resetBtnHandler() {
+  function resetHandler() {
     if (
       isOldPasswordCorrect &&
       !newPasswordErrMsg &&
@@ -147,6 +119,22 @@ function UserProfileModal({ closeModal, isModalVisible }) {
           }, 2000);
         }
       );
+    }
+  }
+
+  function resetBtnHandler() {
+    if (newPassword.length === 0) {
+      setNewPasswordErrMsg(null);
+    } else if (
+      newPassword.length < 6 ||
+      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(newPassword)
+    ) {
+      setNewPasswordErrMsg(
+        "Password - at least 6 characters - at least one digit - one special character."
+      );
+    } else {
+      setNewPasswordErrMsg(null);
+      resetHandler();
     }
   }
 
@@ -320,7 +308,6 @@ function UserProfileModal({ closeModal, isModalVisible }) {
                       }}
                       fontStyle={{ fontSize: CalculateFontSize(1.6) }}
                       disabled={
-                        newPasswordErrMsg ||
                         !isOldPasswordCorrect ||
                         newPassword === null ||
                         oldPassword === null ||
