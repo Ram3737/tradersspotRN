@@ -81,17 +81,17 @@ function UserProfileModal({ closeModal, isModalVisible }) {
 
   function newPasswordHandler(text) {
     setNewPassword(text);
-    // if (
-    //   !text ||
-    //   text.length < 6 ||
-    //   !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(text)
-    // ) {
-    //   setNewPasswordErrMsg(
-    //     "Password - least 6 characters - at least one digit - one special character."
-    //   );
-    // } else {
-    //   setNewPasswordErrMsg(null);
-    // }
+    if (
+      !text ||
+      text.length < 6 ||
+      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(text)
+    ) {
+      setNewPasswordErrMsg(
+        "Password - least 6 characters - at least one digit - one special character."
+      );
+    } else {
+      setNewPasswordErrMsg(null);
+    }
   }
 
   function resetBtnHandler() {
@@ -204,7 +204,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
               <Text style={styles.labelText}>Mobile no</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Mobile nO"
+                placeholder="Mobile no"
                 placeholderTextColor="#fff"
                 keyboardType="numeric"
                 editable={false}
