@@ -81,18 +81,17 @@ function UserProfileModal({ closeModal, isModalVisible }) {
 
   function newPasswordHandler(text) {
     setNewPassword(text);
-    if (
-      !text ||
-      text.length < 6 ||
-      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(text)
-    ) {
-      setNewPasswordErrMsg(
-        "Password - least 6 characters - at least one digit - one special character."
-      );
-      return;
-    } else {
-      setNewPasswordErrMsg(null);
-    }
+    // if (
+    //   !text ||
+    //   text.length < 6 ||
+    //   !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(text)
+    // ) {
+    //   setNewPasswordErrMsg(
+    //     "Password - least 6 characters - at least one digit - one special character."
+    //   );
+    // } else {
+    //   setNewPasswordErrMsg(null);
+    // }
   }
 
   function resetBtnHandler() {
