@@ -171,7 +171,7 @@ function MainScreen() {
     <NavigationContainer>
       {authCtx.isAuthenticated &&
       authCtx.token &&
-      authCtx.courseType &&
+      authCtx.courseType !== "none" &&
       authCtx.paid ? (
         <AfterLogin />
       ) : authCtx.isAuthenticated &&

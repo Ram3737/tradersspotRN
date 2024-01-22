@@ -1,6 +1,7 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 
 const createUser = async (req, res) => {
@@ -8,7 +9,7 @@ const createUser = async (req, res) => {
     const { email, mobileNumber, password, courseType, triedToUpdate } =
       req.body;
     const userType = "learner";
-    const paid = null;
+    const paid = false;
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,6 +23,10 @@ const createUser = async (req, res) => {
       courseType,
       paid,
       triedToUpdate,
+      // resetPasswordOTP: {
+      //   code: null,
+      //   expiresAt: null,
+      // },
     });
 
     await newUser.save();
@@ -209,6 +214,88 @@ const resetPassword = async (req, res) => {
     res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error("resetPassword", error.message);
+    res
+      .status(500)
+      .json({ message: "Internal server error, Try after sometime" });
+  }
+};
+
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const transporter = nodemailer.createTransport({
+  service: "gmail", // use your email service provider
+  auth: {
+    user: "tradersspot.in@gmail.com", // replace with your email
+    pass: "mywu lutg khan bwil", // replace with your email password
+  },
+});
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    const otp = generateOTP();
+
+    // Save OTP and timestamp in temporary storage
+    user.resetPasswordOTP = {
+      code: otp,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    };
+
+    await user.save();
+
+    // Send OTP to user's email
+    const mailOptions = {
+      from: "tradersspot.in@gmail.com", // replace with your email
+      to: user.email,
+      subject: "Password Reset OTP",
+      text: `Your OTP for password reset is: ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("forgotPassword", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, enteredOTP } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { resetPasswordOTP } = user;
+
+    if (!resetPasswordOTP || resetPasswordOTP.expiresAt < Date.now()) {
+      return res
+        .status(400)
+        .json({ message: "OTP expired, Try after sometime..." });
+    }
+    if (resetPasswordOTP.code !== enteredOTP) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    // Clear the OTP after successful verification
+    user.resetPasswordOTP = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error) {
+    console.error("verifyOTP", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -221,4 +308,6 @@ module.exports = {
   updateUser,
   checkUserPassword,
   resetPassword,
+  forgotPassword,
+  verifyOTP,
 };

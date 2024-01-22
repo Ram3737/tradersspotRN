@@ -37,7 +37,7 @@ function OurCoursesScreen() {
   const navigation = useNavigation();
   const [tab, setTab] = useState(0);
   const [paidStatus, setPaidStatus] = useState(false);
-  const [courseTypeFromRes, setCourseTypeFromRes] = useState(null);
+  const [courseTypeFromRes, setCourseTypeFromRes] = useState("none");
   const [courseAmount, setCourseAmount] = useState("6499.00");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   View,
   Text,
   Image,
@@ -9,6 +8,8 @@ import {
   ScrollView,
   Vibration,
   BackHandler,
+  TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState, useEffect, useContext } from "react";
@@ -20,6 +21,8 @@ import Colors from "../../components/colors/colors";
 import { CallPostApiServices } from "../../webServices/apiCalls";
 import CustomAlertBox from "../../components/customAlertBox/customAlertBox";
 import { AuthContext } from "../../components/stores/context/authContextProvider";
+import CalculateFontSize from "../../components/calculateFontSize/calculateFontSize";
+import ForgotPasswordModal from "../../components/modal/forgotPasswordModal";
 
 import { Switch } from "react-native-switch";
 import HapticFeedback from "react-native-haptic-feedback";
@@ -42,6 +45,8 @@ function LoginAndSignupScreen() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [btnLoader, setBtnLoader] = useState(false);
+  const [isForgotPasswordModalVisible, setIsForgotPasswordModalVisible] =
+    useState(false);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -156,11 +161,14 @@ function LoginAndSignupScreen() {
           }
           if (
             response.data.token &&
-            response.data.courseType &&
+            response.data.courseType !== "none" &&
             response.data.paid
           ) {
             navigation.navigate("afterLoggedIn");
-          } else if (response.data.token && response.data.courseType) {
+          } else if (
+            response.data.token &&
+            response.data.courseType !== "none"
+          ) {
             navigation.navigate("courses");
           } else {
             navigation.navigate("dashboard");
@@ -266,6 +274,14 @@ function LoginAndSignupScreen() {
     //   });
   }
 
+  function viewForgotPasswordModal() {
+    setIsForgotPasswordModalVisible(!isForgotPasswordModalVisible);
+  }
+
+  function closeForgotPasswordModal() {
+    setIsForgotPasswordModalVisible(!isForgotPasswordModalVisible);
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -317,6 +333,13 @@ function LoginAndSignupScreen() {
                 />
               </View>
             </View>
+
+            <TouchableOpacity
+              style={{ zIndex: 10 }}
+              onPress={viewForgotPasswordModal}
+            >
+              <Text style={styles.forgotText}>Forgot Password</Text>
+            </TouchableOpacity>
           </View>
         )}
         {authCtx.registerSignupToggle && (
@@ -381,6 +404,10 @@ function LoginAndSignupScreen() {
             </View>
           </View>
         )}
+        <ForgotPasswordModal
+          closeModal={closeForgotPasswordModal}
+          isModalVisible={isForgotPasswordModalVisible}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -404,6 +431,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
     position: "relative",
+    marginBottom: 25,
     // backgroundColor: "yellow",
   },
 
@@ -506,5 +534,12 @@ const styles = StyleSheet.create({
     marginBottom: "8%",
     textAlign: "center",
     paddingHorizontal: "8%",
+  },
+  forgotText: {
+    fontSize: CalculateFontSize(1.6),
+    fontWeight: "400",
+    lineHeight: 19,
+    color: Colors.midWhite,
+    textDecorationLine: "underline",
   },
 });

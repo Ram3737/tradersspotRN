@@ -25,11 +25,21 @@ const userSchema = new mongoose.Schema(
     },
     paid: {
       type: Boolean,
-      require: true,
+      required: true,
     },
     triedToUpdate: {
       type: Boolean,
-      require: true,
+      required: true,
+    },
+    resetPasswordOTP: {
+      code: {
+        type: String,
+        required: false,
+      },
+      expiresAt: {
+        type: Date,
+        required: false,
+      },
     },
   },
   {

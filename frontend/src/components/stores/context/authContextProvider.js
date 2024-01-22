@@ -34,12 +34,12 @@ function AuthContextProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
   const [paid, setPaid] = useState(false);
-  const [courseType, setCourseType] = useState(null);
-  const [userType, setUserType] = useState(null);
+  const [courseType, setCourseType] = useState("none");
+  const [userType, setUserType] = useState("none");
   const [userEmail, setUserEmail] = useState(null);
   const [mblNo, setMblNo] = useState(null);
   const [registerSignupToggle, setRegisterSignupToggle] = useState(false);
-  const [userSelectedCourse, setUserSelectedCourse] = useState(null);
+  const [userSelectedCourse, setUserSelectedCourse] = useState("none");
   const [triedToUpdate, setTriedToUpdate] = useState(false);
   const [swingAnalysisStats, setSwingAnalysisStats] = useState({});
   const [freeSwingAnalysisStats, setFreeSwingAnalysisStats] = useState({});
@@ -103,11 +103,11 @@ function AuthContextProvider({ children }) {
   function logout() {
     setIsAuthenticated(false);
     setPaid(false);
-    setCourseType(null);
+    setCourseType("none");
     setUserType(false);
     setUserEmail(false);
     setMblNo(null);
-    setUserSelectedCourse(null);
+    setUserSelectedCourse("none");
     setToken(null);
     setTriedToUpdate(false);
   }

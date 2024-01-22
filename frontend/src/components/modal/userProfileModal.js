@@ -4,9 +4,10 @@ import {
   Modal,
   Image,
   TextInput,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 
 import { useState, useEffect, useContext } from "react";
@@ -32,13 +33,14 @@ function UserProfileModal({ closeModal, isModalVisible }) {
   const [alertMsgVisible, setAlertMsgVisible] = useState(false);
   const [alertMsgErrVisible, setAlertMsgErrVisible] = useState(false);
   const [logoutLoader, setLogoutLoader] = useState(false);
+  const [oldPasswordCheckLoader, setOldPasswordCheckLoader] = useState(false);
 
   function resetViewHandler() {
-    setResetVisible(!resetVisible);
+    setResetVisible(true);
   }
 
   function resetCancelHandler() {
-    setResetVisible(!resetVisible);
+    setResetVisible(false);
     setOldPassword(null);
     setIsOldPasswordCorrect(false);
     setOldPasswordMsg(null);
@@ -52,6 +54,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
       return;
     }
     const timeoutId = setTimeout(() => {
+      setOldPasswordCheckLoader(true);
       CallPostApiServices(
         `/user/checkPassword`,
         {
@@ -60,12 +63,14 @@ function UserProfileModal({ closeModal, isModalVisible }) {
         },
         (response) => {
           if (response.status === 200) {
+            setOldPasswordCheckLoader(false);
             setIsOldPasswordCorrect(true);
             setOldPasswordMsg(response.data?.message);
           }
         },
         (err) => {
           setIsOldPasswordCorrect(false);
+          setOldPasswordCheckLoader(false);
           setOldPasswordMsg(err.response?.data?.message);
           console.log(err.response?.data?.message);
         }
@@ -105,7 +110,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
             setTimeout(() => {
               logout();
               setAlertMsgVisible(false);
-            }, 2000);
+            }, 1000);
           }
         },
         (err) => {
@@ -139,7 +144,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
   }
 
   function modalCloseHandler() {
-    setResetVisible(!resetVisible);
+    setResetVisible(false);
     setOldPassword(null);
     setIsOldPasswordCorrect(false);
     setOldPasswordMsg(null);
@@ -226,7 +231,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
                 keyboardType="numeric"
                 editable={false}
                 value={
-                  authCtx.courseType !== null && authCtx.paid
+                  authCtx.courseType !== "none" && authCtx.paid
                     ? authCtx.courseType
                     : "none"
                 }
@@ -243,16 +248,21 @@ function UserProfileModal({ closeModal, isModalVisible }) {
                 <>
                   <View style={[styles.labelInput]}>
                     {oldPasswordMsg && (
-                      <Text
-                        style={[
-                          styles.labelText,
-                          {
-                            color: isOldPasswordCorrect ? "#00ff0a" : "red",
-                          },
-                        ]}
-                      >
-                        {oldPasswordMsg}
-                      </Text>
+                      <View style={styles.loaderAndOldPwLoader}>
+                        {oldPasswordCheckLoader && (
+                          <ActivityIndicator size="small" color={Colors.clr4} />
+                        )}
+                        <Text
+                          style={[
+                            styles.labelText,
+                            {
+                              color: isOldPasswordCorrect ? "#00ff0a" : "red",
+                            },
+                          ]}
+                        >
+                          {oldPasswordMsg}
+                        </Text>
+                      </View>
                     )}
                     <TextInput
                       style={[styles.input, { color: "#fff" }]}
@@ -444,5 +454,9 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     marginTop: 15,
+  },
+  loaderAndOldPwLoader: {
+    width: "100%",
+    flexDirection: "row",
   },
 });

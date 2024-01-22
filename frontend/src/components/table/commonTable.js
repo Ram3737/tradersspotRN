@@ -7,17 +7,20 @@ import { DataTable } from "react-native-paper";
 import ButtonComponent from "../buttonComponent/buttonComponent";
 import { CallPatchApiServices } from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
+import BlinkingDot from "../blinkingDot/blinkingDot";
 
-const CommonTable = ({ usersData, getAllUsers }) => {
-  const courses = ["basic", "standard", "premium"];
+const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
+  const courses = ["basic", "standard", "premium", "none"];
   const ttUpdate = ["true", "false"];
-  const [selectedCourseType, setSelectedCourseType] = useState(null);
-  const [selectedTtUpdate, setSelectedTtUpdate] = useState(null);
+  const [selectedCourseType, setSelectedCourseType] = useState("none");
+  const [selectedTtUpdate, setSelectedTtUpdate] = useState(false);
   const [selectedPaid, setSelectedPaid] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isPaidModalVisible, setIsPaidModalVisible] = useState(false);
+  const [isTtuModalVisible, setIsTtuModalVisible] = useState(false);
   const [updateBtnLoader, setUpdateBtnLoader] = useState(false);
+  const [updateTtuBtnLoader, setUpdateTtuBtnLoader] = useState(false);
   const [paidBtnLoader, setPaidBtnLoader] = useState(false);
 
   const openModal = (id) => {
@@ -28,8 +31,7 @@ const CommonTable = ({ usersData, getAllUsers }) => {
 
   const closeModal = () => {
     setIsModalVisible(false);
-    setSelectedCourseType(null);
-    setSelectedTtUpdate(null);
+    setSelectedCourseType("none");
     setSelectedUser(null);
   };
 
@@ -39,18 +41,39 @@ const CommonTable = ({ usersData, getAllUsers }) => {
       `/user/updateUser/${selectedUser._id}`,
       {
         courseType: selectedCourseType,
-        triedToUpdate: selectedTtUpdate,
       },
       (response) => {
         if (response.status === 201) {
           setUpdateBtnLoader(false);
           // console.log("res from update user", response.data.message);
-          getAllUsers();
+          getAllUsers(currentPage);
           closeModal();
         }
       },
       (err) => {
         setUpdateBtnLoader(false);
+        console.log("err", err);
+      }
+    );
+  }
+
+  function updateTtuBtnHandler() {
+    setUpdateTtuBtnLoader(true);
+    CallPatchApiServices(
+      `/user/updateUser/${selectedUser._id}`,
+      {
+        triedToUpdate: selectedTtUpdate ? selectedTtUpdate : false,
+      },
+      (response) => {
+        if (response.status === 201) {
+          setUpdateTtuBtnLoader(false);
+          // console.log("res from update user", response.data.message);
+          getAllUsers(currentPage);
+          closeModal();
+        }
+      },
+      (err) => {
+        setUpdateTtuBtnLoader(false);
         console.log("err", err);
       }
     );
@@ -68,6 +91,18 @@ const CommonTable = ({ usersData, getAllUsers }) => {
     setIsPaidModalVisible(false);
   };
 
+  const openTtuModal = (id) => {
+    const user = usersData.find((item) => item._id === id);
+    setSelectedUser(user);
+    setIsTtuModalVisible(true);
+  };
+
+  const closeTtuModal = () => {
+    setSelectedUser(null);
+    setSelectedTtUpdate(false);
+    setIsTtuModalVisible(false);
+  };
+
   function updatePaidBtnHandler() {
     setPaidBtnLoader(true);
     CallPatchApiServices(
@@ -79,7 +114,7 @@ const CommonTable = ({ usersData, getAllUsers }) => {
         if (response.status === 201) {
           setPaidBtnLoader(false);
           console.log("res from update user", response.data.message);
-          getAllUsers();
+          getAllUsers(currentPage);
           closePaidModal();
         }
       },
@@ -114,28 +149,49 @@ const CommonTable = ({ usersData, getAllUsers }) => {
                   {user.email}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ minWidth: 25 }}>
-                  {user.courseType || "N/A"}
+                  {user.courseType !== "none"
+                    ? user?.courseType.toString()
+                    : user?.courseType}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ minWidth: 25 }}>
                   {user.userType || "N/A"}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ minWidth: 30 }}>
-                  {user.paid !== null ? user.paid.toString() : "null"}
+                  {user?.paid.toString()}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ minWidth: 20 }}>
-                  {user.triedToUpdate !== false
-                    ? user.triedToUpdate.toString()
-                    : "false"}
+                  {user?.triedToUpdate.toString()}
                 </DataTable.Cell>
                 <DataTable.Cell style={{ minWidth: 30 }}>
                   <View style={styles.btnUpdate}>
+                    <View style={{ marginTop: 12, marginLeft: -10 }}>
+                      <BlinkingDot
+                        color={
+                          user?.triedToUpdate
+                            ? "blue"
+                            : user?.courseType !== "none" && user?.paid
+                            ? "green"
+                            : user?.courseType !== "none" && !user?.paid
+                            ? "orange"
+                            : ""
+                        }
+                      />
+                    </View>
                     <ButtonComponent
-                      text={"status"}
+                      text={"ct"}
                       style={{
                         paddingVertical: 5,
                         paddingHorizontal: 10,
                       }}
                       handler={() => openModal(user._id)}
+                    />
+                    <ButtonComponent
+                      text={"ttu"}
+                      style={{
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                      }}
+                      handler={() => openTtuModal(user._id)}
                     />
                     <ButtonComponent
                       text={"paid"}
@@ -183,6 +239,22 @@ const CommonTable = ({ usersData, getAllUsers }) => {
             }}
             defaultButtonText="Course Type"
           />
+          <ButtonComponent
+            indicator={updateBtnLoader}
+            disabled={updateBtnLoader}
+            text={"Update"}
+            handler={updateBtnHandler}
+          />
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isTtuModalVisible}
+        onRequestClose={() => closeTtuModal()}
+      >
+        <View style={styles.modalContainer}>
           <SelectDropdown
             data={ttUpdate}
             onSelect={(selectedItem, index) => {
@@ -206,10 +278,10 @@ const CommonTable = ({ usersData, getAllUsers }) => {
             defaultButtonText="Tt update"
           />
           <ButtonComponent
-            indicator={updateBtnLoader}
-            disabled={updateBtnLoader}
+            indicator={updateTtuBtnLoader}
+            disabled={updateTtuBtnLoader}
             text={"Update"}
-            handler={updateBtnHandler}
+            handler={updateTtuBtnHandler}
           />
         </View>
       </Modal>

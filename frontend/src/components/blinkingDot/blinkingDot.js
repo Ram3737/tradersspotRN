@@ -36,6 +36,8 @@ const BlinkingDot = (props) => {
             ? "#00ff0a"
             : props.color === "orange"
             ? "#FF5F1F"
+            : props.color === "blue"
+            ? "#003ff0"
             : "none",
         opacity: opacity,
       }}

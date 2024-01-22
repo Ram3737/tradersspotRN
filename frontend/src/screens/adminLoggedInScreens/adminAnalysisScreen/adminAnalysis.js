@@ -428,6 +428,7 @@ function AdminAnalysisScreen() {
                 <SwingAnalysisTable
                   swingAnalysisData={analysisData}
                   getAllAnalysis={getAllAnalysis}
+                  currentPage={currentPage}
                 />
               )}
               {analysisData.length === 0 && (
@@ -440,6 +441,7 @@ function AdminAnalysisScreen() {
                         marginTop: "50%",
                         marginBottom: "20%",
                         alignSelf: "center",
+                        color: "#fff",
                       },
                     ]}
                   >
@@ -565,6 +567,7 @@ function AdminAnalysisScreen() {
                         marginTop: "50%",
                         marginBottom: "20%",
                         alignSelf: "center",
+                        color: "#fff",
                       },
                     ]}
                   >

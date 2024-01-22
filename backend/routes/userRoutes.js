@@ -32,4 +32,6 @@ router.patch("/buyCourse", userController.buyCourse);
 router.patch("/updateUser/:id", userController.updateUser);
 router.post("/checkPassword", userController.checkUserPassword);
 router.post("/resetPassword", userController.resetPassword);
+router.post("/forgotPassword", userController.forgotPassword);
+router.post("/verifyOTP", userController.verifyOTP);
 module.exports = router;

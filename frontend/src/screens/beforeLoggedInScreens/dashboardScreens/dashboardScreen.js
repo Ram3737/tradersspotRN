@@ -485,7 +485,7 @@ function DashboardScreen() {
               </View>
             </View>
 
-            <LinkPreview
+            {/* <LinkPreview
               enableAnimation={true}
               containerStyle={{
                 // backgroundColor: "red",
@@ -513,7 +513,7 @@ function DashboardScreen() {
                 </Text>
               )}
               text={analysisData[0]?.analysis.analysisLink}
-            />
+            /> */}
             <View style={styles.viewResultCont}>
               <TouchableOpacity
                 style={styles.playBtn}

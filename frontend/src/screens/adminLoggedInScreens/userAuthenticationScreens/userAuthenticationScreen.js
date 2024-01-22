@@ -1,9 +1,17 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import { useEffect, useState } from "react";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CommonTable from "../../../components/table/commonTable";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
+import Colors from "../../../components/colors/colors";
+import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 
 function UserAuthenticationScreen() {
@@ -12,6 +20,7 @@ function UserAuthenticationScreen() {
   const [searchedText, setSearchedText] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [offset, setOffset] = useState(1);
+  const [allUsersLoader, setAllUsersLoader] = useState(false);
   const itemsPerPage = 10;
 
   function getAllUsers(page = 1) {
@@ -30,16 +39,19 @@ function UserAuthenticationScreen() {
         }
       );
     } else {
+      setAllUsersLoader(true);
       CallGetApiServices(
         `/user/getAllUsers?page=${page}`,
         (response) => {
           if (response.status === 200) {
+            setAllUsersLoader(false);
             console.log(response.data);
             setUsersData(response.data.users);
             setTotalUsers(response.data.totalUsers);
           }
         },
         (err) => {
+          setAllUsersLoader(false);
           console.log(err);
         }
       );
@@ -67,7 +79,34 @@ function UserAuthenticationScreen() {
         value={searchedText}
         onChangeText={(text) => setSearchedText(text.toLowerCase())}
       />
-      <CommonTable usersData={usersData} getAllUsers={getAllUsers} />
+      {allUsersLoader ? (
+        <ActivityIndicator
+          size="small"
+          color={Colors.clr4}
+          style={{ marginTop: "20%" }}
+        />
+      ) : (
+        <CommonTable
+          currentPage={currentPage}
+          usersData={usersData}
+          getAllUsers={getAllUsers}
+        />
+      )}
+      {usersData.length === 0 && (
+        <View>
+          <Text
+            style={{
+              fontSize: CalculateFontSize(1.8),
+              marginTop: "50%",
+              marginBottom: "20%",
+              alignSelf: "center",
+              color: "#fff",
+            }}
+          >
+            No data
+          </Text>
+        </View>
+      )}
       <View style={styles.paginationCont}>
         <ButtonComponent
           text={"<"}

@@ -19,7 +19,12 @@ import {
 import Colors from "../colors/colors";
 import CalculateFontSize from "../calculateFontSize/calculateFontSize";
 
-const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
+const SwingAnalysisTable = ({
+  swingAnalysisData,
+  getAllAnalysis,
+  currentPage,
+  tab,
+}) => {
   const [risk, setRisk] = useState(null);
   const [reward, setReward] = useState(null);
   const [percentage, setPercentage] = useState(null);
@@ -104,7 +109,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
             setBreakoutLoader(false);
             console.log("analysis updated");
             closeBreakoutModal();
-            getAllAnalysis();
+            getAllAnalysis(currentPage);
           }
         },
         (err) => {
@@ -149,7 +154,7 @@ const SwingAnalysisTable = ({ swingAnalysisData, getAllAnalysis, tab }) => {
           setResultUpdateLoader(false);
           console.log("analysis updated");
           closeModal();
-          getAllAnalysis();
+          getAllAnalysis(currentPage);
         }
       },
       (err) => {
