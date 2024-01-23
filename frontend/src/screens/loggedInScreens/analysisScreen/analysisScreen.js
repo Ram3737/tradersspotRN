@@ -346,293 +346,178 @@ function AnalysisScreen() {
         { padding: 0, justifyContent: "flex-start" },
       ]}
     >
-      <ScrollView
-        style={styles.scrollMainContainer}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            progressBackgroundColor={Colors.transparentBg}
-            colors={[Colors.btnClr, Colors.clr4, Colors.clr5, Colors.clr3]}
-          />
-        }
-      >
-        <View style={styles.topCont}>
-          <View style={styles.topContSub}>
-            <View style={styles.topContSubTop}>
-              <Text style={styles.headingText}>Swing Stats</Text>
-              <View style={styles.toggleContainer}>
-                <Switch
-                  value={contToDisplay}
-                  onValueChange={toggleSwitch}
-                  disabled={false}
-                  activeText={"swing"}
-                  inActiveText={"free"}
-                  circleSize={17}
-                  barHeight={24}
-                  // circleBorderWidth={3}
-                  backgroundActive={Colors.clr2}
-                  backgroundInactive={Colors.clr2}
-                  circleActiveColor={Colors.btnClr}
-                  circleInActiveColor={Colors.btnClr}
-                  // renderInsideCircle={} // custom component to render inside the Switch circle (Text, Image, etc.)
-                  changeValueImmediately={true} // if rendering inside circle, change state immediately or wait for animation to complete
-                  innerCircleStyle={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }} // style for inner animated circle for what you (may) be rendering inside the circle
-                  outerCircleStyle={{}} // style for outer animated circle
-                  renderActiveText={true}
-                  renderInActiveText={true}
-                  switchLeftPx={10} // denominator for logic when sliding to TRUE position. Higher number = more space from RIGHT of the circle to END of the slider
-                  switchRightPx={10} // denominator for logic when sliding to FALSE position. Higher number = more space from LEFT of the circle to BEGINNING of the slider
-                  switchWidthMultiplier={contToDisplay ? 4.2 : 3.8} // multiplied by the `circleSize` prop to calculate total width of the Switch
-                  switchBorderRadius={30} // Sets the border Radius of the switch slider. If unset, it remains the circleSize.
-                />
-              </View>
-            </View>
-            {isLoading && (
-              <ActivityIndicator
-                size="small"
-                color={Colors.clr4}
-                style={{ marginTop: "18%" }}
+      <View style={styles.topCont}>
+        <View style={styles.topContSub}>
+          <View style={styles.topContSubTop}>
+            <Text style={styles.headingText}>Swing Stats</Text>
+            <View style={styles.toggleContainer}>
+              <Switch
+                value={contToDisplay}
+                onValueChange={toggleSwitch}
+                disabled={false}
+                activeText={"swing"}
+                inActiveText={"free"}
+                circleSize={17}
+                barHeight={24}
+                // circleBorderWidth={3}
+                backgroundActive={Colors.clr2}
+                backgroundInactive={Colors.clr2}
+                circleActiveColor={Colors.btnClr}
+                circleInActiveColor={Colors.btnClr}
+                // renderInsideCircle={} // custom component to render inside the Switch circle (Text, Image, etc.)
+                changeValueImmediately={true} // if rendering inside circle, change state immediately or wait for animation to complete
+                innerCircleStyle={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }} // style for inner animated circle for what you (may) be rendering inside the circle
+                outerCircleStyle={{}} // style for outer animated circle
+                renderActiveText={true}
+                renderInActiveText={true}
+                switchLeftPx={10} // denominator for logic when sliding to TRUE position. Higher number = more space from RIGHT of the circle to END of the slider
+                switchRightPx={10} // denominator for logic when sliding to FALSE position. Higher number = more space from LEFT of the circle to BEGINNING of the slider
+                switchWidthMultiplier={contToDisplay ? 4.2 : 3.8} // multiplied by the `circleSize` prop to calculate total width of the Switch
+                switchBorderRadius={30} // Sets the border Radius of the switch slider. If unset, it remains the circleSize.
               />
-            )}
-            {analysisData.length > 0 &&
-              (!authCtx.swingAnalysisLoader ||
-                !authCtx.freeSwingAnalysisLoader) &&
-              !isLoading && (
-                <View style={styles.topContSubBottom}>
-                  {authCtx.swingAnalysisStats && (
-                    <DonutChart
-                      top={"35%"}
-                      left={"20%"}
-                      marginTop={"8%"}
-                      series={[
-                        contToDisplay
-                          ? authCtx.freeSwingAnalysisStats?.totalRisk > 0
-                            ? authCtx.freeSwingAnalysisStats.totalRisk
-                            : 10
-                          : (authCtx.swingAnalysisStats.totalRisk > 0
-                              ? authCtx.swingAnalysisStats.totalRisk
-                              : 10) || 10,
-                        contToDisplay
-                          ? authCtx.freeSwingAnalysisStats.totalReward > 0
-                            ? authCtx.freeSwingAnalysisStats.totalReward
-                            : 50
-                          : (authCtx.swingAnalysisStats.totalReward > 0
-                              ? authCtx.swingAnalysisStats.totalReward
-                              : 30) || 50,
-                      ]}
-                    />
-                  )}
-                  <View style={styles.topContSubBottomSub}>
-                    {authCtx.swingAnalysisLoader ? (
-                      <ActivityIndicator
-                        size="small"
-                        color={Colors.clr4}
-                        style={{ marginTop: "25%", marginRight: "30%" }}
-                      />
-                    ) : (
-                      <>
-                        <Text style={styles.topContSubBottomSubText1}>
-                          Total analysis shared:
-                        </Text>
-                        <Text style={styles.topContSubBottomSubText2}>
-                          {totalSwingAnalysis || 0}
-                        </Text>
-                        <View style={styles.riskRewardStatMainCont}>
-                          {authCtx[analysisStat] && (
-                            <ScrollView
-                              style={{
-                                width: "100%",
-                              }}
-                              horizontal={true}
-                            >
-                              <View style={styles.riskRewardStatCont}>
-                                <Text style={styles.rrContSubBottomSubText1}>
-                                  Last month
-                                </Text>
-                                <Text
-                                  style={styles.rrContSubBottomSubText2}
-                                >{`${authCtx[analysisStat].totalRiskLastMonth}:${authCtx[analysisStat].totalRewardLastMonth}`}</Text>
-                              </View>
-                              <View style={styles.riskRewardStatCont}>
-                                <Text style={styles.rrContSubBottomSubText1}>
-                                  Five months
-                                </Text>
-                                <Text
-                                  style={styles.rrContSubBottomSubText2}
-                                >{`${authCtx[analysisStat].totalRiskLastFiveMonth}:${authCtx[analysisStat].totalRewardLastFiveMonth}`}</Text>
-                              </View>
-                              <View style={styles.riskRewardStatCont}>
-                                <Text style={styles.rrContSubBottomSubText1}>
-                                  Last year
-                                </Text>
-                                <Text
-                                  style={styles.rrContSubBottomSubText2}
-                                >{`${authCtx[analysisStat].totalRiskLastYear}:${authCtx[analysisStat].totalRewardLastYear}`}</Text>
-                              </View>
-                              <View style={styles.riskRewardStatCont}>
-                                <Text style={styles.rrContSubBottomSubText1}>
-                                  Overall
-                                </Text>
-                                <Text
-                                  style={styles.rrContSubBottomSubText2}
-                                >{`${authCtx[analysisStat].totalRisk}:${authCtx[analysisStat].totalReward}`}</Text>
-                              </View>
-                            </ScrollView>
-                          )}
-                        </View>
-                      </>
-                    )}
-                  </View>
-                </View>
-              )}
-            {analysisData.length === 0 &&
-              (!authCtx.swingAnalysisLoader ||
-                !authCtx.freeSwingAnalysisLoader) &&
-              !isLoading && (
-                <View>
-                  <Text style={styles.topContSubBottomSubText1}> No data</Text>
-                </View>
-              )}
+            </View>
           </View>
-        </View>
-        <View style={styles.analysisScrollCont}>
           {isLoading && (
             <ActivityIndicator
-              size="large"
+              size="small"
               color={Colors.clr4}
-              style={{ marginTop: "60%" }}
+              style={{ marginTop: "18%" }}
             />
           )}
-          {analysisData.length > 0 && !isLoading && (
-            <FlatList
-              data={analysisData}
-              renderItem={contToDisplay ? renderItemFree : renderItemPaid}
-              keyExtractor={(item, index) => index.toString()}
-              style={styles.analysisScrollContSub}
-              inverted={true}
-            />
-          )}
-          {analysisData.length === 0 && !isLoading && (
-            <View>
-              <Text
-                style={[
-                  styles.topContSubBottomSubText1,
-                  { marginTop: "50%", alignSelf: "center" },
-                ]}
-              >
-                No data
-              </Text>
-            </View>
-          )}
-          {/* <ScrollView
-          ref={scrollViewRef}
-          onLayout={handleScrollToBottom}
-          style={styles.analysisScrollContSub}
-        >
-          {analysisArr.map((analysis, index) => (
-            <View
-              key={index}
-              style={[
-                styles.analysis,
-                {
-                  height:
-                    viewResult === index
-                      ? CalculateFontSize(58)
-                      : CalculateFontSize(32.5),
-                },
-              ]}
-            >
-              <View style={styles.analysisSub}>
-                <View style={styles.analysisSubBtns}>
-                  <Text style={styles.analysisSubBtnsText}>JWSENERGY</Text>
-                </View>
-
-                <View style={[styles.analysisSubBtns, { marginLeft: 8 }]}>
-                  <Text style={styles.analysisSubBtnsText}>
-                    TRIANGLE PATTERN
-                  </Text>
+          {analysisData.length > 0 &&
+            (!authCtx.swingAnalysisLoader ||
+              !authCtx.freeSwingAnalysisLoader) &&
+            !isLoading && (
+              <View style={styles.topContSubBottom}>
+                {authCtx.swingAnalysisStats && (
+                  <DonutChart
+                    top={"35%"}
+                    left={"20%"}
+                    marginTop={"8%"}
+                    series={[
+                      contToDisplay
+                        ? authCtx.freeSwingAnalysisStats?.totalRisk > 0
+                          ? authCtx.freeSwingAnalysisStats.totalRisk
+                          : 10
+                        : (authCtx.swingAnalysisStats.totalRisk > 0
+                            ? authCtx.swingAnalysisStats.totalRisk
+                            : 10) || 10,
+                      contToDisplay
+                        ? authCtx.freeSwingAnalysisStats.totalReward > 0
+                          ? authCtx.freeSwingAnalysisStats.totalReward
+                          : 50
+                        : (authCtx.swingAnalysisStats.totalReward > 0
+                            ? authCtx.swingAnalysisStats.totalReward
+                            : 30) || 50,
+                    ]}
+                  />
+                )}
+                <View style={styles.topContSubBottomSub}>
+                  {authCtx.swingAnalysisLoader ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={Colors.clr4}
+                      style={{ marginTop: "25%", marginRight: "30%" }}
+                    />
+                  ) : (
+                    <>
+                      <Text style={styles.topContSubBottomSubText1}>
+                        Total analysis shared:
+                      </Text>
+                      <Text style={styles.topContSubBottomSubText2}>
+                        {totalSwingAnalysis || 0}
+                      </Text>
+                      <View style={styles.riskRewardStatMainCont}>
+                        {authCtx[analysisStat] && (
+                          <ScrollView
+                            style={{
+                              width: "100%",
+                            }}
+                            horizontal={true}
+                          >
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Last month
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRiskLastMonth}:${authCtx[analysisStat].totalRewardLastMonth}`}</Text>
+                            </View>
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Five months
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRiskLastFiveMonth}:${authCtx[analysisStat].totalRewardLastFiveMonth}`}</Text>
+                            </View>
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Last year
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRiskLastYear}:${authCtx[analysisStat].totalRewardLastYear}`}</Text>
+                            </View>
+                            <View style={styles.riskRewardStatCont}>
+                              <Text style={styles.rrContSubBottomSubText1}>
+                                Overall
+                              </Text>
+                              <Text
+                                style={styles.rrContSubBottomSubText2}
+                              >{`${authCtx[analysisStat].totalRisk}:${authCtx[analysisStat].totalReward}`}</Text>
+                            </View>
+                          </ScrollView>
+                        )}
+                      </View>
+                    </>
+                  )}
                 </View>
               </View>
-
-              <LinkPreview
-                enableAnimation={true}
-                containerStyle={{
-                  // backgroundColor: "red",
-                  width: "95%",
-                }}
-                metadataContainerStyle={{
-                  display: "none",
-                }}
-                textContainerStyle={{
-                  // backgroundColor: "#fff",
-                  marginLeft: 0,
-                  marginTop: 0,
-                  marginBottom: 11,
-                }}
-                renderText={(text, props) => (
-                  <Text
-                    {...props}
-                    style={{
-                      color: Colors.clr4,
-                      fontSize: CalculateFontSize(1.5),
-                      fontWeight: "400",
-                    }}
-                  >
-                    {text}
-                  </Text>
-                )}
-                text="https://www.tradingview.com/x/tXn6jAey"
-              />
-
-              <TouchableOpacity
-                style={styles.playBtn}
-                onPress={() => viewResultHandler(index)}
-              ></TouchableOpacity>
-
-              {viewResult === index && (
-                <>
-                  <Text style={styles.riskRewardText}>1:2 RR</Text>
-
-                  <LinkPreview
-                    enableAnimation={true}
-                    containerStyle={{
-                      // backgroundColor: "red",
-                      width: "95%",
-                    }}
-                    metadataContainerStyle={{
-                      display: "none",
-                    }}
-                    textContainerStyle={{
-                      // backgroundColor: "#fff",
-                      marginLeft: 0,
-                      marginTop: 15,
-                      marginBottom: 11,
-                    }}
-                    renderText={(text, props) => (
-                      <Text
-                        {...props}
-                        style={{
-                          color: Colors.clr4,
-                          fontSize: CalculateFontSize(1.5),
-                          fontWeight: "400",
-                        }}
-                      >
-                        {text}
-                      </Text>
-                    )}
-                    text="https://www.tradingview.com/x/tXn6jAey"
-                  />
-                </>
-              )}
-            </View>
-          ))}
-        </ScrollView> */}
+            )}
+          {analysisData.length === 0 &&
+            (!authCtx.swingAnalysisLoader ||
+              !authCtx.freeSwingAnalysisLoader) &&
+            !isLoading && (
+              <View>
+                <Text style={styles.topContSubBottomSubText1}> No data</Text>
+              </View>
+            )}
         </View>
-      </ScrollView>
+      </View>
+      <View style={styles.analysisScrollCont}>
+        {isLoading && (
+          <ActivityIndicator
+            size="large"
+            color={Colors.clr4}
+            style={{ marginTop: "60%" }}
+          />
+        )}
+        {analysisData.length > 0 && !isLoading && (
+          <FlatList
+            data={analysisData}
+            renderItem={contToDisplay ? renderItemFree : renderItemPaid}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.analysisScrollContSub}
+            inverted={true}
+          />
+        )}
+        {analysisData.length === 0 && !isLoading && (
+          <View>
+            <Text
+              style={[
+                styles.topContSubBottomSubText1,
+                { marginTop: "50%", alignSelf: "center" },
+              ]}
+            >
+              No data
+            </Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
