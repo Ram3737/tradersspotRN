@@ -27,6 +27,7 @@ export const AuthContext = createContext({
   setTriedToUpdate: () => {},
   setRegisterSignupToggle: () => {},
   setUserSelectedCourse: () => {},
+  nullCall: () => {},
   logout: () => {},
 });
 
@@ -85,6 +86,11 @@ function AuthContextProvider({ children }) {
     );
   }
 
+  function nullCall() {
+    swingAnalysisStatsFn();
+    freeSwingAnalysisStatsFn();
+  }
+
   useEffect(() => {
     swingAnalysisStatsFn();
     freeSwingAnalysisStatsFn();
@@ -138,6 +144,7 @@ function AuthContextProvider({ children }) {
     setRegisterSignupToggle: setRegisterSignupToggle,
     setUserSelectedCourse: setUserSelectedCourse,
     setTriedToUpdate: setTriedToUpdate,
+    nullCall: nullCall,
     logout: logout,
   };
 

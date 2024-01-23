@@ -2,12 +2,14 @@ import {
   View,
   Text,
   FlatList,
+  ScrollView,
   TouchableOpacity,
   Vibration,
   ActivityIndicator,
+  RefreshControl,
   StyleSheet,
 } from "react-native";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
 import { Switch } from "react-native-switch";
@@ -28,6 +30,7 @@ function AnalysisStatsScreen() {
   const [barChartValue, setBarChartValue] = useState([]);
   const [analysisData, setAnalysisData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   function getAllAnalysis() {
     setIsLoading(true);
@@ -86,6 +89,15 @@ function AnalysisStatsScreen() {
 
     setContToDisplay(!contToDisplay);
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getAllAnalysis();
+    authCtx.nullCall();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const renderItemPaid = ({ item, index }) => (
     <View key={index} style={styles.analysis}>
@@ -340,161 +352,111 @@ function AnalysisStatsScreen() {
         { justifyContent: "flex-start", padding: 0 },
       ]}
     >
-      <View style={styles.statCont}>
-        <View style={styles.statContTop}>
-          <View style={styles.statContBottom}>
-            <Text style={styles.statContTopText}>Last five months stats</Text>
-            <Switch
-              value={contToDisplay}
-              onValueChange={toggleSwitch}
-              disabled={false}
-              activeText={"Paid"}
-              inActiveText={"Free"}
-              circleSize={17}
-              barHeight={24}
-              // circleBorderWidth={3}
-              backgroundActive={Colors.transparentBg}
-              backgroundInactive={Colors.transparentBg}
-              circleActiveColor={Colors.btnClr}
-              circleInActiveColor={Colors.btnClr}
-              // renderInsideCircle={} // custom component to render inside the Switch circle (Text, Image, etc.)
-              changeValueImmediately={true} // if rendering inside circle, change state immediately or wait for animation to complete
-              innerCircleStyle={{
-                alignItems: "center",
-                justifyContent: "center",
-              }} // style for inner animated circle for what you (may) be rendering inside the circle
-              outerCircleStyle={{}} // style for outer animated circle
-              renderActiveText={true}
-              renderInActiveText={true}
-              switchLeftPx={10} // denominator for logic when sliding to TRUE position. Higher number = more space from RIGHT of the circle to END of the slider
-              switchRightPx={10} // denominator for logic when sliding to FALSE position. Higher number = more space from LEFT of the circle to BEGINNING of the slider
-              switchWidthMultiplier={3.5} // multiplied by the `circleSize` prop to calculate total width of the Switch
-              switchBorderRadius={30} // Sets the border Radius of the switch slider. If unset, it remains the circleSize.
-            />
-          </View>
+      <ScrollView
+        style={styles.scrollMainContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            progressBackgroundColor={Colors.transparentBg}
+            colors={[Colors.btnClr, Colors.clr4, Colors.clr5, Colors.clr3]}
+          />
+        }
+      >
+        <View style={styles.statCont}>
+          <View style={styles.statContTop}>
+            <View style={styles.statContBottom}>
+              <Text style={styles.statContTopText}>Last five months stats</Text>
+              <Switch
+                value={contToDisplay}
+                onValueChange={toggleSwitch}
+                disabled={false}
+                activeText={"Paid"}
+                inActiveText={"Free"}
+                circleSize={17}
+                barHeight={24}
+                // circleBorderWidth={3}
+                backgroundActive={Colors.transparentBg}
+                backgroundInactive={Colors.transparentBg}
+                circleActiveColor={Colors.btnClr}
+                circleInActiveColor={Colors.btnClr}
+                // renderInsideCircle={} // custom component to render inside the Switch circle (Text, Image, etc.)
+                changeValueImmediately={true} // if rendering inside circle, change state immediately or wait for animation to complete
+                innerCircleStyle={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }} // style for inner animated circle for what you (may) be rendering inside the circle
+                outerCircleStyle={{}} // style for outer animated circle
+                renderActiveText={true}
+                renderInActiveText={true}
+                switchLeftPx={10} // denominator for logic when sliding to TRUE position. Higher number = more space from RIGHT of the circle to END of the slider
+                switchRightPx={10} // denominator for logic when sliding to FALSE position. Higher number = more space from LEFT of the circle to BEGINNING of the slider
+                switchWidthMultiplier={3.5} // multiplied by the `circleSize` prop to calculate total width of the Switch
+                switchBorderRadius={30} // Sets the border Radius of the switch slider. If unset, it remains the circleSize.
+              />
+            </View>
 
-          {isLoading && (
-            <ActivityIndicator
-              size="small"
-              color={Colors.clr4}
-              style={{ marginTop: "10%" }}
-            />
-          )}
+            {isLoading && (
+              <ActivityIndicator
+                size="small"
+                color={Colors.clr4}
+                style={{ marginTop: "10%" }}
+              />
+            )}
 
-          {analysisData.length > 0 &&
-            !isLoading &&
-            (!authCtx.swingAnalysisLoader ||
-              !authCtx.freeSwingAnalysisLoader) && (
-              <View style={styles.statContTop2}>
-                <View style={{ width: "35%", height: "100%", marginTop: "1%" }}>
-                  {analysisData.length > 0 &&
-                    (!authCtx.swingAnalysisLoader ||
-                      !authCtx.freeSwingAnalysisLoader) &&
-                    !isLoading && (
-                      <DonutChart
-                        top={"36%"}
-                        left={"24%"}
-                        series={[
-                          contToDisplay
-                            ? authCtx.freeSwingAnalysisStats
-                                ?.totalRiskLastFiveMonth > 0
+            {analysisData.length > 0 &&
+              !isLoading &&
+              (!authCtx.swingAnalysisLoader ||
+                !authCtx.freeSwingAnalysisLoader) && (
+                <View style={styles.statContTop2}>
+                  <View
+                    style={{ width: "35%", height: "100%", marginTop: "1%" }}
+                  >
+                    {analysisData.length > 0 &&
+                      (!authCtx.swingAnalysisLoader ||
+                        !authCtx.freeSwingAnalysisLoader) &&
+                      !isLoading && (
+                        <DonutChart
+                          top={"36%"}
+                          left={"24%"}
+                          series={[
+                            contToDisplay
                               ? authCtx.freeSwingAnalysisStats
-                                  .totalRiskLastFiveMonth
-                              : 10
-                            : (authCtx.swingAnalysisStats
-                                .totalRiskLastFiveMonth > 0
-                                ? authCtx.swingAnalysisStats
+                                  ?.totalRiskLastFiveMonth > 0
+                                ? authCtx.freeSwingAnalysisStats
                                     .totalRiskLastFiveMonth
-                                : 10) || 10,
-                          contToDisplay
-                            ? authCtx.freeSwingAnalysisStats
-                                .totalRewardLastFiveMonth > 0
+                                : 10
+                              : (authCtx.swingAnalysisStats
+                                  .totalRiskLastFiveMonth > 0
+                                  ? authCtx.swingAnalysisStats
+                                      .totalRiskLastFiveMonth
+                                  : 10) || 10,
+                            contToDisplay
                               ? authCtx.freeSwingAnalysisStats
-                                  .totalRewardLastFiveMonth
-                              : 50
-                            : (authCtx.swingAnalysisStats
-                                .totalRewardLastFiveMonth > 0
-                                ? authCtx.swingAnalysisStats
+                                  .totalRewardLastFiveMonth > 0
+                                ? authCtx.freeSwingAnalysisStats
                                     .totalRewardLastFiveMonth
-                                : 30) || 50,
-                        ]}
-                      />
-                    )}
-
-                  {analysisData.length === 0 &&
-                    (!authCtx.swingAnalysisLoader ||
-                      !authCtx.freeSwingAnalysisLoader) &&
-                    !isLoading && (
-                      <View>
-                        <Text
-                          style={[
-                            styles.labelContText,
-                            {
-                              fontSize: CalculateFontSize(1.8),
-                              marginTop: "10%",
-                              alignSelf: "center",
-                            },
+                                : 50
+                              : (authCtx.swingAnalysisStats
+                                  .totalRewardLastFiveMonth > 0
+                                  ? authCtx.swingAnalysisStats
+                                      .totalRewardLastFiveMonth
+                                  : 30) || 50,
                           ]}
-                        >
-                          No data
-                        </Text>
-                      </View>
-                    )}
+                        />
+                      )}
 
-                  {isLoading && (
-                    <ActivityIndicator
-                      size="small"
-                      color={Colors.clr4}
-                      style={{ marginTop: "40%" }}
-                    />
-                  )}
-                </View>
-                <View style={styles.lineChartCont}>
-                  {(authCtx.swingAnalysisLoader ||
-                    authCtx.freeSwingAnalysisLoader) &&
-                  isLoading ? (
-                    <ActivityIndicator
-                      size="small"
-                      color={Colors.clr4}
-                      style={{ marginTop: "35%", marginRight: "50%" }}
-                    />
-                  ) : (
-                    <View style={styles.lineChartContSub}>
-                      {barChartValue.length > 0 ? (
-                        barChartValue.map((item, index) => (
-                          <View key={index} style={styles.lineCont}>
-                            <Text
-                              style={[styles.labelContText, { marginTop: 0 }]}
-                            >
-                              {`${item.risk}:${item.reward}`}
-                            </Text>
-                            <View style={styles.lineOut}>
-                              <View
-                                style={[
-                                  styles.lineIn,
-                                  {
-                                    height: `${
-                                      item.reward * 5 >= 100
-                                        ? 100
-                                        : item.reward * 5
-                                    }%`,
-                                  },
-                                ]}
-                              ></View>
-                            </View>
-                            <Text style={[styles.labelContText]}>
-                              {item.month}
-                            </Text>
-                          </View>
-                        ))
-                      ) : (
+                    {analysisData.length === 0 &&
+                      (!authCtx.swingAnalysisLoader ||
+                        !authCtx.freeSwingAnalysisLoader) &&
+                      !isLoading && (
                         <View>
                           <Text
                             style={[
                               styles.labelContText,
                               {
                                 fontSize: CalculateFontSize(1.8),
-                                marginTop: "30%",
+                                marginTop: "10%",
                                 alignSelf: "center",
                               },
                             ]}
@@ -503,12 +465,110 @@ function AnalysisStatsScreen() {
                           </Text>
                         </View>
                       )}
-                    </View>
-                  )}
+
+                    {isLoading && (
+                      <ActivityIndicator
+                        size="small"
+                        color={Colors.clr4}
+                        style={{ marginTop: "40%" }}
+                      />
+                    )}
+                  </View>
+                  <View style={styles.lineChartCont}>
+                    {(authCtx.swingAnalysisLoader ||
+                      authCtx.freeSwingAnalysisLoader) &&
+                    isLoading ? (
+                      <ActivityIndicator
+                        size="small"
+                        color={Colors.clr4}
+                        style={{ marginTop: "35%", marginRight: "50%" }}
+                      />
+                    ) : (
+                      <View style={styles.lineChartContSub}>
+                        {barChartValue.length > 0 ? (
+                          barChartValue.map((item, index) => (
+                            <View key={index} style={styles.lineCont}>
+                              <Text
+                                style={[styles.labelContText, { marginTop: 0 }]}
+                              >
+                                {`${item.risk}:${item.reward}`}
+                              </Text>
+                              <View style={styles.lineOut}>
+                                <View
+                                  style={[
+                                    styles.lineIn,
+                                    {
+                                      height: `${
+                                        item.reward * 5 >= 100
+                                          ? 100
+                                          : item.reward * 5
+                                      }%`,
+                                    },
+                                  ]}
+                                ></View>
+                              </View>
+                              <Text style={[styles.labelContText]}>
+                                {item.month}
+                              </Text>
+                            </View>
+                          ))
+                        ) : (
+                          <View>
+                            <Text
+                              style={[
+                                styles.labelContText,
+                                {
+                                  fontSize: CalculateFontSize(1.8),
+                                  marginTop: "30%",
+                                  alignSelf: "center",
+                                },
+                              ]}
+                            >
+                              No data
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  </View>
                 </View>
+              )}
+
+            {analysisData.length === 0 && !isLoading && (
+              <View>
+                <Text
+                  style={[
+                    styles.labelContText,
+                    {
+                      fontSize: CalculateFontSize(1.8),
+                      marginTop: "30%",
+                      alignSelf: "center",
+                    },
+                  ]}
+                >
+                  No data
+                </Text>
               </View>
             )}
-
+          </View>
+        </View>
+        <View style={styles.analysisScrollCont}>
+          {isLoading && (
+            <ActivityIndicator
+              size="large"
+              color={Colors.clr4}
+              style={{ marginTop: "60%" }}
+            />
+          )}
+          {analysisData.length > 0 && !isLoading && (
+            <FlatList
+              data={analysisData}
+              renderItem={contToDisplay ? renderItemFree : renderItemPaid}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.analysisScrollContSub}
+              inverted={true}
+            />
+          )}
           {analysisData.length === 0 && !isLoading && (
             <View>
               <Text
@@ -516,7 +576,7 @@ function AnalysisStatsScreen() {
                   styles.labelContText,
                   {
                     fontSize: CalculateFontSize(1.8),
-                    marginTop: "30%",
+                    marginTop: "50%",
                     alignSelf: "center",
                   },
                 ]}
@@ -526,41 +586,7 @@ function AnalysisStatsScreen() {
             </View>
           )}
         </View>
-      </View>
-      <View style={styles.analysisScrollCont}>
-        {isLoading && (
-          <ActivityIndicator
-            size="large"
-            color={Colors.clr4}
-            style={{ marginTop: "60%" }}
-          />
-        )}
-        {analysisData.length > 0 && !isLoading && (
-          <FlatList
-            data={analysisData}
-            renderItem={contToDisplay ? renderItemFree : renderItemPaid}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.analysisScrollContSub}
-            inverted={true}
-          />
-        )}
-        {analysisData.length === 0 && !isLoading && (
-          <View>
-            <Text
-              style={[
-                styles.labelContText,
-                {
-                  fontSize: CalculateFontSize(1.8),
-                  marginTop: "50%",
-                  alignSelf: "center",
-                },
-              ]}
-            >
-              No data
-            </Text>
-          </View>
-        )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -568,6 +594,9 @@ function AnalysisStatsScreen() {
 export default AnalysisStatsScreen;
 
 const styles = StyleSheet.create({
+  scrollMainContainer: {
+    width: "100%",
+  },
   statCont: {
     height: 200,
     width: "100%",

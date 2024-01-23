@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  RefreshControl,
   StyleSheet,
 } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
@@ -33,6 +34,7 @@ function DashboardScreen() {
   const [stocksToWatch, setStocksToWatch] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   function loginrSignupHandler() {
     navigation.navigate("loginSignup");
@@ -67,12 +69,31 @@ function DashboardScreen() {
     setModalVisible(!isModalVisible);
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getAllAnalysis();
+    authCtx.nullCall();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   useEffect(() => {
     getAllAnalysis();
   }, []);
 
   return (
-    <ScrollView style={styles.scrollMainContainer}>
+    <ScrollView
+      style={styles.scrollMainContainer}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          progressBackgroundColor={Colors.transparentBg}
+          colors={[Colors.btnClr, Colors.clr4, Colors.clr5, Colors.clr3]}
+        />
+      }
+    >
       <ImageBackground
         source={require("../../../images/pictures/bgDashboard.jpg")}
         style={styles.scrollMainContainerTop}

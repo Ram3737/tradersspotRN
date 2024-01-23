@@ -1,16 +1,16 @@
 import {
-  StyleSheet,
   Text,
   View,
+  ScrollView,
   Dimensions,
   Image,
   ImageBackground,
   TouchableOpacity,
   ActivityIndicator,
-  ScrollView,
+  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 
 import WebView from "react-native-webview";
 
@@ -118,7 +118,7 @@ function MyCoursesScreen() {
   </div>
 `;
 
-  useEffect(() => {
+  function callCourseContent() {
     setIsLoading(true);
     CallGetApiServices(
       `/course/getCourseContent`,
@@ -134,6 +134,10 @@ function MyCoursesScreen() {
         console.log("err getting allCourseContents", err);
       }
     );
+  }
+
+  useEffect(() => {
+    callCourseContent();
   }, []);
 
   function modalVideoHandler(content, selectedContent) {
@@ -383,6 +387,9 @@ function MyCoursesScreen() {
 export default MyCoursesScreen;
 
 const styles = StyleSheet.create({
+  scrollMainContainer: {
+    width: "100%",
+  },
   topInfoCont: {
     height: "25%",
     width: "100%",
