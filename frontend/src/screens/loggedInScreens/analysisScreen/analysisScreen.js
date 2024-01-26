@@ -496,7 +496,7 @@ function AnalysisScreen() {
             style={{ marginTop: "60%" }}
           />
         )}
-        {analysisData.length > 0 && !isLoading && (
+        {/* {analysisData.length > 0 && !isLoading && (
           <FlatList
             data={analysisData}
             renderItem={contToDisplay ? renderItemFree : renderItemPaid}
@@ -504,7 +504,7 @@ function AnalysisScreen() {
             style={styles.analysisScrollContSub}
             inverted={true}
           />
-        )}
+        )} */}
         {analysisData.length === 0 && !isLoading && (
           <View>
             <Text

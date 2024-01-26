@@ -28,6 +28,7 @@ import ButtonComponent from "../../../components/buttonComponent/buttonComponent
 import CustomAlertBox from "../../../components/customAlertBox/customAlertBox";
 import { CallPatchApiServices } from "../../../webServices/apiCalls";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
+import CourseDetailsModal from "../../../components/modal/courseDetailsModal";
 
 const SLIDER_WIDTH = Dimensions.get("window").width + 80;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -278,7 +279,7 @@ function OurCoursesScreen() {
         </View>
         <View style={styles.btnCont}>
           <ButtonComponent
-            text={"Buy Now"}
+            text={"Get this course"}
             handler={() => {
               buyNowHandler(
                 tab === 0
@@ -313,39 +314,8 @@ function OurCoursesScreen() {
           message="Purchased successfully"
           needCancelBtn={false}
         />
-        {/* <View style={styles.tabCont}>
-        <TouchableOpacity
-          style={[
-            { backgroundColor: tab === "basic" ? Colors.clr3 : Colors.clr2 },
-            styles.tab,
-          ]}
-          onPress={() => setTab("basic")}
-        >
-          <Text style={styles.tabText}>Basic</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            { backgroundColor: tab === "standard" ? Colors.clr3 : Colors.clr2 },
-            styles.tab,
-          ]}
-          onPress={() => setTab("standard")}
-        >
-          <Text style={styles.tabText}>Standard</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            { backgroundColor: tab === "premium" ? Colors.clr3 : Colors.clr2 },
-            styles.tab,
-          ]}
-          onPress={() => setTab("premium")}
-        >
-          <Text style={styles.tabText}>Premium</Text>
-        </TouchableOpacity>
-      </View>*/}
-
-        <View style={{ height: "80%", marginTop: "8%" }}>
+        <View style={{ height: "90%", marginTop: "8%" }}>
           <Carousel
             layout="default"
             layoutCardOffset={9}
@@ -374,26 +344,12 @@ function OurCoursesScreen() {
           />
         </View>
 
-        <Text style={styles.SwipeText}>Swipe up for course contents</Text>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isModalVisible}
-          onRequestClose={() => {
-            toggleModal();
-          }}
-        >
-          <View style={styles.modalContainer}>
-            <ButtonComponent
-              text={"Make Payment"}
-              handler={makePaymentHandler}
-            />
-            {isLoading && (
-              <ActivityIndicator size="large" color={Colors.clr4} />
-            )}
-          </View>
-        </Modal>
-        <BottomSheet
+        {/* <Text style={styles.SwipeText}>Swipe up for course contents</Text> */}
+        <CourseDetailsModal
+          isModalVisible={isModalVisible}
+          closeModal={toggleModal}
+        />
+        {/* <BottomSheet
           isOpen={false}
           sliderMinHeight={40}
           sliderMaxHeight={680}
@@ -406,7 +362,7 @@ function OurCoursesScreen() {
         >
           {(onScrollEndDrag) => (
             <ScrollView style={styles.courseContentCont}>
-              {/* <Text style={styles.headingText}>Course Content</Text> */}
+           
               <View style={styles.contents}>
                 <View style={styles.contentsSub}>
                   <View style={styles.contentsSideHeadingCont}>
@@ -528,7 +484,7 @@ function OurCoursesScreen() {
               </View>
             </ScrollView>
           )}
-        </BottomSheet>
+        </BottomSheet> */}
       </View>
     </ScrollView>
   );
