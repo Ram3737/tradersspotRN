@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "TradersSpotRN",
-    "slug": "TradersSpotRN",
+    "name": "Trader's spot",
+    "slug": "Trader's spot",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/alien.png",
+    "icon": "./assets/tradersSpotLogo.png",
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",

@@ -27,7 +27,7 @@ function StarterScreen() {
   return (
     <View style={CommonStyles.mainContainer}>
       <ImageBackground
-        source={require("../../images/pictures/alien.png")}
+        source={require("../../images/logo/tradersSpotLogo.png")}
         style={styles.picCont}
         imageStyle={styles.pic}
       ></ImageBackground>
