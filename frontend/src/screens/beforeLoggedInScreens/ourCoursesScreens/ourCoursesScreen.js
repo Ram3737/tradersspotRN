@@ -6,6 +6,7 @@ import {
   ScrollView,
   Modal,
   ActivityIndicator,
+  TouchableOpacity,
   StyleSheet,
   Linking,
   Dimensions,
@@ -18,7 +19,6 @@ import {
   useRef,
 } from "react";
 import { useNavigation } from "@react-navigation/native";
-import BottomSheet from "react-native-simple-bottom-sheet";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 
 import CommonStyles from "../../../components/css/commonStyles";
@@ -44,6 +44,7 @@ function OurCoursesScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [index, setIndex] = useState(0);
+  const [selectedCourse, setselectedCourse] = useState("basic");
   const isCarousel = useRef(null);
 
   const data = [
@@ -74,117 +75,18 @@ function OurCoursesScreen() {
     }
   }, [tab]);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-    if (authCtx.buyingWithoutLogin) {
-      authCtx.setBuyingWithoutLogin(false);
-    }
-  };
-
-  useLayoutEffect(() => {
-    if (authCtx.buyingWithoutLogin) {
-      toggleModal();
-    }
-  }, [authCtx.buyingWithoutLogin]);
-
-  const hideAlert = () => {
-    setAlertVisible(false);
-    toggleModal();
-    authCtx.setBuyingWithoutLogin(false);
-    authCtx.setCourseType(courseTypeFromRes);
-    authCtx.setPaid(paidStatus);
-  };
-
-  const makePaymentHandler = async () => {
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      handlePay();
-    }, 2000);
-    // CallPatchApiServices(
-    //   `/user/buyCourse`,
-    //   {
-    //     email: authCtx.userEmail,
-    //     courseType: authCtx.userSelectedCourse,
-    //   },
-    //   (response) => {
-    //     if (response.status === 201) {
-    //       setCourseTypeFromRes(response.data.courseType);
-    //       setPaidStatus(response.data.paid);
-    //       setTimeout(() => {
-    //         setIsLoading(false);
-    //         setAlertVisible(true);
-    //       }, 3000);
-    //     }
-    //   },
-    //   (error) => {
-    //     console.log("payerr", error.message);
-    //   }
-    // );
-  };
-
-  function buyNowHandler(course) {
-    authCtx.setUserSelectedCourse(course);
-    if (authCtx.token && !authCtx.paid) {
-      console.log(1);
-
-      CallPatchApiServices(
-        `/user/buyCourse`,
-        {
-          email: authCtx.userEmail,
-          courseType: course,
-          triedToUpdate: false,
-        },
-        (response) => {
-          if (response.status === 201) {
-            toggleModal();
-            console.log("course updated");
-          }
-        },
-        (error) => {
-          console.log("payerr", error.message);
-        }
-      );
-    } else if (authCtx.token && authCtx.paid) {
-      console.log(2);
-
-      CallPatchApiServices(
-        `/user/buyCourse`,
-        {
-          email: authCtx.userEmail,
-          courseType: authCtx.courseType,
-          triedToUpdate: true,
-        },
-        (response) => {
-          if (response.status === 201) {
-            toggleModal();
-            console.log("course updated");
-          }
-        },
-        (error) => {
-          console.log("payerr", error.message);
-        }
-      );
-    } else {
-      authCtx.setRegisterSignupToggle(true);
-      navigation.navigate("loginSignup");
-    }
+  function openCourseDetailModal() {
+    setModalVisible(true);
+  }
+  function closeCourseDetailModal() {
+    setModalVisible(false);
   }
 
-  const handlePay = async () => {
-    try {
-      const upiAppURI = "upi://pay";
-      const receiverUPIID = "7010034542@ybl";
-      const amount = courseAmount;
-
-      const paymentLink = `${upiAppURI}?pa=${receiverUPIID}&mc=yourMerchantCode&tid=yourTransactionId&tr=yourTransactionRefId&tn=yourTransactionNote&am=${amount}&cu=INR&url=yourCallBackURL`;
-
-      await Linking.openURL(paymentLink);
-    } catch (error) {
-      console.error("Error opening UPI app:", error);
-    }
-  };
+  function getThisCourseHandler(course) {
+    setselectedCourse(course);
+    authCtx.setUserSelectedCourse(course);
+    openCourseDetailModal();
+  }
 
   const CarouselCardItem = ({ item, index }) => {
     const imageSource1 = `../../../images/pictures/buyNow1.jpg`;
@@ -207,6 +109,7 @@ function OurCoursesScreen() {
                 ? "PRO"
                 : ""}
             </Text>
+
             <Text style={styles.priceText}>
               {tab === 0
                 ? "₹ 2,499"
@@ -270,30 +173,174 @@ function OurCoursesScreen() {
         ) : (
           ""
         )}
-        <View style={styles.featuresCont}>
-          <Text style={styles.featureText}>- Access to 14hrs of course</Text>
-          <Text style={styles.featureText}>- Any time oubt clearence</Text>
-          <Text style={styles.featureText}>- Validity 1 Month</Text>
-          <Text style={styles.featureText}>- Validity 1 Month</Text>
-          <Text style={styles.featureText}>- Validity 1 Month</Text>
-        </View>
-        <View style={styles.btnCont}>
-          <ButtonComponent
-            text={"Get this course"}
-            handler={() => {
-              buyNowHandler(
-                tab === 0
-                  ? "basic"
-                  : tab === 1
-                  ? "standard"
-                  : tab === 2
-                  ? "pro"
-                  : ""
-              );
-            }}
+        {tab === 0 ? (
+          <>
+            <Text style={[styles.planSubText]}>
+              PRICE ACTION - THE COMPLETE COURSE
+            </Text>
+            <View style={styles.featuresCont}>
+              <Text style={styles.featureText}>
+                Access to 14hours of technical course content
+              </Text>
+              <Text style={styles.featureText}>
+                Access to weekly free analysis stats
+              </Text>
 
-            // handler={handlePay}
-          />
+              <Text style={styles.featureText}>
+                1 month unlimited course access
+              </Text>
+              <Text style={styles.featureText}> Any time doubt clearence</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  getThisCourseHandler(
+                    tab === 0
+                      ? "basic"
+                      : tab === 1
+                      ? "standard"
+                      : tab === 2
+                      ? "pro"
+                      : ""
+                  );
+                }}
+              >
+                <Text
+                  style={[
+                    styles.featureText,
+                    { textDecorationLine: "underline", color: Colors.clr4 },
+                  ]}
+                >
+                  View more
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : tab === 1 ? (
+          <>
+            <Text style={[styles.planSubText]}>
+              DOMINATE MARKETS: MASTER PRICE ACTION WITH STOCK ANALYSIS
+            </Text>
+            <View style={styles.featuresCont}>
+              <Text style={styles.featureText}>
+                Access to 14hours of technical course content
+              </Text>
+              <Text style={styles.featureText}>
+                Access to potential stock analysis - 6/week
+              </Text>
+
+              <Text style={styles.featureText}>
+                3 months unlimited course access
+              </Text>
+              <Text style={styles.featureText}> Any time doubt clearence</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  getThisCourseHandler(
+                    tab === 0
+                      ? "basic"
+                      : tab === 1
+                      ? "standard"
+                      : tab === 2
+                      ? "pro"
+                      : ""
+                  );
+                }}
+              >
+                <Text
+                  style={[
+                    styles.featureText,
+                    { textDecorationLine: "underline", color: Colors.clr4 },
+                  ]}
+                >
+                  View more
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : tab === 2 ? (
+          <>
+            <Text style={[styles.planSubText]}>
+              SYNERGIZING PRICE ACTION WITH FUNDAMENTALS FOR MARKET MASTERY
+            </Text>
+            <View style={styles.featuresCont}>
+              <Text style={styles.featureText}>
+                Access to 3hours of fundamental course content
+              </Text>
+              <Text style={styles.featureText}>
+                Access to 14hours of technical course content
+              </Text>
+              <Text style={styles.featureText}>
+                1 year unlimited access to everything
+              </Text>
+              <Text style={styles.featureText}> 1 -1 doubt clearence</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  getThisCourseHandler(
+                    tab === 0
+                      ? "basic"
+                      : tab === 1
+                      ? "standard"
+                      : tab === 2
+                      ? "pro"
+                      : ""
+                  );
+                }}
+              >
+                <Text
+                  style={[
+                    styles.featureText,
+                    { textDecorationLine: "underline", color: Colors.clr4 },
+                  ]}
+                >
+                  View more
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <></>
+        )}
+        <View style={styles.btnCont}>
+          {tab === 0 && (
+            <ButtonComponent
+              text={
+                authCtx.courseType === "basic" && authCtx.paid
+                  ? "Your current course"
+                  : "Get this course"
+              }
+              disabled={authCtx.courseType === "basic" && authCtx.paid}
+              handler={() => {
+                getThisCourseHandler("basic");
+              }}
+            />
+          )}
+          {tab === 1 && (
+            <ButtonComponent
+              text={
+                authCtx.courseType === "standard" && authCtx.paid
+                  ? "Your current course"
+                  : "Get this course"
+              }
+              disabled={authCtx.courseType === "standard" && authCtx.paid}
+              handler={() => {
+                getThisCourseHandler("standard");
+              }}
+            />
+          )}
+          {tab === 2 && (
+            <ButtonComponent
+              text={
+                authCtx.courseType === "pro" && authCtx.paid
+                  ? "Your current course"
+                  : "Get this course"
+              }
+              disabled={authCtx.courseType === "pro" && authCtx.paid}
+              handler={() => {
+                getThisCourseHandler("pro");
+              }}
+            />
+          )}
         </View>
       </View>
     );
@@ -308,13 +355,6 @@ function OurCoursesScreen() {
       <View
         style={[CommonStyles.mainContainer, { justifyContent: "flex-start" }]}
       >
-        <CustomAlertBox
-          visible={alertVisible}
-          onClose={hideAlert}
-          message="Purchased successfully"
-          needCancelBtn={false}
-        />
-
         <View style={{ height: "90%", marginTop: "8%" }}>
           <Carousel
             layout="default"
@@ -347,144 +387,11 @@ function OurCoursesScreen() {
         {/* <Text style={styles.SwipeText}>Swipe up for course contents</Text> */}
         <CourseDetailsModal
           isModalVisible={isModalVisible}
-          closeModal={toggleModal}
+          closeModal={closeCourseDetailModal}
+          course={selectedCourse}
+          courseAmount={courseAmount}
+          tab={tab}
         />
-        {/* <BottomSheet
-          isOpen={false}
-          sliderMinHeight={40}
-          sliderMaxHeight={680}
-          wrapperStyle={{
-            backgroundColor: Colors.clr2,
-            paddingHorizontal: 0,
-            paddingTop: 0,
-            paddingBottom: 15,
-          }}
-        >
-          {(onScrollEndDrag) => (
-            <ScrollView style={styles.courseContentCont}>
-           
-              <View style={styles.contents}>
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>BASICS</Text>
-                  </View>
-                  <Text style={styles.contentsName}>
-                    - What is Stock Trading ?
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Charts & Candlesticks
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Fundamental vs Technical analysis
-                  </Text>
-                </View>
-
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>CORE</Text>
-                  </View>
-                  <Text style={styles.contentsName}>
-                    - Support & Resistance (Supply & Demand)
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Zones and how to identify zone ?
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Trendlines and how to draw a perfect trendline ?
-                  </Text>
-                </View>
-
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>INDICTORS</Text>
-                  </View>
-                  <Text style={styles.contentsName}>
-                    - Lagging vs Leading indicator
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Volume Profile and how to use it ?
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Golden Fibonacci rule (0.618)
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Relative Strength Index (RSI) & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Moving Averages (9ma, 20ma, 50ma) & cheatsheet
-                  </Text>
-                </View>
-
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>PATTERNS</Text>
-                  </View>
-                  <Text style={styles.contentsName}>- What are Patterns ?</Text>
-                  <Text style={styles.contentsName}>
-                    - Triangle pattern & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Channel pattern & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Flag pattern & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Wedge pattern & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Double Top pattern & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Double Bottom pattern & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Head and Shoulder & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Inverse Head and Shoulder & cheatsheet
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - Major patterns to trade
-                  </Text>
-                </View>
-
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>STARTEGIES</Text>
-                  </View>
-                  <Text style={styles.contentsName}>
-                    - #1 strategy for Intraday
-                  </Text>
-                  <Text style={styles.contentsName}>
-                    - #1 strategy for Swing
-                  </Text>
-                </View>
-
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>
-                      RISK MANAGEMENT
-                    </Text>
-                  </View>
-                  <Text style={styles.contentsName}>- Position sizing</Text>
-                  <Text style={styles.contentsName}>- Risk / Reward</Text>
-                </View>
-
-                <View style={styles.contentsSub}>
-                  <View style={styles.contentsSideHeadingCont}>
-                    <Text style={styles.contentsSideHeading}>Bonus</Text>
-                  </View>
-                  <Text style={styles.contentsName}>- Breakout vs Fakeout</Text>
-                  <Text style={styles.contentsName}>
-                    - Perfect & Confluence entry
-                  </Text>
-                  <Text style={styles.contentsName}>- Trail your trade</Text>
-                </View>
-              </View>
-            </ScrollView>
-          )}
-        </BottomSheet> */}
       </View>
     </ScrollView>
   );
@@ -596,9 +503,19 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     color: Colors.midWhite,
   },
+  planSubText: {
+    fontSize: CalculateFontSize(1.8),
+    fontWeight: "500",
+    alignSelf: "center",
+    textAlign: "center",
+    marginTop: 10,
+    lineHeight: 20,
+    color: Colors.clr4,
+  },
   priceText: {
     fontSize: CalculateFontSize(5),
     fontWeight: "700",
+    marginTop: 15,
     color: Colors.btnClr,
   },
 
@@ -607,6 +524,7 @@ const styles = StyleSheet.create({
     height: "auto",
     marginTop: "10%",
     alignItems: "center",
+    textAlign: "center",
     // backgroundColor: "blue",
   },
 
@@ -633,33 +551,11 @@ const styles = StyleSheet.create({
     color: Colors.btnClr,
   },
 
-  courseContentCont: {
-    width: "100%",
-    height: 910,
-    marginTop: "-4%",
-    paddingHorizontal: "3%",
-    paddingTop: "0.5%",
-    // backgroundColor: "red",
-  },
-
   headingText: {
     fontSize: CalculateFontSize(3),
     fontWeight: "600",
     alignSelf: "center",
     color: Colors.clr4,
-  },
-
-  contents: {
-    width: "100%",
-    height: 1180,
-    marginTop: "6%",
-    // backgroundColor: "red",
-  },
-  contentsSub: {
-    width: "100%",
-    height: "auto",
-    marginBottom: "7%",
-    // backgroundColor: "blue",
   },
 
   contentsSideHeadingCont: {

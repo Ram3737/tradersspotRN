@@ -52,6 +52,11 @@ function BottomNavigatorAfterLoggedIn() {
         component={DiscussScreen}
         options={{ headerShown: false }}
       />
+      <bottomTab.Screen
+        name="Upgrade"
+        component={OurCoursesScreen}
+        options={{ headerShown: false }}
+      />
     </bottomTab.Navigator>
   );
 }

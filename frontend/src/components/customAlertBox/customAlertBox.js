@@ -3,7 +3,13 @@ import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
 
 import Colors from "../colors/colors";
 
-const CustomAlertBox = ({ visible, onClose, message, needCancelBtn }) => {
+const CustomAlertBox = ({
+  visible,
+  onClose,
+  message,
+  needCancelBtn,
+  btnText,
+}) => {
   return (
     <Modal
       animationType="slide"
@@ -15,7 +21,7 @@ const CustomAlertBox = ({ visible, onClose, message, needCancelBtn }) => {
         <View style={styles.alertBox}>
           <Text style={styles.message}>{message}</Text>
           <TouchableOpacity onPress={onClose} style={styles.okButton}>
-            <Text style={styles.okButtonText}>OK</Text>
+            <Text style={styles.okButtonText}>{btnText ? btnText : "OK"}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -41,10 +47,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   message: {
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 20,
-    fontWeight: "400",
+    fontWeight: "300",
+    textAlign: "center",
     color: "#fff",
+    lineHeight: 23,
   },
   okButton: {
     padding: 10,

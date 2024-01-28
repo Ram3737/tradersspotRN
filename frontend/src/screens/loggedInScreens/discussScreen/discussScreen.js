@@ -11,6 +11,7 @@ import {
 import CommonStyles from "../../../components/css/commonStyles";
 import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 import Colors from "../../../components/colors/colors";
+import OurCoursesScreen from "../../beforeLoggedInScreens/ourCoursesScreens/ourCoursesScreen";
 
 function DiscussScreen() {
   const [msg, setMsg] = useState("");

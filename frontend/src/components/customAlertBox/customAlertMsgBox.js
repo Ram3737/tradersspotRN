@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "300",
     color: "#fff",
+    textAlign: "center",
   },
   okButton: {
     padding: 10,

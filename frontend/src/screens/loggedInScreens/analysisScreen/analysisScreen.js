@@ -17,6 +17,8 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { useNavigation } from "@react-navigation/native";
+
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import Colors from "../../../components/colors/colors";
@@ -28,9 +30,11 @@ import { AuthContext } from "../../../components/stores/context/authContextProvi
 import { Switch } from "react-native-switch";
 import HapticFeedback from "react-native-haptic-feedback";
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
+import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 
 function AnalysisScreen() {
   const authCtx = useContext(AuthContext);
+  const navigation = useNavigation();
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
   const [analysisData, setAnalysisData] = useState([]);
@@ -92,6 +96,10 @@ function AnalysisScreen() {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  function upgradeBtnHandler() {
+    navigation.navigate("Upgrade");
+  }
 
   const renderItemPaid = ({ item, index }) => (
     <View key={index} style={styles.analysis}>
@@ -488,36 +496,51 @@ function AnalysisScreen() {
             )}
         </View>
       </View>
-      <View style={styles.analysisScrollCont}>
-        {isLoading && (
-          <ActivityIndicator
-            size="large"
-            color={Colors.clr4}
-            style={{ marginTop: "60%" }}
+
+      {authCtx.courseType === "basic" && authCtx.paid && !contToDisplay ? (
+        <View style={styles.upgradeBtnCont}>
+          <Text style={styles.upgradeBtnContText}>
+            Upgrade to "STANDARD" plan to access our high potential swing
+            analysis. You can view free analysis stats.
+          </Text>
+          <ButtonComponent
+            text={"Upgrade"}
+            style={{ alignSelf: "center" }}
+            handler={upgradeBtnHandler}
           />
-        )}
-        {/* {analysisData.length > 0 && !isLoading && (
-          <FlatList
-            data={analysisData}
-            renderItem={contToDisplay ? renderItemFree : renderItemPaid}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.analysisScrollContSub}
-            inverted={true}
-          />
-        )} */}
-        {analysisData.length === 0 && !isLoading && (
-          <View>
-            <Text
-              style={[
-                styles.topContSubBottomSubText1,
-                { marginTop: "50%", alignSelf: "center" },
-              ]}
-            >
-              No data
-            </Text>
-          </View>
-        )}
-      </View>
+        </View>
+      ) : (
+        <View style={styles.analysisScrollCont}>
+          {isLoading && (
+            <ActivityIndicator
+              size="large"
+              color={Colors.clr4}
+              style={{ marginTop: "60%" }}
+            />
+          )}
+          {analysisData.length > 0 && !isLoading && (
+            <FlatList
+              data={analysisData}
+              renderItem={contToDisplay ? renderItemFree : renderItemPaid}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.analysisScrollContSub}
+              inverted={true}
+            />
+          )}
+          {analysisData.length === 0 && !isLoading && (
+            <View>
+              <Text
+                style={[
+                  styles.topContSubBottomSubText1,
+                  { marginTop: "50%", alignSelf: "center" },
+                ]}
+              >
+                No data
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -712,5 +735,21 @@ const styles = StyleSheet.create({
     marginRight: "2%",
     color: Colors.clr4,
     // textDecorationLine: "underline",
+  },
+  upgradeBtnCont: {
+    width: "100%",
+    height: "auto",
+    marginTop: "40%",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: Colors.transparentBg,
+  },
+  upgradeBtnContText: {
+    width: "100%",
+    fontSize: CalculateFontSize(1.8),
+    fontWeight: "400",
+    textAlign: "center",
+    marginBottom: 30,
+    color: Colors.midWhite,
   },
 });
