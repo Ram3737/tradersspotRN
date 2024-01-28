@@ -484,7 +484,7 @@ function DashboardScreen() {
             style={{ marginTop: "8%" }}
           />
         )}
-        {/* {analysisData.length > 0 && !isLoading && (
+        {analysisData.length > 0 && !isLoading && (
           <View style={styles.analysis}>
             <View style={styles.analysisSub}>
               <View style={styles.analysisSubBtns}>
@@ -606,7 +606,7 @@ function DashboardScreen() {
                 </Text>
               ))}
           </View>
-        )} */}
+        )}
         {analysisData.length === 0 && !isLoading && (
           <View>
             <Text

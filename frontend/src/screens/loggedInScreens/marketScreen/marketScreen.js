@@ -1,8 +1,8 @@
-import { View, StyleSheet, Modal, ScrollView } from "react-native";
+import { View, StyleSheet, Modal, ScrollView, TextInput } from "react-native";
 
 import WebView from "react-native-webview";
 import BottomSheet from "react-native-simple-bottom-sheet";
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import TradingViewFullChart from "../../../components/tradingViewFullChart/tradingViewFullChart";
 import TradingViewChartWidget from "../../../components/tradingViewChartWidget/tradingViewChartWidget";
@@ -10,9 +10,15 @@ import ButtonComponent from "../../../components/buttonComponent/buttonComponent
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import Colors from "../../../components/colors/colors";
+import { AuthContext } from "../../../components/stores/context/authContextProvider";
+import CustomAlertMsgBox from "../../../components/customAlertBox/customAlertMsgBox";
 
 function MarketScreen() {
+  const authCtx = useContext(AuthContext);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [searchedStockName, setSearchedStockName] = useState("");
+  const [stockName, setStockName] = useState("TCS");
+  const [alertMsgBox, setAlertMsgBox] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -42,21 +48,32 @@ function MarketScreen() {
 
   const newsWidget = `
   <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
-    {
-    "feedMode": "market",
-    "colorTheme": "dark",
-    "isTransparent": true,
-    "displayMode": "regular",
-    "width": "100%",
-    "height": "100%",
-    "locale": "in",
-    "market": "index"
-  }
-    </script>
-  </div>
+
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-financials.js" async>
+  {
+  "isTransparent": false,
+  "largeChartUrl": "",
+  "displayMode": "adaptive",
+  "width": "100%",
+  "height": "100%",
+  "colorTheme": "dark",
+  "symbol": "NSE:${stockName}",
+  "locale": "in"
+}
+  </script>
+</div>
  `;
+
+  function stockNameUpdateHandler() {
+    if (authCtx.courseType === "pro" && authCtx.paid) {
+      setStockName(searchedStockName);
+    } else {
+      setAlertMsgBox(true);
+      setTimeout(() => {
+        setAlertMsgBox(false);
+      }, 3000);
+    }
+  }
 
   return (
     <ScrollView
@@ -79,6 +96,25 @@ function MarketScreen() {
           />
         </View>
         <View style={styles.newsTechWidCont}>
+          <View style={styles.searchCont}>
+            <TextInput
+              style={styles.input}
+              placeholder="Search for stocks"
+              placeholderTextColor="#666"
+              value={searchedStockName}
+              onChangeText={(text) => setSearchedStockName(text.toUpperCase())}
+            />
+            <ButtonComponent
+              text={"search"}
+              style={{
+                paddingHorizontal: 10,
+                paddingVertical: 6,
+                alignSelf: "center",
+              }}
+              handler={stockNameUpdateHandler}
+            />
+          </View>
+
           <View style={styles.mtr1Cont}>
             <WebView
               style={styles.webV}
@@ -128,6 +164,10 @@ function MarketScreen() {
           </View>
         </Modal>
       </View>
+      <CustomAlertMsgBox
+        visible={alertMsgBox}
+        message={`Upgrade to "PRO" plan to view financial stats for the stocks...`}
+      />
     </ScrollView>
   );
 }
@@ -143,7 +183,7 @@ const styles = StyleSheet.create({
   },
   chartCont: {
     width: "93%",
-    height: "32%",
+    height: 190,
     borderWidth: 0.5,
     // borderLeftColor: Colors.clr3,
     // borderRightColor: Colors.clr3,
@@ -162,20 +202,24 @@ const styles = StyleSheet.create({
 
   fullChartBtn: {
     position: "absolute",
-    left: "33%",
+    left: "36%",
     bottom: "-10%",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
 
   newsTechWidCont: {
     width: "100%",
     flex: 1,
-    // paddingHorizontal: 10,
+    height: "auto",
+    paddingHorizontal: 10,
     paddingVertical: 10,
-    paddingTop: 0,
+    alignItems: "center",
     marginTop: "15%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: "hidden",
+
     backgroundColor: Colors.clr2,
   },
 
@@ -187,15 +231,14 @@ const styles = StyleSheet.create({
   },
 
   mtr1Cont: {
-    width: "100%",
-    height: "85%",
+    width: "98%",
+    height: "75%",
     // backgroundColor: "red",
   },
 
   webV: {
     flex: 1,
     width: "100%",
-    // height: "50%",
     backgroundColor: Colors.clr2,
   },
 
@@ -210,5 +253,26 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     backgroundColor: Colors.mainBgClr,
+  },
+  searchCont: {
+    width: "100%",
+    height: "auto",
+    paddingHorizontal: 10,
+    marginTop: 10,
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+
+    // backgroundColor: "red",
+  },
+  input: {
+    width: "73%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 0.3,
+    borderRadius: 5,
+    backgroundColor: "#333",
+    paddingHorizontal: 10,
+    color: "#fff",
   },
 });
