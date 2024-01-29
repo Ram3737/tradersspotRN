@@ -10,8 +10,9 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Colors from "../../components/colors/colors";
 import CalculateFontSize from "../../components/calculateFontSize/calculateFontSize";
@@ -34,6 +35,10 @@ function UserProfileModal({ closeModal, isModalVisible }) {
   const [alertMsgErrVisible, setAlertMsgErrVisible] = useState(false);
   const [logoutLoader, setLogoutLoader] = useState(false);
   const [oldPasswordCheckLoader, setOldPasswordCheckLoader] = useState(false);
+  const [paid, setPaid] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [courseType, setCourseType] = useState(null);
+  const [mobileNo, setMobileNo] = useState(null);
 
   function resetViewHandler() {
     setResetVisible(true);
@@ -143,6 +148,29 @@ function UserProfileModal({ closeModal, isModalVisible }) {
     }
   }
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const uType = await AsyncStorage.getItem("userType");
+      const emil = await AsyncStorage.getItem("email");
+      const mblNo = await AsyncStorage.getItem("mobileNo");
+      const convertedPaid = JSON.parse(pid);
+
+      setPaid(convertedPaid);
+      setCourseType(cType);
+      setEmail(emil);
+      setMobileNo(mblNo);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   function modalCloseHandler() {
     setResetVisible(false);
     setOldPassword(null);
@@ -158,10 +186,11 @@ function UserProfileModal({ closeModal, isModalVisible }) {
 
     setTimeout(() => {
       authCtx.logout();
-      modalCloseHandler();
-      setLogoutLoader(false);
-      navigation.navigate("beforeLoggedIn");
     }, 500);
+    setTimeout(() => {
+      setLogoutLoader(false);
+      closeModal();
+    }, 2000);
   }
 
   return (
@@ -207,7 +236,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
                 placeholderTextColor="#fff"
                 keyboardType="numeric"
                 editable={false}
-                value={authCtx.userEmail || "none"}
+                value={email || "none"}
               />
             </View>
             <View style={styles.labelInput}>
@@ -218,7 +247,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
                 placeholderTextColor="#fff"
                 keyboardType="numeric"
                 editable={false}
-                value={authCtx.mblNo || "none"}
+                value={mobileNo || "none"}
               />
             </View>
 
@@ -230,11 +259,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
                 placeholderTextColor="#fff"
                 keyboardType="numeric"
                 editable={false}
-                value={
-                  authCtx.courseType !== "none" && authCtx.paid
-                    ? authCtx.courseType
-                    : "none"
-                }
+                value={courseType !== "none" && paid ? courseType : "none"}
               />
             </View>
 

@@ -10,9 +10,10 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { useState, useContext, useRef } from "react";
+import { useState, useContext, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import BottomSheet from "react-native-simple-bottom-sheet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Colors from "../../components/colors/colors";
 import ButtonComponent from "../buttonComponent/buttonComponent";
@@ -51,6 +52,10 @@ function CourseDetailsModal({
   const [contentTab, setContentTab] = useState("overview");
   const [buyNowLoader, setBuyNowLoader] = useState(false);
   const [coursePricingModalOpen, setCoursePricingModalOpen] = useState(false);
+  const [token, setToken] = useState(null);
+  const [paid, setPaid] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [courseType, setCourseType] = useState(null);
   const courseContent = [
     {
       topic: "BASICS",
@@ -198,17 +203,39 @@ function CourseDetailsModal({
     },
   ];
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const uType = await AsyncStorage.getItem("userType");
+      const emil = await AsyncStorage.getItem("email");
+      const convertedPaid = JSON.parse(pid);
+
+      setToken(tkn);
+      setPaid(convertedPaid);
+      setCourseType(cType);
+      setEmail(emil);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   function contentViewHandler(text) {
     setContentTab(text);
   }
 
   function coursePricingModalOpenHandler() {
-    if (authCtx.token && !authCtx.paid) {
+    if (token && !paid) {
       setBuyNowLoader(true);
       CallPatchApiServices(
         `/user/buyCourse`,
         {
-          email: authCtx.userEmail,
+          email: email,
           courseType: course,
           triedToUpdate: false,
         },
@@ -225,14 +252,14 @@ function CourseDetailsModal({
           console.log("payerr", error.message);
         }
       );
-    } else if (authCtx.token && authCtx.paid) {
+    } else if (token && paid) {
       console.log(2);
       setBuyNowLoader(true);
       CallPatchApiServices(
         `/user/buyCourse`,
         {
-          email: authCtx.userEmail,
-          courseType: authCtx.courseType,
+          email: email,
+          courseType: courseType,
           triedToUpdate: true,
         },
         (response) => {

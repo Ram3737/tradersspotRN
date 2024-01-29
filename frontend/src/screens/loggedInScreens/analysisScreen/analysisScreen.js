@@ -4,6 +4,7 @@ import React, {
   useRef,
   useContext,
   useCallback,
+  useLayoutEffect,
 } from "react";
 import {
   View,
@@ -26,6 +27,7 @@ import DonutChart from "../../../components/charts/donutChart";
 import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Switch } from "react-native-switch";
 import HapticFeedback from "react-native-haptic-feedback";
@@ -42,6 +44,27 @@ function AnalysisScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisStat, setAnalysisStat] = useState("swingAnalysisStats");
   const [refreshing, setRefreshing] = useState(false);
+  const [paid, setPaid] = useState(null);
+  const [courseType, setCourseType] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const uType = await AsyncStorage.getItem("userType");
+      const convertedPaid = JSON.parse(pid);
+
+      setPaid(convertedPaid);
+      setCourseType(cType);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
 
   const toggleSwitch = () => {
     if (Platform.OS === "ios") {
@@ -497,7 +520,7 @@ function AnalysisScreen() {
         </View>
       </View>
 
-      {authCtx.courseType === "basic" && authCtx.paid && !contToDisplay ? (
+      {courseType === "basic" && paid && !contToDisplay ? (
         <View style={styles.upgradeBtnCont}>
           <Text style={styles.upgradeBtnContText}>
             Upgrade to "STANDARD" plan to access our high potential swing

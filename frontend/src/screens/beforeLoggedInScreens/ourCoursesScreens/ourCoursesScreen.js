@@ -20,6 +20,7 @@ import {
 } from "react";
 import { useNavigation } from "@react-navigation/native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import Colors from "../../../components/colors/colors";
@@ -45,7 +46,28 @@ function OurCoursesScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [index, setIndex] = useState(0);
   const [selectedCourse, setselectedCourse] = useState("basic");
+  const [paid, setPaid] = useState(null);
+  const [courseType, setCourseType] = useState(null);
   const isCarousel = useRef(null);
+
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const uType = await AsyncStorage.getItem("userType");
+      const convertedPaid = JSON.parse(pid);
+
+      setPaid(convertedPaid);
+      setCourseType(cType);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
 
   const data = [
     {
@@ -112,11 +134,11 @@ function OurCoursesScreen() {
 
             <Text style={styles.priceText}>
               {tab === 0
-                ? "₹ 2,499"
+                ? "₹ 4,999"
                 : tab === 1
-                ? "₹ 6,499"
+                ? "₹ 7,999"
                 : tab === 2
-                ? "₹ 9,499"
+                ? "₹ 12,999"
                 : ""}
             </Text>
           </ImageBackground>
@@ -137,11 +159,11 @@ function OurCoursesScreen() {
             </Text>
             <Text style={styles.priceText}>
               {tab === 0
-                ? "₹ 2,499"
+                ? "₹ 4,999"
                 : tab === 1
-                ? "₹ 6,499"
+                ? "₹ 7,999"
                 : tab === 2
-                ? "₹ 9,499"
+                ? "₹ 12,999"
                 : ""}
             </Text>
           </ImageBackground>
@@ -162,11 +184,11 @@ function OurCoursesScreen() {
             </Text>
             <Text style={styles.priceText}>
               {tab === 0
-                ? "₹ 2,499"
+                ? "₹ 4,999"
                 : tab === 1
-                ? "₹ 6,499"
+                ? "₹ 7,999"
                 : tab === 2
-                ? "₹ 9,499"
+                ? "₹ 12,999"
                 : ""}
             </Text>
           </ImageBackground>
@@ -305,11 +327,11 @@ function OurCoursesScreen() {
           {tab === 0 && (
             <ButtonComponent
               text={
-                authCtx.courseType === "basic" && authCtx.paid
+                courseType === "basic" && paid
                   ? "Your current course"
                   : "Get this course"
               }
-              disabled={authCtx.courseType === "basic" && authCtx.paid}
+              disabled={courseType === "basic" && paid}
               handler={() => {
                 getThisCourseHandler("basic");
               }}
@@ -318,11 +340,11 @@ function OurCoursesScreen() {
           {tab === 1 && (
             <ButtonComponent
               text={
-                authCtx.courseType === "standard" && authCtx.paid
+                courseType === "standard" && paid
                   ? "Your current course"
                   : "Get this course"
               }
-              disabled={authCtx.courseType === "standard" && authCtx.paid}
+              disabled={courseType === "standard" && paid}
               handler={() => {
                 getThisCourseHandler("standard");
               }}
@@ -331,11 +353,11 @@ function OurCoursesScreen() {
           {tab === 2 && (
             <ButtonComponent
               text={
-                authCtx.courseType === "pro" && authCtx.paid
+                courseType === "pro" && paid
                   ? "Your current course"
                   : "Get this course"
               }
-              disabled={authCtx.courseType === "pro" && authCtx.paid}
+              disabled={courseType === "pro" && paid}
               handler={() => {
                 getThisCourseHandler("pro");
               }}

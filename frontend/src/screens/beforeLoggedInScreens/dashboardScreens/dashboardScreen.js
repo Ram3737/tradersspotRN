@@ -9,11 +9,18 @@ import {
   RefreshControl,
   StyleSheet,
 } from "react-native";
-import { useContext, useEffect, useState, useCallback } from "react";
+import {
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
 import MarqueeView from "react-native-marquee-view";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Colors from "../../../components/colors/colors";
 import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
@@ -35,6 +42,24 @@ function DashboardScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [token, setToken] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const convertedPaid = JSON.parse(pid);
+
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
 
   function loginrSignupHandler() {
     navigation.navigate("loginSignup");
@@ -101,7 +126,7 @@ function DashboardScreen() {
       >
         <View style={styles.headerCont}>
           <Text style={styles.headerText}>Hi there,</Text>
-          {authCtx.token ? (
+          {token ? (
             <TouchableOpacity
               style={styles.userAvatar}
               onPress={() => toggleModal()}

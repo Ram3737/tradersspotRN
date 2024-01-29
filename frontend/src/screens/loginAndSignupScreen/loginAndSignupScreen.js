@@ -11,9 +11,11 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect, useState, useEffect, useContext } from "react";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CommonStyles from "../../components/css/commonStyles";
 import ButtonComponent from "../../components/buttonComponent/buttonComponent";
@@ -139,13 +141,20 @@ function LoginAndSignupScreen() {
         email: loginEmail,
         password: loginPassword,
       },
-      (response) => {
+      async (response) => {
         if (response.status === 200) {
           console.log(response.data);
-
+          try {
+            await AsyncStorage.setItem("token", response.data.token);
+            await AsyncStorage.setItem("paid", response.data.paid.toString());
+            await AsyncStorage.setItem("courseType", response.data.courseType);
+            await AsyncStorage.setItem("userType", response.data.userType);
+            await AsyncStorage.setItem("email", response.data.email);
+            await AsyncStorage.setItem("mobileNo", response.data.mobileNumber);
+          } catch (error) {
+            console.error("Error storing data:", error);
+          }
           setErrFromBackend(null);
-          setLoginEmail("");
-          setLoginPassword("");
           authCtx.setToken(response.data.token);
           authCtx.setCourseType(response.data.courseType);
           authCtx.setUserType(response.data.userType);
@@ -154,9 +163,14 @@ function LoginAndSignupScreen() {
           authCtx.setPaid(response.data.paid);
           authCtx.setTriedToUpdate(response.data.triedToUpdate);
           authCtx.authenticationHandler();
-          setBtnLoader(false);
+          setTimeout(() => {
+            setLoginEmail("");
+            setLoginPassword("");
+            setBtnLoader(false);
+          }, 2000);
+
           if (response.data.userType === "admin") {
-            navigation.navigate("adminLoggedIn");
+            // navigation.navigate("adminLoggedIn");
             return;
           }
           if (
@@ -164,7 +178,6 @@ function LoginAndSignupScreen() {
             response.data.courseType !== "none" &&
             response.data.paid
           ) {
-            navigation.navigate("afterLoggedIn");
           } else if (
             response.data.token &&
             response.data.courseType !== "none"

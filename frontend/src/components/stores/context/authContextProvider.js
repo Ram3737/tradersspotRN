@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
 
 export const AuthContext = createContext({
@@ -116,6 +117,7 @@ function AuthContextProvider({ children }) {
     setUserSelectedCourse("none");
     setToken(null);
     setTriedToUpdate(false);
+    AsyncStorage.clear();
   }
 
   const value = {

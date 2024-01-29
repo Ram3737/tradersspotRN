@@ -10,7 +10,7 @@ import Colors from "../colors/colors";
 import BlinkingDot from "../blinkingDot/blinkingDot";
 
 const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
-  const courses = ["basic", "standard", "premium", "none"];
+  const courses = ["basic", "standard", "pro", "none"];
   const ttUpdate = ["true", "false"];
   const [selectedCourseType, setSelectedCourseType] = useState("none");
   const [selectedTtUpdate, setSelectedTtUpdate] = useState(false);

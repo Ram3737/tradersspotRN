@@ -7,12 +7,15 @@ import {
   ImageBackground,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
+  Vibration,
   StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useContext, useEffect, useCallback } from "react";
 
 import WebView from "react-native-webview";
+import { Switch } from "react-native-switch";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import Colors from "../../../components/colors/colors";
@@ -79,6 +82,7 @@ function MyCoursesScreen() {
   const [selectedCategory, setSelectedCategory] = useState("BASICS");
   const [selectedContent, setSelectedContent] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [contToDisplay, setContToDisplay] = useState(false);
 
   const tradingViewWidget = `
   <div class="tradingview-widget-container" >
@@ -117,6 +121,20 @@ function MyCoursesScreen() {
     </script>
   </div>
 `;
+
+  const toggleSwitch = () => {
+    if (Platform.OS === "ios") {
+      const options = {
+        enableVibrateFallback: true,
+        ignoreAndroidSystemSettings: false,
+      };
+      HapticFeedback.trigger("impactLight", options);
+    } else if (Platform.OS === "android") {
+      Vibration.vibrate(50);
+    }
+
+    setContToDisplay(!contToDisplay);
+  };
 
   function callCourseContent() {
     setIsLoading(true);
@@ -232,30 +250,44 @@ function MyCoursesScreen() {
         <WebView style={styles.webV} source={{ html: tradingViewWidget }} />
       </View>
 
-      {/* <View style={styles.tabCont}>
-        <TouchableOpacity
-          style={[
-            { backgroundColor: tab === "contents" ? Colors.clr3 : Colors.clr2 },
-            styles.tab,
-          ]}
-          onPress={() => setTab("contents")}
-        >
-          <Text style={styles.tabText}>Contents</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            { backgroundColor: tab === "discuss" ? Colors.clr3 : Colors.clr2 },
-            styles.tab,
-          ]}
-          onPress={() => setTab("discuss")}
-        >
-          <Text style={styles.tabText}>Discuss</Text>
-        </TouchableOpacity>
-      </View> */}
-
       <View style={styles.categoryCont}>
-        <Text style={styles.categoryHeadingText}>Categories</Text>
+        <View style={styles.categoryHeadingCont}>
+          <View style={styles.categoryHeadingSubCont}>
+            <Text style={styles.categoryHeadingText}>Categories</Text>
+            {/* <Text style={styles.contToDisplayText}>
+              {contToDisplay ? "Fundamentals" : "Technicals"}
+            </Text> */}
+          </View>
+
+          <View style={styles.toggleContainer}>
+            <Text style={styles.contToDisplayText}>
+              {contToDisplay ? "Fundamentals" : "Technicals"}
+            </Text>
+            <Switch
+              value={contToDisplay}
+              onValueChange={toggleSwitch}
+              disabled={false}
+              activeText={""}
+              inActiveText={""}
+              circleSize={14}
+              barHeight={18}
+              backgroundActive={Colors.clr2}
+              backgroundInactive={Colors.clr2}
+              circleActiveColor={Colors.btnClr}
+              circleInActiveColor={Colors.btnClr}
+              changeValueImmediately={true}
+              innerCircleStyle={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              renderActiveText={true}
+              renderInActiveText={true}
+              switchLeftPx={3}
+              switchRightPx={3}
+              switchWidthMultiplier={contToDisplay ? 2.9 : 2.9}
+            />
+          </View>
+        </View>
         <ScrollView style={styles.categorySubCont} horizontal={true}>
           {mainTopics.map((topic, index) => (
             <ImageBackground
@@ -504,6 +536,32 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: "7%",
     // backgroundColor: "red",
+  },
+  categoryHeadingCont: {
+    width: "100%",
+    height: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    // backgroundColor: "red",
+  },
+  categoryHeadingSubCont: {
+    width: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  toggleContainer: {
+    width: "auto",
+    paddingRight: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  contToDisplayText: {
+    color: Colors.midWhite,
+    fontSize: calculateFontSize(1.4),
+    fontWeight: "500",
+    marginRight: 8,
   },
   categoryHeadingText: {
     fontSize: calculateFontSize(2.5),

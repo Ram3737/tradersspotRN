@@ -2,7 +2,8 @@ import { View, StyleSheet, Modal, ScrollView, TextInput } from "react-native";
 
 import WebView from "react-native-webview";
 import BottomSheet from "react-native-simple-bottom-sheet";
-import { useState, useContext } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useContext, useLayoutEffect } from "react";
 
 import TradingViewFullChart from "../../../components/tradingViewFullChart/tradingViewFullChart";
 import TradingViewChartWidget from "../../../components/tradingViewChartWidget/tradingViewChartWidget";
@@ -16,9 +17,11 @@ import CustomAlertMsgBox from "../../../components/customAlertBox/customAlertMsg
 function MarketScreen() {
   const authCtx = useContext(AuthContext);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [searchedStockName, setSearchedStockName] = useState("");
+  const [searchedStockName, setSearchedStockName] = useState(null);
   const [stockName, setStockName] = useState("TCS");
   const [alertMsgBox, setAlertMsgBox] = useState(false);
+  const [paid, setPaid] = useState(null);
+  const [courseType, setCourseType] = useState(null);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -64,8 +67,29 @@ function MarketScreen() {
 </div>
  `;
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const uType = await AsyncStorage.getItem("userType");
+      const convertedPaid = JSON.parse(pid);
+
+      setPaid(convertedPaid);
+      setCourseType(cType);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   function stockNameUpdateHandler() {
-    if (authCtx.courseType === "pro" && authCtx.paid) {
+    if (!searchedStockName && courseType === "pro" && paid) {
+      return;
+    } else if (courseType === "pro" && paid && searchedStockName) {
       setStockName(searchedStockName);
     } else {
       setAlertMsgBox(true);
