@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Platform,
   Vibration,
+  RefreshControl,
   StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -83,6 +84,7 @@ function MyCoursesScreen() {
   const [selectedContent, setSelectedContent] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [contToDisplay, setContToDisplay] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const tradingViewWidget = `
   <div class="tradingview-widget-container" >
@@ -182,6 +184,15 @@ function MyCoursesScreen() {
   const closeProfileModal = () => {
     setIsProfileModalVisible(!isProfileModalVisible);
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    callCourseContent();
+    authCtx.nullCall();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <View
@@ -423,7 +434,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   topInfoCont: {
-    height: "25%",
+    height: 173,
     width: "100%",
     flexDirection: "row",
     justifyContent: "center",
@@ -482,7 +493,7 @@ const styles = StyleSheet.create({
   },
   topInfoContFloat: {
     width: "85%",
-    height: "35%",
+    height: 60,
     justifyContent: "flex-end",
     position: "absolute",
     top: "83%",
@@ -521,12 +532,12 @@ const styles = StyleSheet.create({
 
   tickerCont: {
     width: "100%",
-    height: "5%",
+    height: 30,
     // backgroundColor: "red",
     marginTop: "16.5%",
   },
   webV: {
-    height: 10,
+    height: 5,
     backgroundColor: Colors.transparentBg,
     borderRadius: 10,
   },
@@ -670,7 +681,7 @@ const styles = StyleSheet.create({
   contentCont: {
     flex: 1,
     width: "100%",
-    marginTop: "7%",
+    marginTop: "5%",
     paddingBottom: 10,
     // backgroundColor: "red",
   },

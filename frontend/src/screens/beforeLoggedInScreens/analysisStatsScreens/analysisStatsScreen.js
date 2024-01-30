@@ -14,6 +14,7 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
 import { Switch } from "react-native-switch";
 import DonutChart from "../../../components/charts/donutChart";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
@@ -25,19 +26,24 @@ import Colors from "../../../components/colors/colors";
 function AnalysisStatsScreen() {
   const authCtx = useContext(AuthContext);
   const currentDate = new Date();
+  const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
   const [viewResult, setViewResult] = useState(0);
   const [contToDisplay, setContToDisplay] = useState(false);
   const [barChartValue, setBarChartValue] = useState([]);
   const [analysisData, setAnalysisData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [viewFilterCont, setViewFilterCont] = useState(false);
+  const [filterTab, setFilterTab] = useState("All");
+  const [breakout, setBreakOut] = useState(null);
+  const [reward, setReward] = useState(null);
 
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
       `/analysis/getAll${
         contToDisplay ? "FreeSwing" : "Swing"
-      }AnalysisUser?page=100`,
+      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}`,
       (response) => {
         if (response.status === 200) {
           if (!contToDisplay) {
@@ -70,7 +76,7 @@ function AnalysisStatsScreen() {
           : authCtx.swingAnalysisStats?.reversedMonthlyTotals
       );
     }
-  }, [contToDisplay, authCtx]);
+  }, [contToDisplay, authCtx, breakout, reward]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -89,6 +95,36 @@ function AnalysisStatsScreen() {
 
     setContToDisplay(!contToDisplay);
   };
+
+  function viewFilterTabHandler() {
+    setViewFilterCont(!viewFilterCont);
+    setBreakOut(null);
+    setReward(null);
+  }
+
+  function tabPressHandler(pressedTab) {
+    setFilterTab(pressedTab);
+    if (pressedTab === "All") {
+      setBreakOut(null);
+      setReward(null);
+    } else if (pressedTab === "Breakout") {
+      setBreakOut("green");
+      setReward(null);
+    } else if (pressedTab === "Trailing") {
+      if (!contToDisplay) {
+        return;
+      } else {
+        setBreakOut("orange");
+        setReward(null);
+      }
+    } else if (pressedTab === "Reward") {
+      setBreakOut(null);
+      setReward(1);
+    } else if (pressedTab === "Stoploss") {
+      setBreakOut(null);
+      setReward(0);
+    }
+  }
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -539,6 +575,47 @@ function AnalysisStatsScreen() {
           )}
         </View>
       </View>
+
+      <View style={styles.filterCont}>
+        <MaterialIcons
+          name={"filter-list"}
+          size={25}
+          color={Colors.btnClr}
+          onPress={viewFilterTabHandler}
+        />
+        {viewFilterCont && (
+          <View style={styles.tabCont}>
+            <ScrollView style={styles.tabSubCont} horizontal={true}>
+              {tabsArray.map((tab, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.tab,
+                    {
+                      backgroundColor:
+                        filterTab === tab ? Colors.clr4 : "transparent",
+                    },
+                  ]}
+                  onPress={() => tabPressHandler(tab)}
+                >
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: filterTab === tab ? "#000" : "#fff",
+                        fontWeight: filterTab === tab ? "500" : "300",
+                      },
+                    ]}
+                  >
+                    {tab}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </View>
+
       <View style={styles.analysisScrollCont}>
         {isLoading && (
           <ActivityIndicator
@@ -657,11 +734,52 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     // backgroundColor: "yellow",
   },
+  filterCont: {
+    width: "95%",
+    height: "auto",
+    marginTop: "2%",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    // backgroundColor: "blue",
+  },
+  tabCont: {
+    height: 30,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginTop: 5,
+  },
+  tabSubCont: {
+    height: "100%",
+    width: "100%",
+    flexDirection: "row",
+    // backgroundColor: "red",
+  },
+  tab: {
+    width: "auto",
+    height: "80%",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    borderColor: Colors.clr5,
+    borderWidth: 0.8,
+    marginRight: 10,
+  },
+
+  tabText: {
+    fontSize: CalculateFontSize(1.6),
+    fontWeight: "300",
+    color: "#fff",
+  },
+
   analysisScrollCont: {
     flex: 1,
     width: "100%",
-    paddingTop: 15,
-    marginTop: "2%",
+    paddingTop: 10,
+    marginTop: "1%",
     borderRadius: 20,
   },
 

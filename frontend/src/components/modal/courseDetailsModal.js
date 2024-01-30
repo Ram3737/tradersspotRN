@@ -248,7 +248,7 @@ function CourseDetailsModal({
         },
         (error) => {
           setBuyNowLoader(false);
-          Alert.alert("Trouble updating course, please try again later");
+          Alert.alert("Server down", "Please try again sometime");
           console.log("payerr", error.message);
         }
       );
@@ -271,7 +271,7 @@ function CourseDetailsModal({
         },
         (error) => {
           setBuyNowLoader(false);
-          Alert.alert("Trouble updating course, please try again later");
+          Alert.alert("Server down", "Please try again sometime");
           console.log("payerr", error.message);
         }
       );

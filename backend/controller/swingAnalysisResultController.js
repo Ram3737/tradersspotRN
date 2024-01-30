@@ -67,7 +67,28 @@ const getAllSwingAnalysisUser = async (req, res) => {
     const limit = 100;
     const skip = (page - 1) * limit;
 
-    const allSwingAnalyses = await SwingAnalysisResult.find()
+    const breakoutValue = req.query.breakout;
+    const rewardValue = req.query.reward;
+
+    let query = [];
+
+    if (breakoutValue && breakoutValue !== "null") {
+      query.push({ ["result.breakout"]: breakoutValue });
+    }
+
+    if (rewardValue && rewardValue !== "null" && rewardValue !== 1) {
+      query.push({ ["result.reward"]: rewardValue });
+    }
+
+    if (rewardValue && rewardValue == 1) {
+      query.push({ ["result.reward"]: { $gt: 0 } });
+    }
+
+    console.log("paid", query);
+
+    const allSwingAnalyses = await SwingAnalysisResult.find(
+      query.length > 0 ? { $or: query } : {}
+    )
       .sort({
         createdAt: -1,
       })
@@ -208,7 +229,10 @@ const sumRiskRewardSwing = async (req, res) => {
 
       analysesForMonth.forEach((analysis) => {
         monthlyTotal.risk += analysis.result.risk;
-        monthlyTotal.reward += analysis.result.reward;
+        const reward = analysis.result.reward;
+
+        const adjustedReward = reward === 0 ? -1 : reward;
+        monthlyTotal.reward += adjustedReward;
       });
 
       monthlyTotals.push(monthlyTotal);
@@ -255,10 +279,16 @@ const sumRiskRewardSwing = async (req, res) => {
       (sum, analysis) => sum + analysis.result.risk,
       0
     );
-    const totalReward = allSwingAnalyses.reduce(
-      (sum, analysis) => sum + analysis.result.reward,
-      0
-    );
+    // const totalReward = allSwingAnalyses.reduce(
+    //   (sum, analysis) => sum + analysis.result.reward,
+    //   0
+    // );
+    const totalReward = allSwingAnalyses.reduce((sum, analysis) => {
+      const reward = analysis.result.reward;
+      // Set reward to -1 if it is 0
+      const adjustedReward = reward === 0 ? -1 : reward;
+      return sum + adjustedReward;
+    }, 0);
 
     const lastFiveMonthsTotals = [];
 
@@ -301,12 +331,12 @@ const sumRiskRewardSwing = async (req, res) => {
 
     const reversedMonthlyTotals = monthlyTotals.reverse();
 
-    const totalRiskLastFiveMonth = lastFiveMonthsTotals.reduce(
+    const totalRiskLastFiveMonth = monthlyTotals.reduce(
       (sum, monthTotal) => sum + monthTotal.risk,
       0
     );
 
-    const totalRewardLastFiveMonth = lastFiveMonthsTotals.reduce(
+    const totalRewardLastFiveMonth = monthlyTotals.reduce(
       (sum, monthTotal) => sum + monthTotal.reward,
       0
     );

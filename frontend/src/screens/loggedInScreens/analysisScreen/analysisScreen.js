@@ -46,6 +46,7 @@ function AnalysisScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [paid, setPaid] = useState(null);
   const [courseType, setCourseType] = useState(null);
+  const [breakout, setBreakOut] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -85,7 +86,7 @@ function AnalysisScreen() {
     CallGetApiServices(
       `/analysis/getAll${
         contToDisplay ? "FreeSwing" : "Swing"
-      }AnalysisUser?page=100`,
+      }AnalysisUser?page=100&breakout=${breakout}`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data.allSwingAnalyses);

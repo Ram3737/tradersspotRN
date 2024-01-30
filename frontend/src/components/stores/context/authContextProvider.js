@@ -2,6 +2,8 @@ import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
 
+import { Alert } from "react-native";
+
 export const AuthContext = createContext({
   isAuthenticated: "",
   token: "",
@@ -65,6 +67,7 @@ function AuthContextProvider({ children }) {
       },
       (err) => {
         setSwingAnalysisLoader(false);
+        Alert.alert("Server down", "Please try after sometime.");
         console.log("fetching intraday analysis stats err", err);
       }
     );
@@ -82,6 +85,7 @@ function AuthContextProvider({ children }) {
       },
       (err) => {
         setFreeSwingAnalysisLoader(false);
+        Alert.alert("Server down", "Please try after sometime.");
         console.log("fetching free analysis stats err", err);
       }
     );
