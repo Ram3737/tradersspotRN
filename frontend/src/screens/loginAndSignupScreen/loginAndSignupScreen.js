@@ -35,10 +35,12 @@ function LoginAndSignupScreen() {
 
   const [contToDisplay, setContToDisplay] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mblNo, setMblNo] = useState("");
   const [Password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [nameErr, setNameErr] = useState(null);
   const [emailErr, setEmailErr] = useState(null);
   const [mblNoErr, setMblNoErr] = useState(null);
   const [passwordErr, setPasswordErr] = useState(null);
@@ -77,10 +79,16 @@ function LoginAndSignupScreen() {
     }
 
     authCtx.setRegisterSignupToggle(!authCtx.registerSignupToggle);
+    setName("");
     setEmail("");
     setMblNo("");
     setPassword("");
     setConfirmPassword("");
+    setNameErr("");
+    setEmailErr("");
+    setMblNoErr("");
+    setPasswordErr("");
+    setConfirmPasswordErr("");
     setLoginEmail("");
     setLoginPassword("");
     setErrFromBackend("");
@@ -150,6 +158,7 @@ function LoginAndSignupScreen() {
             await AsyncStorage.setItem("courseType", response.data.courseType);
             await AsyncStorage.setItem("userType", response.data.userType);
             await AsyncStorage.setItem("email", response.data.email);
+            await AsyncStorage.setItem("name", response.data.name);
             await AsyncStorage.setItem("mobileNo", response.data.mobileNumber);
           } catch (error) {
             console.error("Error storing data:", error);
@@ -207,6 +216,13 @@ function LoginAndSignupScreen() {
 
   function signUpClickHandler() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name || name.length < 3) {
+      setNameErr("Name should have atleast 3 characters");
+      return;
+    } else {
+      setNameErr("");
+    }
     if (!email || !emailRegex.test(email)) {
       setEmailErr("Please enter a valid email address.");
       return;
@@ -248,6 +264,7 @@ function LoginAndSignupScreen() {
     CallPostApiServices(
       `/user/signup`,
       {
+        name: name,
         email: email,
         mobileNumber: mblNo,
         password: Password,
@@ -325,14 +342,14 @@ function LoginAndSignupScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Email"
-                  placeholderTextColor="#fff"
+                  placeholderTextColor="#777"
                   value={loginEmail}
                   onChangeText={(text) => setLoginEmail(text)}
                 />
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
-                  placeholderTextColor="#fff"
+                  placeholderTextColor="#777"
                   secureTextEntry={true}
                   value={loginPassword}
                   onChangeText={(text) => setLoginPassword(text)}
@@ -363,13 +380,15 @@ function LoginAndSignupScreen() {
                 style={styles.imageSignUpTop}
               />
               <View style={styles.signUpSubCont2}>
-                {(emailErr ||
+                {(nameErr ||
+                  emailErr ||
                   mblNoErr ||
                   passwordErr ||
                   confirmPasswordErr ||
                   errFromBackend) && (
                   <Text style={styles.errMsgText}>
-                    {emailErr ||
+                    {nameErr ||
+                      emailErr ||
                       mblNoErr ||
                       passwordErr ||
                       confirmPasswordErr ||
@@ -378,22 +397,29 @@ function LoginAndSignupScreen() {
                 )}
                 <TextInput
                   style={styles.input}
+                  placeholder="Name"
+                  placeholderTextColor="#777"
+                  value={name}
+                  onChangeText={(text) => setName(text)}
+                />
+                <TextInput
+                  style={styles.input}
                   placeholder="Email"
-                  placeholderTextColor="#fff"
+                  placeholderTextColor="#777"
                   value={email}
                   onChangeText={(text) => setEmail(text.toLowerCase())}
                 />
                 <TextInput
                   style={styles.input}
                   placeholder="Mobile Number"
-                  placeholderTextColor="#fff"
+                  placeholderTextColor="#777"
                   value={mblNo}
                   onChangeText={(text) => setMblNo(text)}
                 />
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
-                  placeholderTextColor="#fff"
+                  placeholderTextColor="#777"
                   secureTextEntry={true}
                   value={Password}
                   onChangeText={(text) => setPassword(text)}
@@ -401,7 +427,7 @@ function LoginAndSignupScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Confirm Password"
-                  placeholderTextColor="#fff"
+                  placeholderTextColor="#777"
                   secureTextEntry={true}
                   confirmPassword={confirmPassword}
                   onChangeText={(text) => setConfirmPassword(text)}
@@ -504,7 +530,7 @@ const styles = StyleSheet.create({
   },
 
   signUpSubCont1: {
-    height: 380,
+    height: "auto",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
@@ -526,11 +552,12 @@ const styles = StyleSheet.create({
 
   signUpSubCont2: {
     width: "90%",
-    height: 370,
+    height: "auto",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(30, 30, 30, 0.7)",
     position: "relative",
+    paddingVertical: 30,
     borderRadius: 10,
     borderWidth: 0.2,
     borderColor: Colors.clr3,

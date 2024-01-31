@@ -8,9 +8,11 @@ import {
   Platform,
   ActivityIndicator,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import {
   CallPostApiServices,
@@ -24,6 +26,7 @@ import SwingAnalysisTable from "../../../components/table/swingAnalysisTable";
 import Colors from "../../../components/colors/colors";
 
 function AdminAnalysisScreen() {
+  const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
   const [selectedStockName, setSelectedStockName] = useState(null);
   const [analysisLink, setAnalysisLink] = useState(null);
   const [selectedPattern, setSelectedPattern] = useState(null);
@@ -34,6 +37,10 @@ function AdminAnalysisScreen() {
   const [currentPage, setCurrentPage] = useState(1);
   const [analysisLoader, setAnalysisLoader] = useState(false);
   const [allAnalysisLoader, setAllAnalysisLoader] = useState(false);
+  const [viewFilterCont, setViewFilterCont] = useState(false);
+  const [filterTab, setFilterTab] = useState("All");
+  const [breakout, setBreakOut] = useState(null);
+  const [reward, setReward] = useState(null);
 
   const patternArr = [
     "PRICE ACTION",
@@ -50,18 +57,6 @@ function AdminAnalysisScreen() {
     "DOUBLE BOTTOM",
   ];
 
-  const obj = {
-    analysis: {
-      stockName: "TCS",
-      pattern: "TRIANGLE PATTERN",
-      analysisLink: "https://www.tradingview.com/x/tXn6jAey",
-    },
-    result: {
-      riskReward: "1:3 RR",
-      resultLink: "https://www.tradingview.com/x/tXn6jAey",
-    },
-  };
-
   function getAllAnalysis(page = 1) {
     if (searchedText) {
       CallGetApiServices(
@@ -75,7 +70,11 @@ function AdminAnalysisScreen() {
           }
         },
         (err) => {
-          console.log("err getting getallanalysis", err);
+          console.log("err getting getallanalysis", err.response.data.message);
+          Alert.alert(
+            "Error getting analysis",
+            "Error getting analysis with given id"
+          );
         }
       );
     } else {
@@ -83,7 +82,7 @@ function AdminAnalysisScreen() {
       CallGetApiServices(
         `/analysis/getAll${
           tab === "Swing" ? tab : tab + "Swing"
-        }Analysis?page=${page}`,
+        }Analysis?page=${page}&breakout=${breakout}&reward=${reward}`,
         (response) => {
           if (response.status === 200) {
             setAllAnalysisLoader(false);
@@ -94,6 +93,7 @@ function AdminAnalysisScreen() {
         (err) => {
           setAllAnalysisLoader(false);
           console.log("err getting getallanalysis", err);
+          Alert.alert("Error getting", "Error getting analysis");
         }
       );
     }
@@ -151,7 +151,7 @@ function AdminAnalysisScreen() {
     setSearchedText(null);
     setCurrentPage(1);
     getAllAnalysis();
-  }, [tab]);
+  }, [tab, breakout, reward]);
 
   useEffect(() => {
     if (!searchedText) {
@@ -161,6 +161,33 @@ function AdminAnalysisScreen() {
       getAllAnalysis(currentPage);
     }
   }, [currentPage, searchedText]);
+
+  function viewFilterTabHandler() {
+    setViewFilterCont(!viewFilterCont);
+    setBreakOut(null);
+    setReward(null);
+    setFilterTab("All");
+  }
+
+  function tabPressHandler(pressedTab) {
+    setFilterTab(pressedTab);
+    if (pressedTab === "All") {
+      setBreakOut(null);
+      setReward(null);
+    } else if (pressedTab === "Breakout") {
+      setBreakOut("green");
+      setReward(null);
+    } else if (pressedTab === "Trailing") {
+      setBreakOut("orange");
+      setReward(null);
+    } else if (pressedTab === "Reward") {
+      setBreakOut(null);
+      setReward(1);
+    } else if (pressedTab === "Stoploss") {
+      setBreakOut(null);
+      setReward(0);
+    }
+  }
 
   return (
     <KeyboardAvoidingView
@@ -181,7 +208,13 @@ function AdminAnalysisScreen() {
                 },
                 styles.tab,
               ]}
-              onPress={() => setTab("Swing")}
+              onPress={() => {
+                setTab("Swing");
+                setViewFilterCont(false);
+                setBreakOut(null);
+                setReward(null);
+                setFilterTab("All");
+              }}
             >
               <Text style={styles.tabText}>Swing</Text>
             </TouchableOpacity>
@@ -193,7 +226,13 @@ function AdminAnalysisScreen() {
                 },
                 styles.tab,
               ]}
-              onPress={() => setTab("Free")}
+              onPress={() => {
+                setTab("Free");
+                setViewFilterCont(false);
+                setBreakOut(null);
+                setReward(null);
+                setFilterTab("All");
+              }}
             >
               <Text style={styles.tabText}>Free</Text>
             </TouchableOpacity>
@@ -206,7 +245,13 @@ function AdminAnalysisScreen() {
                 },
                 styles.tab,
               ]}
-              onPress={() => setTab("Intraday")}
+              onPress={() => {
+                setTab("Intraday");
+                setViewFilterCont(false);
+                setBreakOut(null);
+                setReward(null);
+                setFilterTab("All");
+              }}
             >
               <Text style={styles.tabText}>Intraday</Text>
             </TouchableOpacity>
@@ -411,13 +456,57 @@ function AdminAnalysisScreen() {
               >
                 Swing Analyses
               </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Search"
-                placeholderTextColor="#fff"
-                value={searchedText}
-                onChangeText={(text) => setSearchedText(text.toLowerCase())}
-              />
+              <View
+                style={[
+                  styles.searchCont,
+                  { marginBottom: viewFilterCont ? 10 : 25 },
+                ]}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="Search"
+                  placeholderTextColor="#fff"
+                  value={searchedText}
+                  onChangeText={(text) => setSearchedText(text.toLowerCase())}
+                />
+                <MaterialIcons
+                  name={"filter-list"}
+                  size={25}
+                  color={Colors.btnClr}
+                  onPress={viewFilterTabHandler}
+                />
+              </View>
+              {viewFilterCont && (
+                <View style={styles.tabContFilt}>
+                  <ScrollView style={styles.tabSubContFilt} horizontal={true}>
+                    {tabsArray.map((tab, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.tabFilt,
+                          {
+                            backgroundColor:
+                              filterTab === tab ? Colors.clr4 : "transparent",
+                          },
+                        ]}
+                        onPress={() => tabPressHandler(tab)}
+                      >
+                        <Text
+                          style={[
+                            styles.tabTextFilt,
+                            {
+                              color: filterTab === tab ? "#000" : "#fff",
+                              fontWeight: filterTab === tab ? "500" : "300",
+                            },
+                          ]}
+                        >
+                          {tab}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
               {allAnalysisLoader ? (
                 <ActivityIndicator
                   size="small"
@@ -537,13 +626,57 @@ function AdminAnalysisScreen() {
               >
                 Free Swing Analyses
               </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Search"
-                placeholderTextColor="#fff"
-                value={searchedText}
-                onChangeText={(text) => setSearchedText(text.toLowerCase())}
-              />
+              <View
+                style={[
+                  styles.searchCont,
+                  { marginBottom: viewFilterCont ? 10 : 25 },
+                ]}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="Search"
+                  placeholderTextColor="#fff"
+                  value={searchedText}
+                  onChangeText={(text) => setSearchedText(text.toLowerCase())}
+                />
+                <MaterialIcons
+                  name={"filter-list"}
+                  size={25}
+                  color={Colors.btnClr}
+                  onPress={viewFilterTabHandler}
+                />
+              </View>
+              {viewFilterCont && (
+                <View style={styles.tabContFilt}>
+                  <ScrollView style={styles.tabSubContFilt} horizontal={true}>
+                    {tabsArray.map((tab, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.tabFilt,
+                          {
+                            backgroundColor:
+                              filterTab === tab ? Colors.clr4 : "transparent",
+                          },
+                        ]}
+                        onPress={() => tabPressHandler(tab)}
+                      >
+                        <Text
+                          style={[
+                            styles.tabTextFilt,
+                            {
+                              color: filterTab === tab ? "#000" : "#fff",
+                              fontWeight: filterTab === tab ? "500" : "300",
+                            },
+                          ]}
+                        >
+                          {tab}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
               {allAnalysisLoader ? (
                 <ActivityIndicator
                   size="small"
@@ -653,6 +786,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  searchCont: {
+    width: "100%",
+    height: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    // backgroundColor: "red",
+  },
   input: {
     width: "45%",
     height: 40,
@@ -661,9 +803,42 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#333",
     color: "#fff",
-    marginBottom: 10,
     paddingHorizontal: 10,
-    marginBottom: 15,
+  },
+
+  tabContFilt: {
+    height: 30,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginTop: 3,
+    marginBottom: 10,
+    // backgroundColor: "blue",
+  },
+  tabSubContFilt: {
+    height: "100%",
+    width: "100%",
+    flexDirection: "row",
+    // backgroundColor: "red",
+  },
+  tabFilt: {
+    width: "auto",
+    height: "80%",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    borderColor: Colors.clr5,
+    borderWidth: 0.8,
+    marginRight: 10,
+  },
+
+  tabTextFilt: {
+    fontSize: CalculateFontSize(1.6),
+    fontWeight: "300",
+    color: "#fff",
   },
   analysisSubScroll: {
     flexGrow: 1,

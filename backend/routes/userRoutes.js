@@ -34,4 +34,5 @@ router.post("/checkPassword", userController.checkUserPassword);
 router.post("/resetPassword", userController.resetPassword);
 router.post("/forgotPassword", userController.forgotPassword);
 router.post("/verifyOTP", userController.verifyOTP);
+router.post("/confirmationEmail", userController.PurchaseConfirmationEmail);
 module.exports = router;

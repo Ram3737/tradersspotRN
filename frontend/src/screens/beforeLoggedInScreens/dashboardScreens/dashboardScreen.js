@@ -43,15 +43,18 @@ function DashboardScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
+  const [name, setName] = useState(null);
 
   const fetchData = async () => {
     try {
       const tkn = await AsyncStorage.getItem("token");
       const pid = await AsyncStorage.getItem("paid");
       const cType = await AsyncStorage.getItem("courseType");
+      const nm = await AsyncStorage.getItem("name");
       const convertedPaid = JSON.parse(pid);
 
       setToken(tkn);
+      setName(nm);
     } catch (error) {
       console.error("Error fetching data from AsyncStorage:", error);
     }
@@ -125,7 +128,14 @@ function DashboardScreen() {
         imageStyle={styles.scrollMainContainerBg}
       >
         <View style={styles.headerCont}>
-          <Text style={styles.headerText}>Hi there,</Text>
+          <Text
+            numberOfLines={1}
+            style={styles.headerNameText}
+            ellipsizeMode="tail"
+          >
+            Hi {name ? name : "there"}
+          </Text>
+
           {token ? (
             <TouchableOpacity
               style={styles.userAvatar}
@@ -689,6 +699,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   headerText: {
+    fontSize: CalculateFontSize(2.3),
+    fontWeight: "500",
+    color: "#fff",
+  },
+  headerNameText: {
+    width: 90,
     fontSize: CalculateFontSize(2.3),
     fontWeight: "500",
     color: "#fff",

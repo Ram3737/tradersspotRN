@@ -27,6 +27,7 @@ import DonutChart from "../../../components/charts/donutChart";
 import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 import { CallGetApiServices } from "../../../webServices/apiCalls";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
+import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Switch } from "react-native-switch";
@@ -37,6 +38,7 @@ import ButtonComponent from "../../../components/buttonComponent/buttonComponent
 function AnalysisScreen() {
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
+  const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
   const [analysisData, setAnalysisData] = useState([]);
@@ -46,7 +48,10 @@ function AnalysisScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [paid, setPaid] = useState(null);
   const [courseType, setCourseType] = useState(null);
+  const [viewFilterCont, setViewFilterCont] = useState(false);
+  const [filterTab, setFilterTab] = useState("All");
   const [breakout, setBreakOut] = useState(null);
+  const [reward, setReward] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -86,7 +91,7 @@ function AnalysisScreen() {
     CallGetApiServices(
       `/analysis/getAll${
         contToDisplay ? "FreeSwing" : "Swing"
-      }AnalysisUser?page=100&breakout=${breakout}`,
+      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data.allSwingAnalyses);
@@ -106,10 +111,37 @@ function AnalysisScreen() {
     contToDisplay
       ? setAnalysisStat("freeSwingAnalysisStats")
       : setAnalysisStat("swingAnalysisStats");
-  }, [contToDisplay]);
+  }, [contToDisplay, breakout, reward]);
 
   function viewResultHandler(index) {
     setViewResult(index);
+  }
+
+  function viewFilterTabHandler() {
+    setViewFilterCont(!viewFilterCont);
+    setBreakOut(null);
+    setReward(null);
+    setFilterTab("All");
+  }
+
+  function tabPressHandler(pressedTab) {
+    setFilterTab(pressedTab);
+    if (pressedTab === "All") {
+      setBreakOut(null);
+      setReward(null);
+    } else if (pressedTab === "Breakout") {
+      setBreakOut("green");
+      setReward(null);
+    } else if (pressedTab === "Trailing") {
+      setBreakOut("orange");
+      setReward(null);
+    } else if (pressedTab === "Reward") {
+      setBreakOut(null);
+      setReward(1);
+    } else if (pressedTab === "Stoploss") {
+      setBreakOut(null);
+      setReward(0);
+    }
   }
 
   const onRefresh = useCallback(() => {
@@ -514,13 +546,51 @@ function AnalysisScreen() {
             (!authCtx.swingAnalysisLoader ||
               !authCtx.freeSwingAnalysisLoader) &&
             !isLoading && (
-              <View>
+              <View style={{ alignSelf: "center", marginTop: 50 }}>
                 <Text style={styles.topContSubBottomSubText1}> No data</Text>
               </View>
             )}
         </View>
       </View>
-
+      <View style={styles.filterCont}>
+        <MaterialIcons
+          name={"filter-list"}
+          size={25}
+          color={Colors.btnClr}
+          onPress={viewFilterTabHandler}
+        />
+        {viewFilterCont && (
+          <View style={styles.tabCont}>
+            <ScrollView style={styles.tabSubCont} horizontal={true}>
+              {tabsArray.map((tab, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.tab,
+                    {
+                      backgroundColor:
+                        filterTab === tab ? Colors.clr4 : "transparent",
+                    },
+                  ]}
+                  onPress={() => tabPressHandler(tab)}
+                >
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: filterTab === tab ? "#000" : "#fff",
+                        fontWeight: filterTab === tab ? "500" : "300",
+                      },
+                    ]}
+                  >
+                    {tab}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </View>
       {courseType === "basic" && paid && !contToDisplay ? (
         <View style={styles.upgradeBtnCont}>
           <Text style={styles.upgradeBtnContText}>
@@ -577,8 +647,8 @@ const styles = StyleSheet.create({
   },
   topCont: {
     height: 210,
-    width: "100%",
-    padding: "3.5%",
+    width: "95%",
+    paddingVertical: "3.5%",
     // backgroundColor: "red",
   },
 
@@ -659,11 +729,52 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 
+  filterCont: {
+    width: "94%",
+    height: "auto",
+    // marginTop: "2%",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    // backgroundColor: "blue",
+  },
+  tabCont: {
+    height: 30,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginTop: 5,
+  },
+  tabSubCont: {
+    height: "100%",
+    width: "100%",
+    flexDirection: "row",
+    // backgroundColor: "red",
+  },
+  tab: {
+    width: "auto",
+    height: "80%",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    borderColor: Colors.clr5,
+    borderWidth: 0.8,
+    marginRight: 10,
+  },
+
+  tabText: {
+    fontSize: CalculateFontSize(1.6),
+    fontWeight: "300",
+    color: "#fff",
+  },
+
   analysisScrollCont: {
     flex: 1,
     width: "100%",
-    paddingTop: 15,
-    marginTop: "2%",
+    paddingTop: 10,
+    marginTop: "1%",
     borderRadius: 20,
     // overflow: "hidden",
     // backgroundColor: Colors.clr2,

@@ -36,6 +36,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
   const [logoutLoader, setLogoutLoader] = useState(false);
   const [oldPasswordCheckLoader, setOldPasswordCheckLoader] = useState(false);
   const [paid, setPaid] = useState(null);
+  const [name, setName] = useState(null);
   const [email, setEmail] = useState(null);
   const [courseType, setCourseType] = useState(null);
   const [mobileNo, setMobileNo] = useState(null);
@@ -154,12 +155,14 @@ function UserProfileModal({ closeModal, isModalVisible }) {
       const pid = await AsyncStorage.getItem("paid");
       const cType = await AsyncStorage.getItem("courseType");
       const uType = await AsyncStorage.getItem("userType");
+      const nm = await AsyncStorage.getItem("name");
       const emil = await AsyncStorage.getItem("email");
       const mblNo = await AsyncStorage.getItem("mobileNo");
       const convertedPaid = JSON.parse(pid);
 
       setPaid(convertedPaid);
       setCourseType(cType);
+      setName(nm);
       setEmail(emil);
       setMobileNo(mblNo);
     } catch (error) {
@@ -229,12 +232,23 @@ function UserProfileModal({ closeModal, isModalVisible }) {
               />
             </View>
             <View style={styles.labelInput}>
+              <Text style={styles.labelText}>Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                placeholderTextColor="#fff"
+                // keyboardType="numeric"
+                editable={false}
+                value={name || "none"}
+              />
+            </View>
+            <View style={styles.labelInput}>
               <Text style={styles.labelText}>Email</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Email"
                 placeholderTextColor="#fff"
-                keyboardType="numeric"
+                // keyboardType="numeric"
                 editable={false}
                 value={email || "none"}
               />
@@ -430,6 +444,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 20,
     marginTop: 10,
+    marginBottom: 30,
     borderRadius: 10,
     borderWidth: 0.2,
     borderColor: Colors.clr3,

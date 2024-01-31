@@ -37,6 +37,25 @@ const getAllSwingAnalysis = async (req, res) => {
     const limit = req.query.limit || 10;
     const skip = (page - 1) * limit;
 
+    const breakoutValue = req.query.breakout;
+    const rewardValue = req.query.reward;
+
+    let query = [];
+
+    if (breakoutValue && breakoutValue !== "null") {
+      query.push({ ["result.breakout"]: breakoutValue });
+    }
+
+    if (rewardValue && rewardValue !== "null" && rewardValue !== 1) {
+      query.push({ ["result.reward"]: rewardValue });
+    }
+
+    if (rewardValue && rewardValue == 1) {
+      query.push({ ["result.reward"]: { $gt: 0 } });
+    }
+
+    console.log("paid", query);
+
     if (searchedId) {
       const objectId = new mongoose.Types.ObjectId(searchedId);
       const allSwingAnalyses = await SwingAnalysisResult.find({ _id: objectId })
@@ -47,11 +66,15 @@ const getAllSwingAnalysis = async (req, res) => {
 
       res.status(200).json({ totalSwingAnalyses, allSwingAnalyses });
     } else {
-      const allSwingAnalyses = await SwingAnalysisResult.find()
+      const allSwingAnalyses = await SwingAnalysisResult.find(
+        query.length > 0 ? { $or: query } : {}
+      )
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
-      const totalSwingAnalysis = await SwingAnalysisResult.countDocuments();
+      const totalSwingAnalysis = await SwingAnalysisResult.countDocuments(
+        query.length > 0 ? { $or: query } : {}
+      );
 
       res.status(200).json({ totalSwingAnalysis, allSwingAnalyses });
     }

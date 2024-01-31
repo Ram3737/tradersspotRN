@@ -124,7 +124,7 @@ function MarketScreen() {
             <TextInput
               style={styles.input}
               placeholder="Search for stocks"
-              placeholderTextColor="#666"
+              placeholderTextColor="#777"
               value={searchedStockName}
               onChangeText={(text) => setSearchedStockName(text.toUpperCase())}
             />

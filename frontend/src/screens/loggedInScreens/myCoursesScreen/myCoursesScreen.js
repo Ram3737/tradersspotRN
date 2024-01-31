@@ -13,10 +13,17 @@ import {
   StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState, useContext, useEffect, useCallback } from "react";
+import {
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 
 import WebView from "react-native-webview";
 import { Switch } from "react-native-switch";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import Colors from "../../../components/colors/colors";
@@ -85,6 +92,8 @@ function MyCoursesScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [contToDisplay, setContToDisplay] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [token, setToken] = useState(null);
+  const [name, setName] = useState(null);
 
   const tradingViewWidget = `
   <div class="tradingview-widget-container" >
@@ -160,6 +169,25 @@ function MyCoursesScreen() {
     callCourseContent();
   }, []);
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      const pid = await AsyncStorage.getItem("paid");
+      const cType = await AsyncStorage.getItem("courseType");
+      const nm = await AsyncStorage.getItem("name");
+      const convertedPaid = JSON.parse(pid);
+
+      setToken(tkn);
+      setName(nm);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   function modalVideoHandler(content, selectedContent) {
     setModalVideoContent(content);
     setSelectedContent(selectedContent);
@@ -207,7 +235,9 @@ function MyCoursesScreen() {
         imageStyle={styles.topInfoContPic}
       >
         <View style={styles.topInfoContLeft}>
-          <Text style={styles.text}>Hey, Ashwin</Text>
+          <Text numberOfLines={1} style={styles.nameText} ellipsizeMode="tail">
+            Hey {name ? name : "there"}
+          </Text>
           <Text style={styles.text1}>Good Day !</Text>
         </View>
 
@@ -462,6 +492,14 @@ const styles = StyleSheet.create({
     // backgroundColor: "yellow",
     position: "relative",
     overflow: "hidden",
+  },
+  nameText: {
+    color: "white",
+    fontSize: calculateFontSize(2),
+    textAlign: "left",
+    marginBottom: 5,
+    fontWeight: "400",
+    width: 90,
   },
   text: {
     color: "white",

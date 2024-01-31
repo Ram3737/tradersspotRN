@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 
 const createUser = async (req, res) => {
   try {
-    const { email, mobileNumber, password, courseType, triedToUpdate } =
+    const { name, email, mobileNumber, password, courseType, triedToUpdate } =
       req.body;
     const userType = "learner";
     const paid = false;
@@ -16,6 +16,7 @@ const createUser = async (req, res) => {
 
     // Create a new user
     const newUser = new User({
+      name,
       email,
       mobileNumber,
       password: hashedPassword,
@@ -74,6 +75,7 @@ const signInUser = async (req, res) => {
     );
 
     res.status(200).json({
+      name: user.name,
       email: user.email,
       mobileNumber: user.mobileNumber,
       userType: user.userType,
@@ -300,6 +302,55 @@ const verifyOTP = async (req, res) => {
   }
 };
 
+const PurchaseConfirmationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    const mailOptions = {
+      from: "tradersspot.in@gmail.com",
+      to: email,
+      subject: "Purchase confirmation mail",
+      html: `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Email Template</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+      
+        <div style="max-width:'100%'; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+      
+
+      
+          <h2 style="color: #333333;">Trader's spot</h2>
+      
+          <p style="color: #666666;">Thank you for purchasing our course. You can now access our courses anywhere, anytime through our mobile and web app.</p>
+      
+          <p class="price" style="color: #0c969a; font-weight: bold;">Happy Trading</p>
+      
+        </div>
+      
+      </body>
+      </html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "Mail sent" });
+  } catch (error) {
+    console.error("forgotPassword", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createUser,
   signInUser,
@@ -310,4 +361,5 @@ module.exports = {
   resetPassword,
   forgotPassword,
   verifyOTP,
+  PurchaseConfirmationEmail,
 };

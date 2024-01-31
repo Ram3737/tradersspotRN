@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { View, ScrollView, Modal, StyleSheet } from "react-native";
+import { View, ScrollView, Modal, Alert, StyleSheet } from "react-native";
 
 import SelectDropdown from "react-native-select-dropdown";
 import { DataTable } from "react-native-paper";
 
 import ButtonComponent from "../buttonComponent/buttonComponent";
 import { CallPatchApiServices } from "../../webServices/apiCalls";
+import { CallPostApiServices } from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
 import BlinkingDot from "../blinkingDot/blinkingDot";
+import CustomAlertMsgBox from "../customAlertBox/customAlertMsgBox";
 
 const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   const courses = ["basic", "standard", "pro", "none"];
@@ -22,6 +24,9 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   const [updateBtnLoader, setUpdateBtnLoader] = useState(false);
   const [updateTtuBtnLoader, setUpdateTtuBtnLoader] = useState(false);
   const [paidBtnLoader, setPaidBtnLoader] = useState(false);
+  const [mailBtnLoader, setMailBtnLoader] = useState(false);
+  const [mailSentAlert, setMailSentAlert] = useState(false);
+  const [clickedMail, setClickedMail] = useState(null);
 
   const openModal = (id) => {
     const user = usersData.find((item) => item._id === id);
@@ -53,6 +58,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
       (err) => {
         setUpdateBtnLoader(false);
         console.log("err", err);
+        Alert.alert("CT update error", err.response.data.message);
       }
     );
   }
@@ -75,6 +81,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
       (err) => {
         setUpdateTtuBtnLoader(false);
         console.log("err", err);
+        Alert.alert("TTU update error", err.response.data.message);
       }
     );
   }
@@ -121,6 +128,34 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
       (err) => {
         setPaidBtnLoader(false);
         console.log("err", err);
+        Alert.alert("Paid update error", err.response.data.message);
+      }
+    );
+  }
+
+  function confirmMailHandler(mail) {
+    setClickedMail(mail);
+    setMailBtnLoader(true);
+    CallPostApiServices(
+      `/user/confirmationEmail`,
+      {
+        email: mail,
+      },
+      (response) => {
+        if (response.status === 200) {
+          setMailBtnLoader(false);
+          setMailSentAlert(true);
+          setClickedMail(null);
+          setTimeout(() => {
+            setMailSentAlert(false);
+          }, 3000);
+        }
+      },
+      (err) => {
+        setMailBtnLoader(false);
+        setClickedMail(null);
+        console.log("err", err);
+        Alert.alert("Mailing error", err.response.data.message);
       }
     );
   }
@@ -145,26 +180,28 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
 
             {usersData.map((user, index) => (
               <DataTable.Row key={index} style={styles.tableRow}>
-                <DataTable.Cell style={{ minWidth: 45, paddingLeft: 15 }}>
+                <DataTable.Cell style={{ minWidth: 70, paddingLeft: 15 }}>
                   {user.email}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 25 }}>
+                <DataTable.Cell style={{ minWidth: 50 }}>
                   {user.courseType !== "none"
                     ? user?.courseType.toString()
                     : user?.courseType}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 25 }}>
+                <DataTable.Cell style={{ minWidth: 50 }}>
                   {user.userType || "N/A"}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 30 }}>
+                <DataTable.Cell style={{ minWidth: 50 }}>
                   {user?.paid.toString()}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 20 }}>
+                <DataTable.Cell style={{ minWidth: 15 }}>
                   {user?.triedToUpdate.toString()}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 30 }}>
+                <DataTable.Cell style={{ minWidth: 80 }}>
                   <View style={styles.btnUpdate}>
-                    <View style={{ marginTop: 12, marginLeft: -10 }}>
+                    <View
+                      style={{ marginTop: 12, marginLeft: -10, marginRight: 8 }}
+                    >
                       <BlinkingDot
                         color={
                           user?.triedToUpdate
@@ -182,6 +219,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                       style={{
                         paddingVertical: 5,
                         paddingHorizontal: 10,
+                        marginRight: 8,
                       }}
                       handler={() => openModal(user._id)}
                     />
@@ -190,6 +228,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                       style={{
                         paddingVertical: 5,
                         paddingHorizontal: 10,
+                        marginRight: 8,
                       }}
                       handler={() => openTtuModal(user._id)}
                     />
@@ -198,8 +237,21 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                       style={{
                         paddingVertical: 5,
                         paddingHorizontal: 10,
+                        marginRight: 8,
                       }}
                       handler={() => openPaidModal(user._id)}
+                    />
+
+                    <ButtonComponent
+                      text={"mail"}
+                      style={{
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                        marginRight: 8,
+                      }}
+                      disabled={mailBtnLoader}
+                      indicator={mailBtnLoader && clickedMail === user.email}
+                      handler={() => confirmMailHandler(user.email)}
                     />
                   </View>
                 </DataTable.Cell>
@@ -323,6 +375,11 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
           />
         </View>
       </Modal>
+
+      <CustomAlertMsgBox
+        visible={mailSentAlert}
+        message={"Mail sent successfully"}
+      />
     </>
   );
 };
@@ -334,12 +391,12 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   tableHeader: {
-    width: 800,
+    width: 980,
     backgroundColor: Colors.clr3,
     borderBottomColor: Colors.clr3,
   },
   tableRow: {
-    width: 800,
+    width: 980,
     paddingLeft: 0,
     backgroundColor: "#999",
     borderBottomColor: "#000",

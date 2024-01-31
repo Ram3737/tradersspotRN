@@ -15,6 +15,7 @@ import { LinkPreview } from "@flyerhq/react-native-link-preview";
 import { Switch } from "react-native-switch";
 import DonutChart from "../../../components/charts/donutChart";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
@@ -22,9 +23,11 @@ import { CallGetApiServices } from "../../../webServices/apiCalls";
 import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 import Colors from "../../../components/colors/colors";
+import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 
 function AnalysisStatsScreen() {
   const authCtx = useContext(AuthContext);
+  const navigation = useNavigation();
   const currentDate = new Date();
   const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
   const [viewResult, setViewResult] = useState(0);
@@ -100,6 +103,7 @@ function AnalysisStatsScreen() {
     setViewFilterCont(!viewFilterCont);
     setBreakOut(null);
     setReward(null);
+    setFilterTab("All");
   }
 
   function tabPressHandler(pressedTab) {
@@ -108,8 +112,12 @@ function AnalysisStatsScreen() {
       setBreakOut(null);
       setReward(null);
     } else if (pressedTab === "Breakout") {
-      setBreakOut("green");
-      setReward(null);
+      if (!contToDisplay) {
+        return;
+      } else {
+        setBreakOut("green");
+        setReward(null);
+      }
     } else if (pressedTab === "Trailing") {
       if (!contToDisplay) {
         return;
@@ -124,6 +132,10 @@ function AnalysisStatsScreen() {
       setBreakOut(null);
       setReward(0);
     }
+  }
+
+  function upgradeBtnHandler() {
+    navigation.navigate("courses");
   }
 
   const onRefresh = useCallback(() => {
@@ -558,7 +570,7 @@ function AnalysisStatsScreen() {
             )}
 
           {analysisData.length === 0 && !isLoading && (
-            <View>
+            <View style={{ alignSelf: "center", marginTop: 50 }}>
               <Text
                 style={[
                   styles.labelContText,
@@ -624,30 +636,47 @@ function AnalysisStatsScreen() {
             style={{ marginTop: "60%" }}
           />
         )}
-        {analysisData.length > 0 && !isLoading && (
-          <FlatList
-            data={analysisData}
-            renderItem={contToDisplay ? renderItemFree : renderItemPaid}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.analysisScrollContSub}
-            inverted={true}
-          />
-        )}
-        {analysisData.length === 0 && !isLoading && (
-          <View>
-            <Text
-              style={[
-                styles.labelContText,
-                {
-                  fontSize: CalculateFontSize(1.8),
-                  marginTop: "50%",
-                  alignSelf: "center",
-                },
-              ]}
-            >
-              No data
+        {!contToDisplay &&
+        (filterTab === "Breakout" || filterTab === "Trailing") ? (
+          <View style={styles.upgradeBtnCont}>
+            <Text style={styles.upgradeBtnContText}>
+              Upgrade to "STANDARD" plan to access our high potential swing
+              analysis. You can view free analysis stats.
             </Text>
+            <ButtonComponent
+              text={"Upgrade"}
+              style={{ alignSelf: "center" }}
+              handler={upgradeBtnHandler}
+            />
           </View>
+        ) : (
+          <>
+            {analysisData.length > 0 && !isLoading && (
+              <FlatList
+                data={analysisData}
+                renderItem={contToDisplay ? renderItemFree : renderItemPaid}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.analysisScrollContSub}
+                inverted={true}
+              />
+            )}
+            {analysisData.length === 0 && !isLoading && (
+              <View>
+                <Text
+                  style={[
+                    styles.labelContText,
+                    {
+                      fontSize: CalculateFontSize(1.8),
+                      marginTop: "50%",
+                      alignSelf: "center",
+                    },
+                  ]}
+                >
+                  No data
+                </Text>
+              </View>
+            )}
+          </>
         )}
       </View>
     </View>
@@ -851,5 +880,22 @@ const styles = StyleSheet.create({
     marginRight: "2%",
     color: Colors.clr4,
     // textDecorationLine: "underline",
+  },
+  upgradeBtnCont: {
+    width: "90%",
+    height: "auto",
+    alignSelf: "center",
+    marginTop: "40%",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: Colors.transparentBg,
+  },
+  upgradeBtnContText: {
+    width: "100%",
+    fontSize: CalculateFontSize(1.8),
+    fontWeight: "400",
+    textAlign: "center",
+    marginBottom: 30,
+    color: Colors.midWhite,
   },
 });
