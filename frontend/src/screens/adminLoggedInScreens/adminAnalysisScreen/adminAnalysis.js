@@ -467,7 +467,12 @@ function AdminAnalysisScreen() {
                   placeholder="Search"
                   placeholderTextColor="#fff"
                   value={searchedText}
-                  onChangeText={(text) => setSearchedText(text.toLowerCase())}
+                  onChangeText={(text) => {
+                    setSearchedText(text.toLowerCase());
+                    if (viewFilterCont) {
+                      setViewFilterCont(false);
+                    }
+                  }}
                 />
                 <MaterialIcons
                   name={"filter-list"}
@@ -637,7 +642,12 @@ function AdminAnalysisScreen() {
                   placeholder="Search"
                   placeholderTextColor="#fff"
                   value={searchedText}
-                  onChangeText={(text) => setSearchedText(text.toLowerCase())}
+                  onChangeText={(text) => {
+                    setSearchedText(text.toLowerCase());
+                    if (viewFilterCont) {
+                      setViewFilterCont(false);
+                    }
+                  }}
                 />
                 <MaterialIcons
                   name={"filter-list"}

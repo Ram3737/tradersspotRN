@@ -55,7 +55,7 @@ const getAllFreeSwingAnalysis = async (req, res) => {
       query.push({ ["result.reward"]: { $gt: 0 } });
     }
 
-    console.log("paid", query);
+    console.log("free", query);
 
     if (searchedId) {
       const objectId = new mongoose.Types.ObjectId(searchedId);

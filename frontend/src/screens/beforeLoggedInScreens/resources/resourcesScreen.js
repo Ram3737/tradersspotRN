@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Alert,
   StyleSheet,
 } from "react-native";
 import { useState, useContext, useEffect } from "react";
@@ -29,6 +30,9 @@ function ResourcesScreen() {
   const [msg, setMsg] = useState("");
   const [mobileNo, setMobileNo] = useState("8248189924");
   const phoneNumber = "8248189924";
+  const [phoneAlertMsg, setPhoneAlertMsg] = useState(false);
+  const [whatsappAlertMsgBox, setWhatsappAlertMsgBox] = useState(false);
+  const [whatsappAlertMsg, setWhatsappAlertMsg] = useState("");
   const [selectedBookLink, setSelectedBookLink] = useState(
     "download-trading-in-the-zone-pdf"
   );
@@ -84,10 +88,20 @@ function ResourcesScreen() {
     Linking.openURL(url)
       .then((supported) => {
         if (!supported) {
+          setPhoneAlertMsg(true);
+          setTimeout(() => {
+            setPhoneAlertMsg(false);
+          }, 3000);
           console.error("Phone number is not supported");
         }
       })
-      .catch((err) => console.error("An error occurred", err));
+      .catch((err) => {
+        setPhoneAlertMsg(true);
+        setTimeout(() => {
+          setPhoneAlertMsg(false);
+        }, 3000);
+        console.error("An error occurred", err);
+      });
   };
 
   const sendOnWhatsApp = () => {
@@ -100,13 +114,20 @@ function ResourcesScreen() {
           }, 3000);
         })
         .catch(() => {
-          Alert.alert(
-            "Error",
-            "Make sure WhatsApp is installed on your device"
-          );
+          setWhatsappAlertMsgBox(true);
+          setWhatsappAlertMsg("Make sure WhatsApp is installed on your device");
+          setTimeout(() => {
+            setWhatsappAlertMsgBox(false);
+            setWhatsappAlertMsg("");
+          }, 3000);
         });
     } else {
-      Alert.alert("Error", "Please type a message to send");
+      setWhatsappAlertMsgBox(true);
+      setWhatsappAlertMsg("Please enter a message");
+      setTimeout(() => {
+        setWhatsappAlertMsgBox(false);
+        setWhatsappAlertMsg("");
+      }, 3000);
     }
   };
 
@@ -116,11 +137,6 @@ function ResourcesScreen() {
       contentContainerStyle={{ flexGrow: 1 }}
       keyboardShouldPersistTaps="handled"
     >
-      <CustomAlertMsgBox
-        visible={register}
-        message="please register for free to download"
-      />
-
       <View style={styles.mainBookCont}>
         <View style={styles.mainBookContLeft}>
           {selectedBook === 0 ? (
@@ -238,6 +254,21 @@ function ResourcesScreen() {
           </View>
         </View>
       </View>
+
+      <CustomAlertMsgBox
+        visible={register}
+        message="please register for free to download"
+      />
+
+      <CustomAlertMsgBox
+        visible={phoneAlertMsg}
+        message="Unable to make a call; please try again later"
+      />
+
+      <CustomAlertMsgBox
+        visible={whatsappAlertMsgBox}
+        message={whatsappAlertMsg}
+      />
     </ScrollView>
   );
 }
@@ -350,6 +381,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     marginTop: "10%",
+    marginBottom: 20,
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 30,

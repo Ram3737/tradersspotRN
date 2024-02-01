@@ -47,7 +47,7 @@ function ScreenshotModal({
       "whatsapp://send?phone=91" +
       mobileNo +
       "&text=" +
-      "Hey, here is my payment screenshot(attach your screenshot here)";
+      "Hey, here is my payment screenshot. (Please attach your screenshot here.)";
     Linking.openURL(url)
       .then(() => {
         setTimeout(() => {

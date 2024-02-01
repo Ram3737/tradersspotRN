@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Modal, Alert, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Modal, Alert, StyleSheet } from "react-native";
 
 import SelectDropdown from "react-native-select-dropdown";
 import { DataTable } from "react-native-paper";
@@ -10,6 +10,7 @@ import { CallPostApiServices } from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
 import BlinkingDot from "../blinkingDot/blinkingDot";
 import CustomAlertMsgBox from "../customAlertBox/customAlertMsgBox";
+import CalculateFontSize from "../calculateFontSize/calculateFontSize";
 
 const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   const courses = ["basic", "standard", "pro", "none"];
@@ -202,7 +203,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                     <View
                       style={{ marginTop: 12, marginLeft: -10, marginRight: 8 }}
                     >
-                      <BlinkingDot
+                      {/* <BlinkingDot
                         color={
                           user?.triedToUpdate
                             ? "blue"
@@ -212,7 +213,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                             ? "orange"
                             : ""
                         }
-                      />
+                      /> */}
                     </View>
                     <ButtonComponent
                       text={"ct"}
@@ -268,6 +269,9 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
         onRequestClose={() => closeModal()}
       >
         <View style={styles.modalContainer}>
+          <Text style={styles.userNameText}>
+            {selectedUser?.email || "none"}
+          </Text>
           <SelectDropdown
             data={courses}
             onSelect={(selectedItem, index) => {
@@ -307,6 +311,9 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
         onRequestClose={() => closeTtuModal()}
       >
         <View style={styles.modalContainer}>
+          <Text style={styles.userNameText}>
+            {selectedUser?.email || "none"}
+          </Text>
           <SelectDropdown
             data={ttUpdate}
             onSelect={(selectedItem, index) => {
@@ -345,6 +352,9 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
         onRequestClose={() => closePaidModal()}
       >
         <View style={styles.modalContainer}>
+          <Text style={styles.userNameText}>
+            {selectedUser?.email || "none"}
+          </Text>
           <SelectDropdown
             data={ttUpdate}
             onSelect={(selectedItem, index) => {
@@ -418,5 +428,12 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  userNameText: {
+    fontSize: CalculateFontSize(2.2),
+    fontWeight: "500",
+    color: Colors.clr4,
+    alignSelf: "center",
+    marginBottom: "13%",
   },
 });

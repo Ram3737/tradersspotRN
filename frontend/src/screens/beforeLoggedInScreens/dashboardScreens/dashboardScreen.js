@@ -276,7 +276,7 @@ function DashboardScreen() {
                                 40
                                 ? 40
                                 : authCtx.freeSwingAnalysisStats
-                                    ?.totalRiskLastMonth * 3
+                                    ?.totalRiskLastMonth * 10
                               : 20
                           }%`,
                         },
@@ -298,7 +298,7 @@ function DashboardScreen() {
                                 60
                                 ? 60
                                 : authCtx.freeSwingAnalysisStats
-                                    ?.totalRewardLastMonth * 3
+                                    ?.totalRewardLastMonth * 10
                               : 80
                           }%`,
                         },

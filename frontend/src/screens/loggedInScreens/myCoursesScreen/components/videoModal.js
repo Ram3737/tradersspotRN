@@ -12,6 +12,7 @@ import WebView from "react-native-webview";
 import { useState } from "react";
 
 import Colors from "../../../../components/colors/colors";
+import ButtonComponent from "../../../../components/buttonComponent/buttonComponent";
 import CalculateFontSize from "../../../../components/calculateFontSize/calculateFontSize";
 
 function VideoModal({
@@ -36,9 +37,15 @@ function VideoModal({
     >
       <View style={styles.modalContainer}>
         <View style={styles.topBtnCont}>
-          <TouchableOpacity style={styles.topBtn} onPress={closeModal}>
-            <Text style={styles.topBtnText}>Back</Text>
-          </TouchableOpacity>
+          <ButtonComponent
+            text={"Back"}
+            style={{
+              alignSelf: "flex-end",
+              paddingVertical: 3,
+              paddingHorizontal: 15,
+            }}
+            handler={closeModal}
+          />
 
           <View style={styles.videoCont}>
             <WebView
@@ -50,121 +57,99 @@ function VideoModal({
             />
           </View>
         </View>
-        {/* <TouchableHighlight
-          onPress={() => {
-            toggleModal();
-          }}
-        >
-          <Text>Close Modal</Text>
-        </TouchableHighlight> */}
-
-        {/* <View style={styles.tabCont}>
-          <TouchableOpacity
-            style={[
-              {
-                backgroundColor: tab === "contents" ? Colors.clr3 : Colors.clr2,
-              },
-              styles.tab,
-            ]}
-            onPress={() => setTab("contents")}
-          >
-            <Text style={styles.tabText}>Contents</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              {
-                backgroundColor: tab === "discuss" ? Colors.clr3 : Colors.clr2,
-              },
-              styles.tab,
-            ]}
-            onPress={() => setTab("discuss")}
-          >
-            <Text style={styles.tabText}>Discuss</Text>
-          </TouchableOpacity>
-        </View> */}
 
         <View style={styles.belowCont}>
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            keyboardShouldPersistTaps="handled"
-            style={styles.belowSubCont}
-          >
-            {/* <Image
-              source={require("../../.././../images/pictures/descriptionTop.png")}
-              style={styles.modalFloatImg}
-            /> */}
-
-            <View style={styles.descriptionBox}>
-              <View style={styles.descriptionHeadingCont}>
-                <Text style={styles.descriptionHeadingText}>
-                  {selectedCategory || ""}
-                </Text>
-              </View>
-
-              <View style={styles.contentHeading}>
-                <Text style={styles.contentHeadingText}>
-                  {modalVideoContent?.name}
-                </Text>
-              </View>
-
-              <ScrollView style={styles.descriptionContent}>
-                <Text style={styles.descriptionContentText}>
-                  {modalVideoContent?.pointOne}
-                </Text>
-
-                <Text style={styles.descriptionContentText}>
-                  {modalVideoContent?.pointTwo}
-                </Text>
-
-                <Text style={styles.descriptionContentText}>
-                  {modalVideoContent?.pointThree}
-                </Text>
-              </ScrollView>
-
-              <ScrollView style={styles.contentSubCont}>
-                {content.map((content, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.contents,
-                      {
-                        backgroundColor:
-                          selectedContent === index ? "#222" : Colors.clr5,
-                      },
-                    ]}
-                  >
-                    <View style={styles.contentsLeft}>
-                      <Text style={styles.contentsLeftText}>{index + 1}</Text>
-                    </View>
-                    <View style={styles.contentsCenter}>
-                      <Text
-                        style={styles.contentsCenterText1}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {content.name}
-                      </Text>
-                      <Text style={styles.contentsCenterText2}>
-                        {content.duration}
-                      </Text>
-                    </View>
-                    <View style={styles.contentsRight}>
-                      <TouchableOpacity
-                        style={styles.playBtn}
-                        onPress={() => modalVideoHandler(content, index)}
-                      >
-                        <Image
-                          source={require("../../../../images/icons/play.png")}
-                          style={styles.playBtnImg}
-                        />
-                      </TouchableOpacity>
-                    </View>
+          <View style={styles.belowSubCont}>
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              keyboardShouldPersistTaps="handled"
+              style={styles.scrollBelowCont}
+            >
+              <View style={styles.scrollBelowContSub}>
+                <View style={styles.descriptionBox}>
+                  <View style={styles.descriptionHeadingCont}>
+                    <Text style={styles.descriptionHeadingText}>
+                      {selectedCategory || ""}
+                    </Text>
                   </View>
-                ))}
-              </ScrollView>
-            </View>
-          </ScrollView>
+
+                  <View style={styles.contentHeading}>
+                    <Text style={styles.contentHeadingText}>
+                      {modalVideoContent?.name}
+                    </Text>
+                  </View>
+                  <View style={styles.descriptionContentMain}>
+                    <ScrollView
+                      nestedScrollEnabled={true}
+                      style={styles.descriptionContentScroll}
+                    >
+                      <Text style={styles.descriptionContentText}>
+                        {modalVideoContent?.pointOne}
+                      </Text>
+
+                      <Text style={styles.descriptionContentText}>
+                        {modalVideoContent?.pointTwo}
+                      </Text>
+
+                      <Text style={styles.descriptionContentText}>
+                        {modalVideoContent?.pointThree}
+                      </Text>
+                    </ScrollView>
+                  </View>
+                  <View style={styles.contentContMain}>
+                    <ScrollView
+                      nestedScrollEnabled={true}
+                      style={styles.scrollContentCont}
+                    >
+                      {content.map((content, index) => (
+                        <View
+                          key={index}
+                          style={[
+                            styles.contents,
+                            {
+                              backgroundColor:
+                                selectedContent === index
+                                  ? "#222"
+                                  : Colors.clr5,
+                            },
+                          ]}
+                        >
+                          <View style={styles.contentsLeft}>
+                            <Text style={styles.contentsLeftText}>
+                              {index + 1}
+                            </Text>
+                          </View>
+                          <View style={styles.contentsCenter}>
+                            <Text
+                              style={styles.contentsCenterText1}
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {content.name}
+                            </Text>
+                            <Text style={styles.contentsCenterText2}>
+                              {content.duration}
+                            </Text>
+                          </View>
+                          <View style={styles.contentsRight}>
+                            <TouchableOpacity
+                              style={styles.playBtn}
+                              onPress={() => modalVideoHandler(content, index)}
+                            >
+                              <Image
+                                source={require("../../../../images/icons/play.png")}
+                                style={styles.playBtnImg}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </View>
     </Modal>
@@ -175,7 +160,7 @@ export default VideoModal;
 
 const styles = StyleSheet.create({
   topBtnCont: {
-    height: "33%",
+    height: "auto",
     width: "100%",
     // backgroundColor: Colors.clr2,
     paddingHorizontal: 10,
@@ -184,7 +169,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     alignItems: "center",
     justifyContent: "flex-start",
-    marginTop: "3%",
+    marginTop: 8,
   },
 
   topBtn: {
@@ -223,15 +208,10 @@ const styles = StyleSheet.create({
 
   videoCont: {
     width: "100%",
-    // height: "100%",
-    flex: 1,
-    marginTop: "4%",
-    // borderColor: Colors.clr3,
-    // borderWidth: 0.5,
+    height: 180,
+    marginTop: "5%",
     backgroundColor: Colors.btnClr,
-    // borderRadius: 10,
     overflow: "hidden",
-    // padding: 5,
     marginBottom: "2%",
     zIndex: 10,
   },
@@ -269,53 +249,41 @@ const styles = StyleSheet.create({
   belowCont: {
     flex: 1,
     width: "100%",
-    // backgroundColor: "red",
     marginTop: "3%",
-    // padding: 10,
     overflow: "hidden",
   },
 
   belowSubCont: {
     width: "100%",
     height: "100%",
-    backgroundColor: Colors.clr2,
-    // borderColor: Colors.clr5,
     borderRadius: 15,
-    // borderWidth: 0.5,
     position: "relative",
-    // overflow: "hidden",
+    paddingVertical: 10,
+    backgroundColor: Colors.clr2,
+    overflow: "hidden",
   },
 
-  modalFloatImg: {
-    width: 60,
-    height: 60,
-    position: "absolute",
-    top: -0,
-    right: -0,
-    opacity: 1,
-    zIndex: -10,
-    transform: [{ rotate: "5deg" }],
+  scrollBelowCont: {
+    width: "100%",
+    flex: 1,
+  },
+
+  scrollBelowContSub: {
+    width: "100%",
+    flex: 1,
   },
 
   descriptionBox: {
-    position: "absolute",
-    height: "100%",
+    height: "auto",
     width: "100%",
-    // top: "2%",
-    // left: "18%",
-    // backgroundColor: Colors.clr3,
-    // borderColor: Colors.clr3,
-    // borderWidth: 0.3,
-    // borderRadius: 10,
     paddingLeft: 15,
     paddingRight: 15,
     paddingVertical: 20,
-    // display: "none",
   },
 
   descriptionHeadingCont: {
     width: "auto",
-    height: "7%",
+    height: 25,
     backgroundColor: Colors.clr3,
     padding: 4,
     paddingHorizontal: 8,
@@ -327,7 +295,7 @@ const styles = StyleSheet.create({
   },
 
   descriptionHeadingText: {
-    fontSize: CalculateFontSize(1.8),
+    fontSize: CalculateFontSize(1.5),
     color: "#000",
     fontWeight: "600",
   },
@@ -345,13 +313,16 @@ const styles = StyleSheet.create({
     color: Colors.clr4,
   },
 
-  descriptionContent: {
-    // flex: 1,
-    height: "5%",
+  descriptionContentMain: {
+    width: "100%",
+    height: 200,
+  },
+
+  descriptionContentScroll: {
+    flex: 1,
     width: "100%",
     marginTop: "2.5%",
     paddingLeft: "2%",
-    // backgroundColor: "blue",
   },
 
   descriptionContentText: {
@@ -362,14 +333,18 @@ const styles = StyleSheet.create({
     lineHeight: 19.5,
   },
 
-  contentSubCont: {
+  contentContMain: {
+    width: "100%",
+    height: 230,
+    marginTop: 5,
+  },
+
+  scrollContentCont: {
     flex: 1,
     width: "100%",
     marginTop: "5%",
     paddingVertical: 5,
     paddingHorizontal: 5,
-    flexDirection: "column",
-    // backgroundColor: "blue",
   },
 
   contents: {

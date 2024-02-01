@@ -49,37 +49,37 @@ function MyCoursesScreen() {
   const [mainTopics, setMainTopics] = useState([
     {
       name: "BASICS",
-      duration: `15:29 mins`,
+      duration: `1hr:08 mins`,
       link: "basicsContent",
     },
     {
       name: "CORE",
-      duration: `15:29 mins`,
+      duration: `1hr:44 mins`,
       link: "coreContent",
     },
     {
       name: "INDICATORS",
-      duration: `15:29 mins`,
+      duration: `1hr:43 mins`,
       link: "indicatorsContent",
     },
     {
       name: "PATTERNS",
-      duration: `15:29 mins`,
+      duration: `4hr:22 mins`,
       link: "patternsContent",
     },
     {
       name: "STARTEGIES",
-      duration: `15:29 mins`,
+      duration: `2hr:44 mins`,
       link: "strategiesContent",
     },
     {
       name: "MANAGE RISK",
-      duration: `15:29 mins`,
+      duration: `19:20 mins`,
       link: "riskManagementContent",
     },
     {
       name: "BONUS",
-      duration: `15:29 mins`,
+      duration: `58:51 mins`,
       link: "bonusContent",
     },
   ]);
@@ -226,7 +226,7 @@ function MyCoursesScreen() {
     <View
       style={[
         CommonStyles.mainContainer,
-        { padding: 0, justifyContent: "flex-start" },
+        { padding: 0, justifyContent: "flex-start", paddingBottom: 10 },
       ]}
     >
       <ImageBackground
@@ -252,20 +252,16 @@ function MyCoursesScreen() {
         <View style={styles.topInfoContFloat}>
           <View style={styles.topInfoContFloatTop}>
             <View style={styles.topInfoContFloatTopSub}>
-              <Image
-                source={require("../../../images/icons/totalHours.png")}
-                style={styles.topInfoContFloatTopSubImg}
-              />
-              <Text style={styles.topInfoContFloatTopSubText}>Total Hours</Text>
+              <Text style={styles.topInfoContFloatTopSubText2}>29</Text>
+              <Text style={styles.topInfoContFloatTopSubText}>
+                Total Videos
+              </Text>
             </View>
 
             <View style={styles.topInfoContFloatTopSub}>
-              <Image
-                source={require("../../../images/icons/view.png")}
-                style={styles.topInfoContFloatTopSubImg}
-              />
+              <Text style={styles.topInfoContFloatTopSubText2}>14</Text>
               <Text style={[styles.topInfoContFloatTopSubText]}>
-                Watched Hours
+                Total Hours
               </Text>
             </View>
 
@@ -287,158 +283,196 @@ function MyCoursesScreen() {
         </View>
       </ImageBackground>
 
-      <View style={styles.tickerCont}>
-        <WebView style={styles.webV} source={{ html: tradingViewWidget }} />
-      </View>
+      <ScrollView
+        nestedScrollEnabled={true}
+        style={styles.scrollMainCont}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            progressBackgroundColor={Colors.transparentBg}
+            colors={[Colors.btnClr, Colors.clr4, Colors.clr5, Colors.clr3]}
+          />
+        }
+      >
+        <View style={styles.tickerCont}>
+          <WebView style={styles.webV} source={{ html: tradingViewWidget }} />
+        </View>
+        <View style={styles.categoryCont}>
+          <View style={styles.categoryHeadingCont}>
+            <View style={styles.categoryHeadingSubCont}>
+              <Text style={styles.categoryHeadingText}>Categories</Text>
+            </View>
 
-      <View style={styles.categoryCont}>
-        <View style={styles.categoryHeadingCont}>
-          <View style={styles.categoryHeadingSubCont}>
-            <Text style={styles.categoryHeadingText}>Categories</Text>
-            {/* <Text style={styles.contToDisplayText}>
-              {contToDisplay ? "Fundamentals" : "Technicals"}
-            </Text> */}
+            <View style={styles.toggleContainer}>
+              <Text style={styles.contToDisplayText}>
+                {contToDisplay ? "Fundamentals" : "Technicals"}
+              </Text>
+              <Switch
+                value={contToDisplay}
+                onValueChange={toggleSwitch}
+                disabled={false}
+                activeText={""}
+                inActiveText={""}
+                circleSize={14}
+                barHeight={18}
+                backgroundActive={Colors.clr2}
+                backgroundInactive={Colors.clr2}
+                circleActiveColor={Colors.btnClr}
+                circleInActiveColor={Colors.btnClr}
+                changeValueImmediately={true}
+                innerCircleStyle={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                renderActiveText={true}
+                renderInActiveText={true}
+                switchLeftPx={3}
+                switchRightPx={3}
+                switchWidthMultiplier={contToDisplay ? 2.9 : 2.9}
+              />
+            </View>
           </View>
+          <ScrollView style={styles.categorySubCont} horizontal={true}>
+            {mainTopics.map((topic, index) => (
+              <ImageBackground
+                key={index}
+                style={styles.categories}
+                source={require("../../../images/pictures/cat1.jpg")}
+                imageStyle={styles.categoriesPic}
+              >
+                <View style={styles.categoriesTop}>
+                  <Text style={styles.categoriesTopText}>{topic.name}</Text>
+                </View>
+                <View style={styles.categoriesBottom}>
+                  {/* <View style={styles.categoriesBottomLeft}>
+                  <Text style={styles.categoriesBottomText1}>Total Hours</Text>
+                </View> */}
+                  <View style={styles.categoriesBottomCenter}>
+                    <Text style={styles.categoriesBottomText2}>
+                      {topic.duration}
+                    </Text>
+                  </View>
+                  <View style={styles.categoriesBottomRight}>
+                    <TouchableOpacity
+                      style={[
+                        styles.viewBtn,
+                        {
+                          backgroundColor:
+                            selectedCategory === topic.name
+                              ? "#555"
+                              : Colors.clr4,
+                        },
+                      ]}
+                      onPress={() => {
+                        setContent(allContent?.[topic.link] || []);
+                        setSelectedCategory(topic.name);
+                        setSelectedContent(0);
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.viewBtnText,
+                          {
+                            color:
+                              selectedCategory === topic.name
+                                ? Colors.midWhite
+                                : "#000",
+                          },
+                        ]}
+                      >
+                        view
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ImageBackground>
+            ))}
+          </ScrollView>
+        </View>
 
-          <View style={styles.toggleContainer}>
-            <Text style={styles.contToDisplayText}>
-              {contToDisplay ? "Fundamentals" : "Technicals"}
+        <View style={styles.contentCont}>
+          <View style={styles.contentHeadingSubCont}>
+            <Text style={styles.contentHeadingText}>Contents</Text>
+            <Text style={styles.contentToDisplayText}>
+              {`-   ${selectedCategory?.toLowerCase()}`}
             </Text>
-            <Switch
-              value={contToDisplay}
-              onValueChange={toggleSwitch}
-              disabled={false}
-              activeText={""}
-              inActiveText={""}
-              circleSize={14}
-              barHeight={18}
-              backgroundActive={Colors.clr2}
-              backgroundInactive={Colors.clr2}
-              circleActiveColor={Colors.btnClr}
-              circleInActiveColor={Colors.btnClr}
-              changeValueImmediately={true}
-              innerCircleStyle={{
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              renderActiveText={true}
-              renderInActiveText={true}
-              switchLeftPx={3}
-              switchRightPx={3}
-              switchWidthMultiplier={contToDisplay ? 2.9 : 2.9}
-            />
+          </View>
+          <View style={styles.contentContMain}>
+            <ScrollView
+              nestedScrollEnabled={true}
+              style={styles.scrollContentCont}
+            >
+              {content.length === 0 && isLoading && (
+                <ActivityIndicator
+                  size="small"
+                  color={Colors.clr4}
+                  style={{ marginTop: "20%" }}
+                />
+              )}
+              {content.length > 0 &&
+                !isLoading &&
+                content.map((content, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.contents,
+                      {
+                        backgroundColor:
+                          selectedContent === index ? "#222" : Colors.clr2,
+                      },
+                    ]}
+                  >
+                    <View style={styles.contentsLeft}>
+                      <Text style={styles.contentsLeftText}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.contentsCenter}>
+                      <Text
+                        style={styles.contentsCenterText1}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {content.name}
+                      </Text>
+                      <Text style={styles.contentsCenterText2}>
+                        {content.duration}
+                      </Text>
+                    </View>
+                    <View style={styles.contentsRight}>
+                      <TouchableOpacity
+                        style={styles.playBtn}
+                        onPress={() => toggleModal(content, index)}
+                      >
+                        <Image
+                          source={require("../../../images/icons/play.png")}
+                          style={styles.playBtnImg}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+
+              {content.length === 0 && !isLoading && (
+                <View>
+                  <Text
+                    style={[
+                      styles.labelContText,
+                      {
+                        fontSize: calculateFontSize(1.5),
+                        marginTop: "10%",
+                        marginBottom: "20%",
+                        alignSelf: "center",
+                      },
+                    ]}
+                  >
+                    No data
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
           </View>
         </View>
-        <ScrollView style={styles.categorySubCont} horizontal={true}>
-          {mainTopics.map((topic, index) => (
-            <ImageBackground
-              key={index}
-              style={styles.categories}
-              source={require("../../../images/pictures/cat1.jpg")}
-              imageStyle={styles.categoriesPic}
-            >
-              <View style={styles.categoriesTop}>
-                <Text style={styles.categoriesTopText}>{topic.name}</Text>
-              </View>
-              <View style={styles.categoriesBottom}>
-                <View style={styles.categoriesBottomLeft}>
-                  <Text style={styles.categoriesBottomText1}>Total Hours</Text>
-                </View>
-                <View style={styles.categoriesBottomCenter}>
-                  <Text style={styles.categoriesBottomText2}>
-                    {topic.duration}
-                  </Text>
-                </View>
-                <View style={styles.categoriesBottomRight}>
-                  <TouchableOpacity
-                    style={styles.viewBtn}
-                    onPress={() => {
-                      setContent(allContent?.[topic.link] || []);
-                      setSelectedCategory(topic.name);
-                      setSelectedContent(0);
-                    }}
-                  >
-                    <Text style={styles.viewBtnText}>view</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ImageBackground>
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.contentCont}>
-        <Text style={styles.contentHeadingText}>Contents</Text>
-        <ScrollView style={styles.contentSubCont}>
-          {content.length === 0 && isLoading && (
-            <ActivityIndicator
-              size="small"
-              color={Colors.clr4}
-              style={{ marginTop: "20%" }}
-            />
-          )}
-          {content.length > 0 &&
-            !isLoading &&
-            content.map((content, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.contents,
-                  {
-                    backgroundColor:
-                      selectedContent === index ? "#222" : Colors.clr2,
-                  },
-                ]}
-              >
-                <View style={styles.contentsLeft}>
-                  <Text style={styles.contentsLeftText}>{index + 1}</Text>
-                </View>
-                <View style={styles.contentsCenter}>
-                  <Text
-                    style={styles.contentsCenterText1}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {content.name}
-                  </Text>
-                  <Text style={styles.contentsCenterText2}>
-                    {content.duration}
-                  </Text>
-                </View>
-                <View style={styles.contentsRight}>
-                  <TouchableOpacity
-                    style={styles.playBtn}
-                    onPress={() => toggleModal(content, index)}
-                  >
-                    <Image
-                      source={require("../../../images/icons/play.png")}
-                      style={styles.playBtnImg}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-
-          {content.length === 0 && !isLoading && (
-            <View>
-              <Text
-                style={[
-                  styles.labelContText,
-                  {
-                    fontSize: calculateFontSize(1.5),
-                    marginTop: "10%",
-                    marginBottom: "20%",
-                    alignSelf: "center",
-                  },
-                ]}
-              >
-                No data
-              </Text>
-            </View>
-          )}
-        </ScrollView>
-      </View>
-
+      </ScrollView>
       <VideoModal
         content={content}
         modalVideoContent={modalVideoContent}
@@ -460,7 +494,8 @@ function MyCoursesScreen() {
 export default MyCoursesScreen;
 
 const styles = StyleSheet.create({
-  scrollMainContainer: {
+  scrollMainCont: {
+    flex: 1,
     width: "100%",
   },
   topInfoCont: {
@@ -470,6 +505,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // backgroundColor: Colors.clr2,
     position: "relative",
+    marginBottom: "16.5%",
   },
   topInfoContPic: {
     resizeMode: "cover",
@@ -568,11 +604,17 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 
+  topInfoContFloatTopSubText2: {
+    fontSize: calculateFontSize(1.8),
+    fontWeight: "400",
+    marginBottom: 2,
+    color: Colors.btnClr,
+  },
+
   tickerCont: {
     width: "100%",
     height: 30,
     // backgroundColor: "red",
-    marginTop: "16.5%",
   },
   webV: {
     height: 5,
@@ -584,7 +626,6 @@ const styles = StyleSheet.create({
     height: 200,
     width: "100%",
     marginTop: "7%",
-    // backgroundColor: "red",
   },
   categoryHeadingCont: {
     width: "100%",
@@ -688,6 +729,7 @@ const styles = StyleSheet.create({
   },
 
   categoriesBottomText2: {
+    width: 70,
     fontSize: calculateFontSize(1.4),
     fontWeight: "500",
     color: Colors.clr4,
@@ -720,8 +762,20 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     marginTop: "5%",
-    paddingBottom: 10,
-    // backgroundColor: "red",
+    // paddingBottom: 10,
+  },
+  contentHeadingSubCont: {
+    width: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  contentToDisplayText: {
+    color: Colors.midWhite,
+    fontSize: calculateFontSize(1.6),
+    fontWeight: "500",
+    marginBottom: 4,
+    marginLeft: 8,
   },
   contentHeadingText: {
     fontSize: calculateFontSize(2.5),
@@ -730,14 +784,16 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: "2%",
   },
-
-  contentSubCont: {
+  contentContMain: {
+    width: "100%",
+    height: 230,
+    paddingBottom: 5,
+  },
+  scrollContentCont: {
     flex: 1,
     width: "100%",
     paddingVertical: 10,
     paddingHorizontal: 15,
-    flexDirection: "column",
-    // backgroundColor: "blue",
   },
 
   contents: {

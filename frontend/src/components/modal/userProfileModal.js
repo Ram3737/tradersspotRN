@@ -138,7 +138,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
       setNewPasswordErrMsg(null);
     } else if (
       newPassword.length < 6 ||
-      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(newPassword)
+      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9.!@#$%^&*]+$/.test(newPassword)
     ) {
       setNewPasswordErrMsg(
         "Password - at least 6 characters - at least one digit - one special character."

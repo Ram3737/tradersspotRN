@@ -95,6 +95,30 @@ const getAllUsers = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+    const courseTypeValue = req.query.courseType;
+    const ttuValue = req.query.ttu;
+    const paidValue = req.query.paid;
+
+    let query = [];
+
+    if (courseTypeValue && courseTypeValue !== "null") {
+      const courseTypeValues = courseTypeValue.split(",");
+      query.push({ courseType: { $in: courseTypeValues } });
+    }
+
+    if (paidValue && paidValue !== "null") {
+      query.push({ paid: paidValue });
+    }
+
+    if (ttuValue && ttuValue !== "null") {
+      query.push({ triedToUpdate: ttuValue });
+    }
+
+    console.log("ct", courseTypeValue);
+    console.log("pv", paidValue);
+
+    console.log("user", query);
+
     if (search) {
       const users = await User.find(
         { email: { $regex: new RegExp(search, "i") } },
@@ -110,13 +134,15 @@ const getAllUsers = async (req, res) => {
       res.status(200).json({ users, totalUsers });
     } else {
       const users = await User.find(
-        {},
+        query.length > 0 ? { $and: query } : {},
         "_id email courseType paid userType triedToUpdate"
       )
         .skip(skip)
         .limit(limit);
 
-      const totalUsers = await User.countDocuments();
+      const totalUsers = await User.countDocuments(
+        query.length > 0 ? { $and: query } : {}
+      );
 
       res.status(200).json({ users, totalUsers });
     }

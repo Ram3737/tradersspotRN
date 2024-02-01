@@ -234,8 +234,7 @@ const styles = StyleSheet.create({
 
   newsTechWidCont: {
     width: "100%",
-    flex: 1,
-    height: "auto",
+    height: 450,
     paddingHorizontal: 10,
     paddingVertical: 10,
     alignItems: "center",

@@ -377,7 +377,7 @@ function OurCoursesScreen() {
       <View
         style={[CommonStyles.mainContainer, { justifyContent: "flex-start" }]}
       >
-        <View style={{ height: "90%", marginTop: "8%" }}>
+        <View style={{ height: "auto", marginTop: "8%" }}>
           <Carousel
             layout="default"
             layoutCardOffset={9}
@@ -429,8 +429,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mainBgClr,
   },
   container: {
-    backgroundColor: Colors.transparentBg,
-    height: "90%",
+    height: 480,
     width: ITEM_WIDTH - 20,
     // paddingVertical: 10,
     // paddingHorizontal: 20,
@@ -441,6 +440,7 @@ const styles = StyleSheet.create({
     marginTop: "15%",
     justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: Colors.transparentBg,
     overflow: "hidden",
     // shadowColor: "#000",
     // shadowOffset: {

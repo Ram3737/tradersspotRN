@@ -243,7 +243,7 @@ function LoginAndSignupScreen() {
     if (
       !Password ||
       Password.length < 6 ||
-      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/.test(Password)
+      !/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9.!@#$%^&*]+$/.test(Password)
     ) {
       setPasswordErr(
         "Password - least 6 characters - at least one digit - one special character."
