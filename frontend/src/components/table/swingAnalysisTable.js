@@ -15,6 +15,7 @@ import ButtonComponent from "../buttonComponent/buttonComponent";
 import {
   CallPatchApiServices,
   CallGetApiServices,
+  CallDeleteApiServices,
 } from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
 import CalculateFontSize from "../calculateFontSize/calculateFontSize";
@@ -33,8 +34,10 @@ const SwingAnalysisTable = ({
   const [analysisResultLink, setAnalysisResultLink] = useState(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isBreakoutModalVisible, setIsBreakoutModalVisible] = useState(false);
   const [resultUpdateLoader, setResultUpdateLoader] = useState(false);
+  const [deleteAnalysisLoader, setDeleteAnalysisLoader] = useState(false);
   const [breakoutLoader, setBreakoutLoader] = useState(false);
 
   const arr = ["true", "false"];
@@ -95,12 +98,12 @@ const SwingAnalysisTable = ({
         }/${selectedAnalysis._id}`,
         {
           result: {
-            risk: risk,
-            reward: reward,
-            percentage: percentage,
+            risk: risk || null,
+            reward: reward || null,
+            percentage: percentage || null,
             breakout: breakout,
-            canSharetoAll: shareToAll,
-            resultLink: analysisResultLink,
+            canSharetoAll: shareToAll || null,
+            resultLink: analysisResultLink || null,
           },
         },
         (response) => {
@@ -132,7 +135,6 @@ const SwingAnalysisTable = ({
     ) {
       return;
     }
-
     setResultUpdateLoader(true);
     CallPatchApiServices(
       `/analysis/${
@@ -140,12 +142,12 @@ const SwingAnalysisTable = ({
       }/${selectedAnalysis._id}`,
       {
         result: {
-          risk: risk,
-          reward: reward,
-          percentage: percentage,
+          risk: risk || null,
+          reward: reward >= 0 ? reward : null,
+          percentage: percentage || null,
           breakout: breakout,
-          canSharetoAll: shareToAll,
-          resultLink: analysisResultLink,
+          canSharetoAll: shareToAll || null,
+          resultLink: analysisResultLink || null,
         },
       },
       (response) => {
@@ -162,6 +164,44 @@ const SwingAnalysisTable = ({
         console.log("result update err", err);
       }
     );
+  }
+
+  const openDeleteModal = (id) => {
+    const analysis = swingAnalysisData.find((item) => item._id === id);
+    setSelectedAnalysis(analysis);
+    setIsDeleteModalVisible(true);
+  };
+
+  const closeDeleteModal = () => {
+    setSelectedAnalysis(null);
+    setIsDeleteModalVisible(false);
+  };
+
+  function deleteAnalysisHandler(id) {
+    if (id) {
+      setDeleteAnalysisLoader(true);
+      CallDeleteApiServices(
+        `/analysis/${
+          tab === "Free" ? "deleteFreeSwingAnalysis" : "deleteSwingAnalysis"
+        }/${id}`,
+        (response) => {
+          if (response.status === 200) {
+            setDeleteAnalysisLoader(false);
+            getAllAnalysis(currentPage);
+            closeDeleteModal();
+          }
+        },
+        (err) => {
+          setDeleteAnalysisLoader(false);
+          console.log("deletion err", err);
+          closeDeleteModal();
+          Alert.alert("Deletion error", err.response.data.message);
+        }
+      );
+    } else {
+      closeDeleteModal();
+      Alert.alert("Deletion error", "No prior id found");
+    }
   }
 
   return (
@@ -256,6 +296,16 @@ const SwingAnalysisTable = ({
                           marginRight: 15,
                         }}
                         handler={() => openBreakoutModal(analysis._id)}
+                      />
+                      <ButtonComponent
+                        text={"Del"}
+                        style={{
+                          paddingVertical: 5,
+                          paddingHorizontal: 10,
+                          marginRight: 8,
+                          backgroundColor: "red",
+                        }}
+                        handler={() => openDeleteModal(analysis._id)}
                       />
                     </View>
                   </DataTable.Cell>
@@ -472,6 +522,29 @@ const SwingAnalysisTable = ({
           </View>
         </View>
       </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteModalVisible}
+        onRequestClose={() => closeDeleteModal()}
+      >
+        <View style={styles.modalContainer2}>
+          <Text style={styles.confirmationText}>
+            Are you sure, want to delete
+          </Text>
+          <Text style={styles.analysisNameText}>
+            {selectedAnalysis?.analysis?.stockName || "none"}
+          </Text>
+          <ButtonComponent
+            indicator={deleteAnalysisLoader}
+            disabled={deleteAnalysisLoader}
+            style={{ backgroundColor: "red" }}
+            text={"delete"}
+            handler={() => deleteAnalysisHandler(selectedAnalysis?._id || null)}
+          />
+        </View>
+      </Modal>
     </>
   );
 };
@@ -483,12 +556,12 @@ const styles = StyleSheet.create({
     // padding: 15,
   },
   tableHeader: {
-    width: 990,
+    width: 1890,
     backgroundColor: Colors.clr3,
     borderBottomColor: Colors.clr3,
   },
   tableRow: {
-    width: 990,
+    width: 1890,
     paddingLeft: 0,
     backgroundColor: "#999",
     borderBottomColor: "#000",
@@ -497,6 +570,19 @@ const styles = StyleSheet.create({
     height: "100%",
     paddingHorizontal: "3%",
     backgroundColor: "rgba(0,0,0,0.9)",
+  },
+
+  modalContainer2: {
+    height: 200,
+    paddingHorizontal: "15%",
+    marginTop: "70%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: Colors.clr2,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
   },
 
   stockNameText: {
@@ -524,6 +610,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  analysisContWhole: {
+    height: "auto",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    marginTop: "5%",
+    borderRadius: 10,
+    borderWidth: 0.2,
+    borderColor: Colors.clr3,
+    backgroundColor: Colors.transparentBg,
+  },
+  topTwoWhole: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   input: {
     width: "45%",
     height: 40,
@@ -542,5 +645,29 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+
+  analysisNameText: {
+    fontSize: CalculateFontSize(2.2),
+    fontWeight: "500",
+    color: Colors.clr4,
+    alignSelf: "center",
+    marginBottom: "13%",
+  },
+  confirmationText: {
+    color: Colors.midWhite,
+    fontSize: CalculateFontSize(2),
+    fontWeight: "500",
+    marginBottom: 10,
+  },
+  scrollWholeUpdateCont: {
+    width: "100%",
+    flex: 1,
+  },
+  scrollWholeUpdateContSub: {
+    width: "100%",
+    height: "100%",
+    paddingVertical: 10,
+    backgroundColor: "red",
   },
 });

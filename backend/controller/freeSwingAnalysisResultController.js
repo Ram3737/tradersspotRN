@@ -40,22 +40,42 @@ const getAllFreeSwingAnalysis = async (req, res) => {
 
     const breakoutValue = req.query.breakout;
     const rewardValue = req.query.reward;
+    const analysisLinkValue = req.query.analysisLink;
+    const resultLinkValue = req.query.resultLink;
 
     let query = [];
 
-    if (breakoutValue && breakoutValue !== "null") {
+    if (analysisLinkValue !== "null") {
+      console.log("0");
+      query.push({ "result.resultLink": null });
+      query.push({ "result.breakout": "none" });
+    }
+
+    if (resultLinkValue !== "null") {
+      console.log("1");
+      query.push({ "result.resultLink": "none" });
+    }
+
+    if (
+      analysisLinkValue == "null" &&
+      breakoutValue &&
+      breakoutValue !== "null"
+    ) {
+      console.log("2");
       query.push({ ["result.breakout"]: breakoutValue });
     }
 
-    if (rewardValue && rewardValue !== "null" && rewardValue !== 1) {
+    if (rewardValue && rewardValue !== "null" && rewardValue == 0) {
+      console.log("3");
       query.push({ ["result.reward"]: rewardValue });
     }
 
     if (rewardValue && rewardValue == 1) {
+      console.log("4");
       query.push({ ["result.reward"]: { $gt: 0 } });
     }
 
-    console.log("free", query);
+    console.log("sumRRfree", query);
 
     if (searchedId) {
       const objectId = new mongoose.Types.ObjectId(searchedId);
@@ -71,13 +91,25 @@ const getAllFreeSwingAnalysis = async (req, res) => {
       res.status(200).json({ totalSwingAnalysis, allSwingAnalyses });
     } else {
       const allSwingAnalyses = await FreeSwingAnalysisResult.find(
-        query.length > 0 ? { $or: query } : {}
+        query.length === 0
+          ? {}
+          : query.length > 0 && analysisLinkValue == "null"
+          ? { $or: query }
+          : query.length > 0 && analysisLinkValue == 1
+          ? { $and: query }
+          : {}
       )
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
       const totalSwingAnalysis = await FreeSwingAnalysisResult.countDocuments(
-        query.length > 0 ? { $or: query } : {}
+        query.length === 0
+          ? {}
+          : query.length > 0 && analysisLinkValue == "null"
+          ? { $or: query }
+          : query.length > 0 && analysisLinkValue == 1
+          ? { $and: query }
+          : {}
       );
 
       res.status(200).json({ totalSwingAnalysis, allSwingAnalyses });
@@ -96,29 +128,63 @@ const getAllFreeSwingAnalysisUser = async (req, res) => {
 
     const breakoutValue = req.query.breakout;
     const rewardValue = req.query.reward;
+    const analysisLinkValue = req.query.analysisLink;
+    const resultLinkValue = req.query.resultLink;
 
     let query = [];
 
-    if (breakoutValue && breakoutValue !== "null") {
+    if (analysisLinkValue !== "null") {
+      console.log("0");
+      query.push({ "result.resultLink": null });
+      query.push({ "result.breakout": "none" });
+    }
+
+    if (resultLinkValue !== "null") {
+      console.log("1");
+      query.push({ "result.resultLink": "none" });
+    }
+
+    if (
+      analysisLinkValue == "null" &&
+      breakoutValue &&
+      breakoutValue !== "null"
+    ) {
+      console.log("2");
       query.push({ ["result.breakout"]: breakoutValue });
     }
 
-    if (rewardValue && rewardValue !== "null" && rewardValue !== 1) {
+    if (rewardValue && rewardValue !== "null" && rewardValue == 0) {
+      console.log("3");
       query.push({ ["result.reward"]: rewardValue });
     }
 
     if (rewardValue && rewardValue == 1) {
+      console.log("4");
       query.push({ ["result.reward"]: { $gt: 0 } });
     }
 
     console.log("free", query);
 
     const allSwingAnalyses = await FreeSwingAnalysisResult.find(
-      query.length > 0 ? { $or: query } : {}
+      query.length === 0
+        ? {}
+        : query.length > 0 && analysisLinkValue == "null"
+        ? { $or: query }
+        : query.length > 0 && analysisLinkValue == 1
+        ? { $and: query }
+        : {}
     )
       .sort({ createdAt: -1 })
       .limit(limit);
-    const totalSwingAnalysis = await FreeSwingAnalysisResult.countDocuments();
+    const totalSwingAnalysis = await FreeSwingAnalysisResult.countDocuments(
+      query.length === 0
+        ? {}
+        : query.length > 0 && analysisLinkValue == "null"
+        ? { $or: query }
+        : query.length > 0 && analysisLinkValue == 1
+        ? { $and: query }
+        : {}
+    );
 
     res.status(200).json({ totalSwingAnalysis, allSwingAnalyses });
   } catch (error) {
@@ -146,6 +212,29 @@ const updateFreeSwingResults = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server Error - Try after sometime" });
+  }
+};
+
+const deleteFreeSwingAnalysis = async (req, res) => {
+  try {
+    const { id: analysisId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(analysisId)) {
+      return res.status(404).json({ error: "Analysis not found!" });
+    }
+
+    const deletedAnalysis = await FreeSwingAnalysisResult.findByIdAndDelete(
+      analysisId
+    );
+
+    if (!deletedAnalysis) {
+      return res.status(404).json({ error: "Analysis not found!" });
+    }
+
+    res.status(200).json({ message: "Analysis deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -405,4 +494,5 @@ module.exports = {
   getAllFreeSwingAnalysisUser,
   updateFreeSwingResults,
   sumRiskRewardFreeSwing,
+  deleteFreeSwingAnalysis,
 };

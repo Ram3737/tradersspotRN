@@ -26,7 +26,15 @@ import SwingAnalysisTable from "../../../components/table/swingAnalysisTable";
 import Colors from "../../../components/colors/colors";
 
 function AdminAnalysisScreen() {
-  const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
+  const tabsArray = [
+    "All",
+    "Breakout",
+    "Trailing",
+    "Reward",
+    "Stoploss",
+    "Idle",
+    "Nill",
+  ];
   const [selectedStockName, setSelectedStockName] = useState(null);
   const [analysisLink, setAnalysisLink] = useState(null);
   const [selectedPattern, setSelectedPattern] = useState(null);
@@ -41,6 +49,8 @@ function AdminAnalysisScreen() {
   const [filterTab, setFilterTab] = useState("All");
   const [breakout, setBreakOut] = useState(null);
   const [reward, setReward] = useState(null);
+  const [analysisLinkFilt, setAnalysisLinkFilt] = useState(null);
+  const [resultLink, setResultLink] = useState(null);
 
   const patternArr = [
     "PRICE ACTION",
@@ -82,7 +92,7 @@ function AdminAnalysisScreen() {
       CallGetApiServices(
         `/analysis/getAll${
           tab === "Swing" ? tab : tab + "Swing"
-        }Analysis?page=${page}&breakout=${breakout}&reward=${reward}`,
+        }Analysis?page=${page}&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLinkFilt}&resultLink=${resultLink}`,
         (response) => {
           if (response.status === 200) {
             setAllAnalysisLoader(false);
@@ -151,7 +161,7 @@ function AdminAnalysisScreen() {
     setSearchedText(null);
     setCurrentPage(1);
     getAllAnalysis();
-  }, [tab, breakout, reward]);
+  }, [tab, breakout, reward, analysisLinkFilt, resultLink]);
 
   useEffect(() => {
     if (!searchedText) {
@@ -166,6 +176,8 @@ function AdminAnalysisScreen() {
     setViewFilterCont(!viewFilterCont);
     setBreakOut(null);
     setReward(null);
+    setAnalysisLinkFilt(null);
+    setResultLink(null);
     setFilterTab("All");
   }
 
@@ -174,18 +186,38 @@ function AdminAnalysisScreen() {
     if (pressedTab === "All") {
       setBreakOut(null);
       setReward(null);
+      setAnalysisLinkFilt(null);
+      setResultLink(null);
     } else if (pressedTab === "Breakout") {
       setBreakOut("green");
       setReward(null);
+      setAnalysisLinkFilt(null);
+      setResultLink(null);
     } else if (pressedTab === "Trailing") {
       setBreakOut("orange");
       setReward(null);
+      setAnalysisLinkFilt(null);
+      setResultLink(null);
     } else if (pressedTab === "Reward") {
       setBreakOut(null);
       setReward(1);
+      setAnalysisLinkFilt(null);
+      setResultLink(null);
     } else if (pressedTab === "Stoploss") {
       setBreakOut(null);
       setReward(0);
+      setAnalysisLinkFilt(null);
+      setResultLink(null);
+    } else if (pressedTab === "Idle") {
+      setBreakOut(null);
+      setReward(null);
+      setAnalysisLinkFilt(1);
+      setResultLink(null);
+    } else if (pressedTab === "Nill") {
+      setBreakOut(null);
+      setReward(null);
+      setAnalysisLinkFilt(null);
+      setResultLink(1);
     }
   }
 
@@ -213,6 +245,8 @@ function AdminAnalysisScreen() {
                 setViewFilterCont(false);
                 setBreakOut(null);
                 setReward(null);
+                setAnalysisLinkFilt(null);
+                setResultLink(null);
                 setFilterTab("All");
               }}
             >
@@ -231,6 +265,8 @@ function AdminAnalysisScreen() {
                 setViewFilterCont(false);
                 setBreakOut(null);
                 setReward(null);
+                setAnalysisLinkFilt(null);
+                setResultLink(null);
                 setFilterTab("All");
               }}
             >
@@ -245,13 +281,15 @@ function AdminAnalysisScreen() {
                 },
                 styles.tab,
               ]}
-              onPress={() => {
-                setTab("Intraday");
-                setViewFilterCont(false);
-                setBreakOut(null);
-                setReward(null);
-                setFilterTab("All");
-              }}
+              // onPress={() => {
+              //   setTab("Intraday");
+              //   setViewFilterCont(false);
+              //   setBreakOut(null);
+              //   setReward(null);
+              //   setAnalysisLinkFilt(null);
+              //   setResultLink(null);
+              //   setFilterTab("All");
+              // }}
             >
               <Text style={styles.tabText}>Intraday</Text>
             </TouchableOpacity>
@@ -525,7 +563,7 @@ function AdminAnalysisScreen() {
                   currentPage={currentPage}
                 />
               )}
-              {analysisData.length === 0 && (
+              {analysisData.length === 0 && !allAnalysisLoader && (
                 <View>
                   <Text
                     style={[

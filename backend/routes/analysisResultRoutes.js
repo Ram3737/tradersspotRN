@@ -63,6 +63,11 @@ router.get(
   swingAnalysisResultController.sumRiskRewardSwing
 );
 
+router.delete(
+  "/deleteSwingAnalysis/:id",
+  swingAnalysisResultController.deleteSwingAnalysis
+);
+
 //FREE SWING
 router.post(
   "/createFreeSwingAnalysis",
@@ -83,6 +88,11 @@ router.patch(
 router.get(
   "/sumRiskRewardFreeSwing",
   freeSwingAnalysisResultController.sumRiskRewardFreeSwing
+);
+
+router.delete(
+  "/deleteFreeSwingAnalysis/:id",
+  freeSwingAnalysisResultController.deleteFreeSwingAnalysis
 );
 
 module.exports = router;

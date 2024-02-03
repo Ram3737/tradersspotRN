@@ -38,7 +38,15 @@ import ButtonComponent from "../../../components/buttonComponent/buttonComponent
 function AnalysisScreen() {
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
-  const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
+  const tabsArray = [
+    "All",
+    "Breakout",
+    "Trailing",
+    "Reward",
+    "Stoploss",
+    "Idle",
+    "Nill",
+  ];
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
   const [analysisData, setAnalysisData] = useState([]);
@@ -52,6 +60,8 @@ function AnalysisScreen() {
   const [filterTab, setFilterTab] = useState("All");
   const [breakout, setBreakOut] = useState(null);
   const [reward, setReward] = useState(null);
+  const [analysisLink, setAnalysisLink] = useState(null);
+  const [resultLink, setResultLink] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -83,6 +93,12 @@ function AnalysisScreen() {
       Vibration.vibrate(50);
     }
 
+    setFilterTab("All");
+    setBreakOut(null);
+    setReward(null);
+    setAnalysisLink(null);
+    setResultLink(null);
+    setViewFilterCont(false);
     setContToDisplay(!contToDisplay);
   };
 
@@ -91,7 +107,7 @@ function AnalysisScreen() {
     CallGetApiServices(
       `/analysis/getAll${
         contToDisplay ? "FreeSwing" : "Swing"
-      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}`,
+      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data.allSwingAnalyses);
@@ -111,7 +127,7 @@ function AnalysisScreen() {
     contToDisplay
       ? setAnalysisStat("freeSwingAnalysisStats")
       : setAnalysisStat("swingAnalysisStats");
-  }, [contToDisplay, breakout, reward]);
+  }, [contToDisplay, breakout, reward, analysisLink, resultLink]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -121,6 +137,8 @@ function AnalysisScreen() {
     setViewFilterCont(!viewFilterCont);
     setBreakOut(null);
     setReward(null);
+    setAnalysisLink(null);
+    setResultLink(null);
     setFilterTab("All");
   }
 
@@ -129,18 +147,38 @@ function AnalysisScreen() {
     if (pressedTab === "All") {
       setBreakOut(null);
       setReward(null);
+      setAnalysisLink(null);
+      setResultLink(null);
     } else if (pressedTab === "Breakout") {
       setBreakOut("green");
       setReward(null);
+      setAnalysisLink(null);
+      setResultLink(null);
     } else if (pressedTab === "Trailing") {
       setBreakOut("orange");
       setReward(null);
+      setAnalysisLink(null);
+      setResultLink(null);
     } else if (pressedTab === "Reward") {
       setBreakOut(null);
       setReward(1);
+      setAnalysisLink(null);
+      setResultLink(null);
     } else if (pressedTab === "Stoploss") {
       setBreakOut(null);
       setReward(0);
+      setAnalysisLink(null);
+      setResultLink(null);
+    } else if (pressedTab === "Idle") {
+      setBreakOut(null);
+      setReward(null);
+      setAnalysisLink(1);
+      setResultLink(null);
+    } else if (pressedTab === "Nill") {
+      setBreakOut(null);
+      setReward(null);
+      setAnalysisLink(null);
+      setResultLink(1);
     }
   }
 
@@ -592,16 +630,18 @@ function AnalysisScreen() {
         )}
       </View>
       {courseType === "basic" && paid && !contToDisplay ? (
-        <View style={styles.upgradeBtnCont}>
-          <Text style={styles.upgradeBtnContText}>
-            Upgrade to "STANDARD" plan to access our high potential swing
-            analysis. You can view free analysis stats.
-          </Text>
-          <ButtonComponent
-            text={"Upgrade"}
-            style={{ alignSelf: "center" }}
-            handler={upgradeBtnHandler}
-          />
+        <View style={styles.upgradeBtnMainCont}>
+          <View style={styles.upgradeBtnCont}>
+            <Text style={styles.upgradeBtnContText}>
+              Upgrade to "STANDARD" plan to access our high potential swing
+              analysis. You can view free analysis stats.
+            </Text>
+            <ButtonComponent
+              text={"Upgrade"}
+              style={{ alignSelf: "center" }}
+              handler={upgradeBtnHandler}
+            />
+          </View>
         </View>
       ) : (
         <View style={styles.analysisScrollCont}>
@@ -622,11 +662,11 @@ function AnalysisScreen() {
             />
           )}
           {analysisData.length === 0 && !isLoading && (
-            <View>
+            <View style={styles.noDataCont}>
               <Text
                 style={[
                   styles.topContSubBottomSubText1,
-                  { marginTop: "50%", alignSelf: "center" },
+                  { alignSelf: "center" },
                 ]}
               >
                 No data
@@ -871,10 +911,16 @@ const styles = StyleSheet.create({
     color: Colors.clr4,
     // textDecorationLine: "underline",
   },
-  upgradeBtnCont: {
+  upgradeBtnMainCont: {
+    flex: 1,
     width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  upgradeBtnCont: {
+    width: "90%",
     height: "auto",
-    marginTop: "40%",
     paddingHorizontal: 10,
     paddingVertical: 20,
     backgroundColor: Colors.transparentBg,
@@ -886,5 +932,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
     color: Colors.midWhite,
+  },
+  noDataCont: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
   },
 });

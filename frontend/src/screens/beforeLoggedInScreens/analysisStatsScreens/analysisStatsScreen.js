@@ -29,7 +29,15 @@ function AnalysisStatsScreen() {
   const authCtx = useContext(AuthContext);
   const navigation = useNavigation();
   const currentDate = new Date();
-  const tabsArray = ["All", "Breakout", "Trailing", "Reward", "Stoploss"];
+  const tabsArray = [
+    "All",
+    "Breakout",
+    "Trailing",
+    "Reward",
+    "Stoploss",
+    "Idle",
+    "Nill",
+  ];
   const [viewResult, setViewResult] = useState(0);
   const [contToDisplay, setContToDisplay] = useState(false);
   const [barChartValue, setBarChartValue] = useState([]);
@@ -40,13 +48,15 @@ function AnalysisStatsScreen() {
   const [filterTab, setFilterTab] = useState("All");
   const [breakout, setBreakOut] = useState(null);
   const [reward, setReward] = useState(null);
+  const [analysisLink, setAnalysisLink] = useState(null);
+  const [resultLink, setResultLink] = useState(null);
 
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
       `/analysis/getAll${
         contToDisplay ? "FreeSwing" : "Swing"
-      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}`,
+      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
       (response) => {
         if (response.status === 200) {
           if (!contToDisplay) {
@@ -79,7 +89,7 @@ function AnalysisStatsScreen() {
           : authCtx.swingAnalysisStats?.reversedMonthlyTotals
       );
     }
-  }, [contToDisplay, authCtx, breakout, reward]);
+  }, [contToDisplay, authCtx, breakout, reward, analysisLink, resultLink]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -96,6 +106,12 @@ function AnalysisStatsScreen() {
       Vibration.vibrate(50);
     }
 
+    setFilterTab("All");
+    setBreakOut(null);
+    setReward(null);
+    setAnalysisLink(null);
+    setResultLink(null);
+    setViewFilterCont(false);
     setContToDisplay(!contToDisplay);
   };
 
@@ -103,6 +119,8 @@ function AnalysisStatsScreen() {
     setViewFilterCont(!viewFilterCont);
     setBreakOut(null);
     setReward(null);
+    setAnalysisLink(null);
+    setResultLink(null);
     setFilterTab("All");
   }
 
@@ -111,12 +129,16 @@ function AnalysisStatsScreen() {
     if (pressedTab === "All") {
       setBreakOut(null);
       setReward(null);
+      setAnalysisLink(null);
+      setResultLink(null);
     } else if (pressedTab === "Breakout") {
       if (!contToDisplay) {
         return;
       } else {
         setBreakOut("green");
         setReward(null);
+        setAnalysisLink(null);
+        setResultLink(null);
       }
     } else if (pressedTab === "Trailing") {
       if (!contToDisplay) {
@@ -124,13 +146,34 @@ function AnalysisStatsScreen() {
       } else {
         setBreakOut("orange");
         setReward(null);
+        setAnalysisLink(null);
+        setResultLink(null);
       }
     } else if (pressedTab === "Reward") {
       setBreakOut(null);
       setReward(1);
+      setAnalysisLink(null);
+      setResultLink(null);
     } else if (pressedTab === "Stoploss") {
       setBreakOut(null);
       setReward(0);
+      setAnalysisLink(null);
+      setResultLink(null);
+    } else if (pressedTab === "Idle") {
+      console.log(11);
+      if (!contToDisplay) {
+        return;
+      } else {
+        setBreakOut(null);
+        setReward(null);
+        setAnalysisLink(1);
+        setResultLink(null);
+      }
+    } else if (pressedTab === "Nill") {
+      setBreakOut(null);
+      setReward(null);
+      setAnalysisLink(null);
+      setResultLink(1);
     }
   }
 
@@ -575,8 +618,9 @@ function AnalysisStatsScreen() {
                 style={[
                   styles.labelContText,
                   {
-                    fontSize: CalculateFontSize(1.8),
-                    marginTop: "30%",
+                    fontSize: CalculateFontSize(1.5),
+                    color: "#b8b6b6",
+                    // marginTop: "10%",
                     alignSelf: "center",
                   },
                 ]}
@@ -637,17 +681,21 @@ function AnalysisStatsScreen() {
           />
         )}
         {!contToDisplay &&
-        (filterTab === "Breakout" || filterTab === "Trailing") ? (
-          <View style={styles.upgradeBtnCont}>
-            <Text style={styles.upgradeBtnContText}>
-              Upgrade to "STANDARD" plan to access our high potential swing
-              analysis. You can view free analysis stats.
-            </Text>
-            <ButtonComponent
-              text={"Upgrade"}
-              style={{ alignSelf: "center" }}
-              handler={upgradeBtnHandler}
-            />
+        (filterTab === "Breakout" ||
+          filterTab === "Trailing" ||
+          filterTab === "Idle") ? (
+          <View style={styles.upgradeBtnMainCont}>
+            <View style={styles.upgradeBtnCont}>
+              <Text style={styles.upgradeBtnContText}>
+                Upgrade to "STANDARD" plan to access our high potential swing
+                analysis. You can view free analysis stats.
+              </Text>
+              <ButtonComponent
+                text={"Upgrade"}
+                style={{ alignSelf: "center" }}
+                handler={upgradeBtnHandler}
+              />
+            </View>
           </View>
         ) : (
           <>
@@ -661,13 +709,14 @@ function AnalysisStatsScreen() {
               />
             )}
             {analysisData.length === 0 && !isLoading && (
-              <View>
+              <View style={styles.noDataCont}>
                 <Text
                   style={[
                     styles.labelContText,
                     {
-                      fontSize: CalculateFontSize(1.8),
-                      marginTop: "50%",
+                      fontSize: CalculateFontSize(1.5),
+                      color: "#b8b6b6",
+                      // marginTop: "50%",
                       alignSelf: "center",
                     },
                   ]}
@@ -881,11 +930,16 @@ const styles = StyleSheet.create({
     color: Colors.clr4,
     // textDecorationLine: "underline",
   },
+  upgradeBtnMainCont: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
   upgradeBtnCont: {
     width: "90%",
     height: "auto",
-    alignSelf: "center",
-    marginTop: "40%",
     paddingHorizontal: 10,
     paddingVertical: 20,
     backgroundColor: Colors.transparentBg,
@@ -897,5 +951,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
     color: Colors.midWhite,
+  },
+  noDataCont: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
   },
 });

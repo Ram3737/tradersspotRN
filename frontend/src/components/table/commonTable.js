@@ -3,10 +3,12 @@ import { View, Text, ScrollView, Modal, Alert, StyleSheet } from "react-native";
 
 import SelectDropdown from "react-native-select-dropdown";
 import { DataTable } from "react-native-paper";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ButtonComponent from "../buttonComponent/buttonComponent";
 import { CallPatchApiServices } from "../../webServices/apiCalls";
 import { CallPostApiServices } from "../../webServices/apiCalls";
+import { CallDeleteApiServices } from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
 import BlinkingDot from "../blinkingDot/blinkingDot";
 import CustomAlertMsgBox from "../customAlertBox/customAlertMsgBox";
@@ -22,12 +24,15 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isPaidModalVisible, setIsPaidModalVisible] = useState(false);
   const [isTtuModalVisible, setIsTtuModalVisible] = useState(false);
+  const [isConfirmMailModalVisible, setIsConfirmMailModalVisible] =
+    useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [updateBtnLoader, setUpdateBtnLoader] = useState(false);
   const [updateTtuBtnLoader, setUpdateTtuBtnLoader] = useState(false);
   const [paidBtnLoader, setPaidBtnLoader] = useState(false);
   const [mailBtnLoader, setMailBtnLoader] = useState(false);
+  const [deleteUserLoader, setDeleteUserLoader] = useState(false);
   const [mailSentAlert, setMailSentAlert] = useState(false);
-  const [clickedMail, setClickedMail] = useState(null);
 
   const openModal = (id) => {
     const user = usersData.find((item) => item._id === id);
@@ -99,6 +104,17 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
     setIsPaidModalVisible(false);
   };
 
+  const openConfirmMailModal = (id) => {
+    const user = usersData.find((item) => item._id === id);
+    setSelectedUser(user);
+    setIsConfirmMailModalVisible(true);
+  };
+
+  const closeConfirmMailModal = () => {
+    setSelectedUser(null);
+    setIsConfirmMailModalVisible(false);
+  };
+
   const openTtuModal = (id) => {
     const user = usersData.find((item) => item._id === id);
     setSelectedUser(user);
@@ -109,6 +125,17 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
     setSelectedUser(null);
     setSelectedTtUpdate(false);
     setIsTtuModalVisible(false);
+  };
+
+  const openDeleteModal = (id) => {
+    const user = usersData.find((item) => item._id === id);
+    setSelectedUser(user);
+    setIsDeleteModalVisible(true);
+  };
+
+  const closeDeleteModal = () => {
+    setSelectedUser(null);
+    setIsDeleteModalVisible(false);
   };
 
   function updatePaidBtnHandler() {
@@ -135,30 +162,59 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   }
 
   function confirmMailHandler(mail) {
-    setClickedMail(mail);
-    setMailBtnLoader(true);
-    CallPostApiServices(
-      `/user/confirmationEmail`,
-      {
-        email: mail,
-      },
-      (response) => {
-        if (response.status === 200) {
+    if (mail) {
+      setMailBtnLoader(true);
+      CallPostApiServices(
+        `/user/confirmationEmail`,
+        {
+          email: mail,
+        },
+        (response) => {
+          if (response.status === 200) {
+            setMailBtnLoader(false);
+            setMailSentAlert(true);
+            closeConfirmMailModal();
+            setTimeout(() => {
+              setMailSentAlert(false);
+            }, 3000);
+          }
+        },
+        (err) => {
           setMailBtnLoader(false);
-          setMailSentAlert(true);
-          setClickedMail(null);
-          setTimeout(() => {
-            setMailSentAlert(false);
-          }, 3000);
+          console.log("err", err);
+          closeConfirmMailModal();
+          Alert.alert("Mailing error", err.response.data.message);
         }
-      },
-      (err) => {
-        setMailBtnLoader(false);
-        setClickedMail(null);
-        console.log("err", err);
-        Alert.alert("Mailing error", err.response.data.message);
-      }
-    );
+      );
+    } else {
+      closeConfirmMailModal();
+      Alert.alert("Mailing error", "No prior email found");
+    }
+  }
+
+  function deleteUserHandler(id) {
+    if (id) {
+      setDeleteUserLoader(true);
+      CallDeleteApiServices(
+        `/user/${id}`,
+        (response) => {
+          if (response.status === 200) {
+            setDeleteUserLoader(false);
+            getAllUsers(currentPage);
+            closeDeleteModal();
+          }
+        },
+        (err) => {
+          setDeleteUserLoader(false);
+          console.log("deletion err", err);
+          closeDeleteModal();
+          Alert.alert("Deletion error", err.response.data.message);
+        }
+      );
+    } else {
+      closeDeleteModal();
+      Alert.alert("Deletion error", "No prior id found");
+    }
   }
 
   // console.log(selectedUser);
@@ -181,24 +237,24 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
 
             {usersData.map((user, index) => (
               <DataTable.Row key={index} style={styles.tableRow}>
-                <DataTable.Cell style={{ minWidth: 70, paddingLeft: 15 }}>
+                <DataTable.Cell style={{ minWidth: "6%", paddingLeft: 15 }}>
                   {user.email}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 50 }}>
+                <DataTable.Cell style={{ minWidth: "5%" }}>
                   {user.courseType !== "none"
                     ? user?.courseType.toString()
                     : user?.courseType}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 50 }}>
+                <DataTable.Cell style={{ minWidth: "5%" }}>
                   {user.userType || "N/A"}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 50 }}>
+                <DataTable.Cell style={{ minWidth: "5%" }}>
                   {user?.paid.toString()}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 15 }}>
+                <DataTable.Cell style={{ minWidth: "1%" }}>
                   {user?.triedToUpdate.toString()}
                 </DataTable.Cell>
-                <DataTable.Cell style={{ minWidth: 80 }}>
+                <DataTable.Cell style={{ minWidth: 120 }}>
                   <View style={styles.btnUpdate}>
                     <View
                       style={{ marginTop: 12, marginLeft: -10, marginRight: 8 }}
@@ -242,7 +298,6 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                       }}
                       handler={() => openPaidModal(user._id)}
                     />
-
                     <ButtonComponent
                       text={"mail"}
                       style={{
@@ -250,9 +305,18 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
                         paddingHorizontal: 10,
                         marginRight: 8,
                       }}
-                      disabled={mailBtnLoader}
-                      indicator={mailBtnLoader && clickedMail === user.email}
-                      handler={() => confirmMailHandler(user.email)}
+                      handler={() => openConfirmMailModal(user._id)}
+                    />
+                    <ButtonComponent
+                      text={"Del"}
+                      style={{
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                        marginRight: 8,
+                        backgroundColor: "red",
+                      }}
+                      disabled={user?.userType == "admin"}
+                      handler={() => openDeleteModal(user._id)}
                     />
                   </View>
                 </DataTable.Cell>
@@ -386,6 +450,48 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
         </View>
       </Modal>
 
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isConfirmMailModalVisible}
+        onRequestClose={() => closeConfirmMailModal()}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.userNameText}>
+            {selectedUser?.email || "none"}
+          </Text>
+          <ButtonComponent
+            indicator={mailBtnLoader}
+            disabled={mailBtnLoader}
+            text={"Send mail ?"}
+            handler={() => confirmMailHandler(selectedUser?.email || null)}
+          />
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteModalVisible}
+        onRequestClose={() => closeDeleteModal()}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.confirmationText}>
+            Are you sure, want to delete
+          </Text>
+          <Text style={styles.userNameText}>
+            {selectedUser?.email || "none"}
+          </Text>
+          <ButtonComponent
+            indicator={deleteUserLoader}
+            disabled={deleteUserLoader}
+            style={{ backgroundColor: "red" }}
+            text={"delete"}
+            handler={() => deleteUserHandler(selectedUser?._id || null)}
+          />
+        </View>
+      </Modal>
+
       <CustomAlertMsgBox
         visible={mailSentAlert}
         message={"Mail sent successfully"}
@@ -401,12 +507,12 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   tableHeader: {
-    width: 980,
+    width: 1420,
     backgroundColor: Colors.clr3,
     borderBottomColor: Colors.clr3,
   },
   tableRow: {
-    width: 980,
+    width: 1420,
     paddingLeft: 0,
     backgroundColor: "#999",
     borderBottomColor: "#000",
@@ -421,7 +527,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.clr2,
     borderWidth: 1,
     borderRadius: 10,
-    backgroundColor: Colors.transparentBg,
+    backgroundColor: "rgba(0,0,0,0.9)",
   },
 
   btnUpdate: {
@@ -435,5 +541,11 @@ const styles = StyleSheet.create({
     color: Colors.clr4,
     alignSelf: "center",
     marginBottom: "13%",
+  },
+  confirmationText: {
+    color: Colors.midWhite,
+    fontSize: CalculateFontSize(2),
+    fontWeight: "500",
+    marginBottom: 10,
   },
 });

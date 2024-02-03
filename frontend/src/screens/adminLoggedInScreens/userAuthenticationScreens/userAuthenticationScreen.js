@@ -184,7 +184,7 @@ function UserAuthenticationScreen() {
             getAllUsers={getAllUsers}
           />
         )}
-        {usersData.length === 0 && (
+        {usersData.length === 0 && !allUsersLoader && (
           <View>
             <Text
               style={{

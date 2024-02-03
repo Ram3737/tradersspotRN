@@ -35,4 +35,5 @@ router.post("/resetPassword", userController.resetPassword);
 router.post("/forgotPassword", userController.forgotPassword);
 router.post("/verifyOTP", userController.verifyOTP);
 router.post("/confirmationEmail", userController.PurchaseConfirmationEmail);
+router.delete("/:id", userController.deleteUser);
 module.exports = router;

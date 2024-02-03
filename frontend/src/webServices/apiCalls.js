@@ -33,3 +33,8 @@ export const CallPatchApiServices = (
     .then(successCallBack)
     .catch(errorCallBack);
 };
+
+export const CallDeleteApiServices = (url, successCallBack, errorCallBack) => {
+  console.log(`${apiurl}${url}`);
+  axios.delete(`${apiurl}${url}`).then(successCallBack).catch(errorCallBack);
+};
