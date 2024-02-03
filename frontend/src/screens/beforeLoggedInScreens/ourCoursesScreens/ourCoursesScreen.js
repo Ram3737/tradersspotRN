@@ -213,28 +213,32 @@ function OurCoursesScreen() {
               </Text>
               <Text style={styles.featureText}> Any time doubt clearence</Text>
 
-              <TouchableOpacity
-                onPress={() => {
-                  getThisCourseHandler(
-                    tab === 0
-                      ? "basic"
-                      : tab === 1
-                      ? "standard"
-                      : tab === 2
-                      ? "pro"
-                      : ""
-                  );
-                }}
-              >
-                <Text
-                  style={[
-                    styles.featureText,
-                    { textDecorationLine: "underline", color: Colors.clr4 },
-                  ]}
+              {courseType === "basic" && paid ? (
+                <></>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    getThisCourseHandler(
+                      tab === 0
+                        ? "basic"
+                        : tab === 1
+                        ? "standard"
+                        : tab === 2
+                        ? "pro"
+                        : ""
+                    );
+                  }}
                 >
-                  View more
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.featureText,
+                      { textDecorationLine: "underline", color: Colors.clr4 },
+                    ]}
+                  >
+                    View more
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </>
         ) : tab === 1 ? (
@@ -255,28 +259,32 @@ function OurCoursesScreen() {
               </Text>
               <Text style={styles.featureText}> Any time doubt clearence</Text>
 
-              <TouchableOpacity
-                onPress={() => {
-                  getThisCourseHandler(
-                    tab === 0
-                      ? "basic"
-                      : tab === 1
-                      ? "standard"
-                      : tab === 2
-                      ? "pro"
-                      : ""
-                  );
-                }}
-              >
-                <Text
-                  style={[
-                    styles.featureText,
-                    { textDecorationLine: "underline", color: Colors.clr4 },
-                  ]}
+              {courseType === "standard" && paid ? (
+                <></>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    getThisCourseHandler(
+                      tab === 0
+                        ? "basic"
+                        : tab === 1
+                        ? "standard"
+                        : tab === 2
+                        ? "pro"
+                        : ""
+                    );
+                  }}
                 >
-                  View more
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.featureText,
+                      { textDecorationLine: "underline", color: Colors.clr4 },
+                    ]}
+                  >
+                    View more
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </>
         ) : tab === 2 ? (
@@ -296,28 +304,32 @@ function OurCoursesScreen() {
               </Text>
               <Text style={styles.featureText}> 1 -1 doubt clearence</Text>
 
-              <TouchableOpacity
-                onPress={() => {
-                  getThisCourseHandler(
-                    tab === 0
-                      ? "basic"
-                      : tab === 1
-                      ? "standard"
-                      : tab === 2
-                      ? "pro"
-                      : ""
-                  );
-                }}
-              >
-                <Text
-                  style={[
-                    styles.featureText,
-                    { textDecorationLine: "underline", color: Colors.clr4 },
-                  ]}
+              {courseType === "pro" && paid ? (
+                <></>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    getThisCourseHandler(
+                      tab === 0
+                        ? "basic"
+                        : tab === 1
+                        ? "standard"
+                        : tab === 2
+                        ? "pro"
+                        : ""
+                    );
+                  }}
                 >
-                  View more
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.featureText,
+                      { textDecorationLine: "underline", color: Colors.clr4 },
+                    ]}
+                  >
+                    View more
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </>
         ) : (

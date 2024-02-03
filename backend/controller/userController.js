@@ -124,6 +124,7 @@ const getAllUsers = async (req, res) => {
         { email: { $regex: new RegExp(search, "i") } },
         "_id email courseType paid userType triedToUpdate"
       )
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
@@ -137,6 +138,7 @@ const getAllUsers = async (req, res) => {
         query.length > 0 ? { $and: query } : {},
         "_id email courseType paid userType triedToUpdate"
       )
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
