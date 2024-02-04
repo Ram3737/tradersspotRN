@@ -32,16 +32,36 @@ const SwingAnalysisTable = ({
   const [breakout, setBreakout] = useState(null);
   const [shareToAll, setSharetoAll] = useState(null);
   const [analysisResultLink, setAnalysisResultLink] = useState(null);
+  const [updateStockName, setUpdateStockName] = useState(null);
+  const [updatePattern, setUpdatePattern] = useState(null);
+  const [updateAnalysisLink, setUpdateAnalysisLink] = useState(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isBreakoutModalVisible, setIsBreakoutModalVisible] = useState(false);
+  const [isAnalysisUpdateModalVisible, setIsAnalysisUpdateModalVisible] =
+    useState(false);
   const [resultUpdateLoader, setResultUpdateLoader] = useState(false);
   const [deleteAnalysisLoader, setDeleteAnalysisLoader] = useState(false);
+  const [analysisUpdateLoader, setAnalysisUpdateLoader] = useState(false);
   const [breakoutLoader, setBreakoutLoader] = useState(false);
 
   const arr = ["true", "false"];
   const breakoutOptions = ["green", "orange", "none"];
+  const patternArr = [
+    "PRICE ACTION",
+    "TRIANGLE PATTERN",
+    "ASCENDING TRIANGLE",
+    "DESCENDING TRIANGLE",
+    "WEDGE PATTERN",
+    "RISING WEDGE",
+    "FALLING WEDGE",
+    "CHANNEL PATTERN",
+    "RISING CHANNEL",
+    "FALLING CHANNEL",
+    "DOUBLE TOP",
+    "DOUBLE BOTTOM",
+  ];
 
   const openModal = (id) => {
     const analysis = swingAnalysisData.find((item) => item._id === id);
@@ -204,6 +224,61 @@ const SwingAnalysisTable = ({
     }
   }
 
+  const openAnalysisUpdateModal = (id) => {
+    const analysis = swingAnalysisData.find((item) => item._id === id);
+    setSelectedAnalysis(analysis);
+    setUpdateStockName(analysis.analysis.stockName);
+    setUpdatePattern(analysis.analysis.pattern);
+    setUpdateAnalysisLink(analysis.analysis.analysisLink);
+    setIsAnalysisUpdateModalVisible(true);
+  };
+
+  const closeAnalysisUpdateModal = () => {
+    setSelectedAnalysis(null);
+    setUpdateStockName(null);
+    setUpdatePattern(null);
+    setUpdateAnalysisLink(null);
+    setIsAnalysisUpdateModalVisible(false);
+  };
+
+  function analysisUpdateHandler(id) {
+    if (id) {
+      setAnalysisUpdateLoader(true);
+      CallPatchApiServices(
+        `/analysis/${
+          tab === "Free" ? "updateFreeSwingResults" : "updateSwingResults"
+        }/${selectedAnalysis._id}`,
+        {
+          analysis: {
+            stockName:
+              updateStockName || selectedAnalysis.analysis.stockName || null,
+            pattern: updatePattern || selectedAnalysis.analysis.pattern || null,
+            analysisLink:
+              updateAnalysisLink ||
+              selectedAnalysis.analysis.analysisLink ||
+              null,
+          },
+        },
+        (response) => {
+          if (response.status === 201) {
+            setAnalysisUpdateLoader(false);
+            getAllAnalysis(currentPage);
+            closeAnalysisUpdateModal();
+            console.log("analysis updated");
+          }
+        },
+        (err) => {
+          setAnalysisUpdateLoader(false);
+          closeAnalysisUpdateModal();
+          console.log(err);
+          Alert.alert("Updation error", "No prior id found");
+        }
+      );
+    } else {
+      Alert.alert("Updation error", "No prior id found");
+    }
+  }
+
   return (
     <>
       <ScrollView horizontal={true}>
@@ -307,6 +382,16 @@ const SwingAnalysisTable = ({
                         }}
                         handler={() => openDeleteModal(analysis._id)}
                       />
+                      <ButtonComponent
+                        text={"Upd"}
+                        style={{
+                          paddingVertical: 5,
+                          paddingHorizontal: 10,
+                          marginRight: 8,
+                          backgroundColor: "orange",
+                        }}
+                        handler={() => openAnalysisUpdateModal(analysis._id)}
+                      />
                     </View>
                   </DataTable.Cell>
                 </DataTable.Row>
@@ -325,136 +410,142 @@ const SwingAnalysisTable = ({
           <Text style={styles.stockNameText}>
             {selectedAnalysis?.analysis.stockName || "none"}
           </Text>
-          <View style={[styles.analysisCont, { height: 320 }]}>
-            <View style={[styles.topTwo, { marginTop: "5%" }]}>
-              <TextInput
-                style={[styles.input, { width: "30%" }]}
-                placeholder="Risk"
-                placeholderTextColor="#fff"
-                keyboardType="numeric"
-                value={risk?.toString()}
-                onChangeText={(text) => {
-                  const riskValue = parseFloat(text);
-                  setRisk(isNaN(riskValue) ? "" : riskValue);
-                }}
-              />
-              <TextInput
-                style={[styles.input, { width: "30%" }]}
-                placeholder="Reward"
-                placeholderTextColor="#fff"
-                keyboardType="numeric"
-                value={reward?.toString()}
-                onChangeText={(text) => {
-                  const rewardValue = parseFloat(text);
-                  setReward(isNaN(rewardValue) ? "" : rewardValue);
-                }}
-              />
-              <TextInput
-                style={[styles.input, { width: "32%" }]}
-                placeholder="Percentage"
-                placeholderTextColor="#fff"
-                keyboardType="numeric"
-                value={percentage?.toString()}
-                onChangeText={(text) => {
-                  const percentageValue = parseFloat(text);
-                  setPercentage(isNaN(percentageValue) ? "" : percentageValue);
-                }}
-              />
-            </View>
-            <View style={[styles.topTwo, { marginTop: "5%" }]}>
-              <SelectDropdown
-                data={breakoutOptions}
-                onSelect={(selectedItem, index) => {
-                  setBreakout(selectedItem || breakout);
-                }}
-                buttonTextAfterSelection={(selectedItem, index) => {
-                  return selectedItem;
-                }}
-                rowTextForSelection={(item, index) => {
-                  return item;
-                }}
-                rowStyle={{
-                  height: 35,
-                  backgroundColor: "#999",
-                }}
-                rowTextStyle={{
-                  color: "#333",
-                  fontSize: 14,
-                  fontWeight: "400",
-                }}
-                buttonStyle={[styles.input, { width: "45%" }]}
-                buttonTextStyle={{
-                  color: "#fff",
-                  fontSize: 14,
-                  fontWeight: "400",
-                }}
-                defaultButtonText="Breakout"
-                defaultValueByIndex={
-                  breakout === null
-                    ? "none"
-                    : breakout === "orange"
-                    ? 1
-                    : breakout === "green"
-                    ? 0
-                    : "none"
-                }
-              />
-              <SelectDropdown
-                data={arr}
-                onSelect={(selectedItem, index) => {
-                  setSharetoAll(selectedItem);
-                }}
-                buttonTextAfterSelection={(selectedItem, index) => {
-                  return selectedItem;
-                }}
-                rowTextForSelection={(item, index) => {
-                  return item;
-                }}
-                rowStyle={{
-                  height: 35,
-                  backgroundColor: "#999",
-                }}
-                rowTextStyle={{
-                  color: "#333",
-                  fontSize: 14,
-                  fontWeight: "400",
-                }}
-                buttonStyle={[styles.input, { width: "45%" }]}
-                buttonTextStyle={{
-                  color: "#fff",
-                  fontSize: 14,
-                  fontWeight: "400",
-                }}
-                defaultButtonText="Share to all"
-                defaultValueByIndex={
-                  shareToAll === null
-                    ? "none"
-                    : shareToAll === false
-                    ? 1
-                    : shareToAll === true
-                    ? 0
-                    : "none"
-                }
-              />
-            </View>
-            <TextInput
-              style={[
-                styles.input,
-                { width: "100%", marginTop: "3%", marginBottom: "10%" },
-              ]}
-              placeholder="Link"
-              placeholderTextColor="#fff"
-              value={analysisResultLink}
-              onChangeText={(text) => setAnalysisResultLink(text)}
-            />
+          <ScrollView style={styles.scrollWholeUpdateCont}>
+            <View style={styles.scrollWholeUpdateContSub}>
+              <View style={[styles.analysisCont, { height: 320 }]}>
+                <View style={[styles.topTwo, { marginTop: "5%" }]}>
+                  <TextInput
+                    style={[styles.input, { width: "30%" }]}
+                    placeholder="Risk"
+                    placeholderTextColor="#fff"
+                    keyboardType="numeric"
+                    value={risk?.toString()}
+                    onChangeText={(text) => {
+                      const riskValue = parseFloat(text);
+                      setRisk(isNaN(riskValue) ? "" : riskValue);
+                    }}
+                  />
+                  <TextInput
+                    style={[styles.input, { width: "30%" }]}
+                    placeholder="Reward"
+                    placeholderTextColor="#fff"
+                    keyboardType="numeric"
+                    value={reward?.toString()}
+                    onChangeText={(text) => {
+                      const rewardValue = parseFloat(text);
+                      setReward(isNaN(rewardValue) ? "" : rewardValue);
+                    }}
+                  />
+                  <TextInput
+                    style={[styles.input, { width: "32%" }]}
+                    placeholder="Percentage"
+                    placeholderTextColor="#fff"
+                    keyboardType="numeric"
+                    value={percentage?.toString()}
+                    onChangeText={(text) => {
+                      const percentageValue = parseFloat(text);
+                      setPercentage(
+                        isNaN(percentageValue) ? "" : percentageValue
+                      );
+                    }}
+                  />
+                </View>
+                <View style={[styles.topTwo, { marginTop: "5%" }]}>
+                  <SelectDropdown
+                    data={breakoutOptions}
+                    onSelect={(selectedItem, index) => {
+                      setBreakout(selectedItem || breakout);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    rowStyle={{
+                      height: 35,
+                      backgroundColor: "#999",
+                    }}
+                    rowTextStyle={{
+                      color: "#333",
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    buttonStyle={[styles.input, { width: "45%" }]}
+                    buttonTextStyle={{
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    defaultButtonText="Breakout"
+                    defaultValueByIndex={
+                      breakout === null
+                        ? "none"
+                        : breakout === "orange"
+                        ? 1
+                        : breakout === "green"
+                        ? 0
+                        : "none"
+                    }
+                  />
+                  <SelectDropdown
+                    data={arr}
+                    onSelect={(selectedItem, index) => {
+                      setSharetoAll(selectedItem);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    rowStyle={{
+                      height: 35,
+                      backgroundColor: "#999",
+                    }}
+                    rowTextStyle={{
+                      color: "#333",
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    buttonStyle={[styles.input, { width: "45%" }]}
+                    buttonTextStyle={{
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    defaultButtonText="Share to all"
+                    defaultValueByIndex={
+                      shareToAll === null
+                        ? "none"
+                        : shareToAll === false
+                        ? 1
+                        : shareToAll === true
+                        ? 0
+                        : "none"
+                    }
+                  />
+                </View>
+                <TextInput
+                  style={[
+                    styles.input,
+                    { width: "100%", marginTop: "3%", marginBottom: "10%" },
+                  ]}
+                  placeholder="Link"
+                  placeholderTextColor="#fff"
+                  value={analysisResultLink}
+                  onChangeText={(text) => setAnalysisResultLink(text)}
+                />
 
-            <ButtonComponent
-              indicator={resultUpdateLoader}
-              disabled={resultUpdateLoader}
-              text={"Update"}
-              handler={analysisResultBtnHandler}
-            />
-          </View>
+                <ButtonComponent
+                  indicator={resultUpdateLoader}
+                  disabled={resultUpdateLoader}
+                  text={"Update"}
+                  handler={analysisResultBtnHandler}
+                />
+              </View>
+            </View>
+          </ScrollView>
         </View>
       </Modal>
 
@@ -545,6 +636,84 @@ const SwingAnalysisTable = ({
           />
         </View>
       </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isAnalysisUpdateModalVisible}
+        onRequestClose={() => closeAnalysisUpdateModal()}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.analysisNameText}>
+            {selectedAnalysis?.analysis?.stockName || "none"}
+          </Text>
+
+          <ScrollView style={styles.scrollWholeUpdateCont}>
+            <View style={styles.scrollWholeUpdateContSub}>
+              <View style={styles.analysisContUpdate}>
+                <View style={styles.topTwoUpdate}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Stock name"
+                    placeholderTextColor="#fff"
+                    value={updateStockName}
+                    onChangeText={(text) =>
+                      setUpdateStockName(text.toUpperCase())
+                    }
+                  />
+                  <SelectDropdown
+                    data={patternArr}
+                    onSelect={(selectedItem, index) => {
+                      setUpdatePattern(selectedItem);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    rowStyle={{
+                      height: 35,
+                      backgroundColor: "#999",
+                    }}
+                    rowTextStyle={{
+                      color: "#333",
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    buttonStyle={styles.input}
+                    buttonTextStyle={{
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    defaultButtonText="Pattern"
+                  />
+                </View>
+                <TextInput
+                  style={[
+                    styles.input,
+                    { width: "100%", marginTop: "3%", marginBottom: "10%" },
+                  ]}
+                  placeholder="Link"
+                  placeholderTextColor="#fff"
+                  value={updateAnalysisLink}
+                  onChangeText={(text) => setUpdateAnalysisLink(text)}
+                />
+              </View>
+              <ButtonComponent
+                indicator={analysisUpdateLoader}
+                disabled={analysisUpdateLoader}
+                style={{ backgroundColor: "orange", marginTop: "10%" }}
+                text={"update"}
+                handler={() =>
+                  analysisUpdateHandler(selectedAnalysis?._id || null)
+                }
+              />
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
     </>
   );
 };
@@ -569,6 +738,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     height: "100%",
     paddingHorizontal: "3%",
+    paddingVertical: "10%",
     backgroundColor: "rgba(0,0,0,0.9)",
   },
 
@@ -610,9 +780,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  analysisContWhole: {
+  analysisContUpdate: {
     height: "auto",
-    width: "100%",
+    width: "95%",
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
@@ -622,7 +792,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.clr3,
     backgroundColor: Colors.transparentBg,
   },
-  topTwoWhole: {
+  topTwoUpdate: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -667,7 +837,7 @@ const styles = StyleSheet.create({
   scrollWholeUpdateContSub: {
     width: "100%",
     height: "100%",
-    paddingVertical: 10,
-    backgroundColor: "red",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
