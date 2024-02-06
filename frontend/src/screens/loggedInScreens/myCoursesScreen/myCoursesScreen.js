@@ -216,6 +216,7 @@ function MyCoursesScreen() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     callCourseContent();
+    setSelectedCategory("BASICS");
     authCtx.nullCall();
     setTimeout(() => {
       setRefreshing(false);
