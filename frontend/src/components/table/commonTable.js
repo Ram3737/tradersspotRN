@@ -49,7 +49,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   function updateBtnHandler() {
     setUpdateBtnLoader(true);
     CallPatchApiServices(
-      `/user/updateUser/${selectedUser._id}`,
+      `/user/update-user/${selectedUser._id}`,
       {
         courseType: selectedCourseType,
       },
@@ -72,7 +72,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   function updateTtuBtnHandler() {
     setUpdateTtuBtnLoader(true);
     CallPatchApiServices(
-      `/user/updateUser/${selectedUser._id}`,
+      `/user/update-user/${selectedUser._id}`,
       {
         triedToUpdate: selectedTtUpdate ? selectedTtUpdate : false,
       },
@@ -141,7 +141,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   function updatePaidBtnHandler() {
     setPaidBtnLoader(true);
     CallPatchApiServices(
-      `/user/updateUser/${selectedUser._id}`,
+      `/user/update-user/${selectedUser._id}`,
       {
         paid: selectedPaid,
       },
@@ -165,7 +165,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
     if (mail) {
       setMailBtnLoader(true);
       CallPostApiServices(
-        `/user/confirmationEmail`,
+        `/user/purchase-confirmation-email`,
         {
           email: mail,
         },
@@ -196,7 +196,7 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
     if (id) {
       setDeleteUserLoader(true);
       CallDeleteApiServices(
-        `/user/${id}`,
+        `/user/delete-user/${id}`,
         (response) => {
           if (response.status === 200) {
             setDeleteUserLoader(false);

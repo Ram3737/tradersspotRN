@@ -62,7 +62,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
     const timeoutId = setTimeout(() => {
       setOldPasswordCheckLoader(true);
       CallPostApiServices(
-        `/user/checkPassword`,
+        `/user/check-user-password`,
         {
           email: authCtx.userEmail,
           enteredPassword: oldPassword,
@@ -103,7 +103,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
     ) {
       setIsLoading(true);
       CallPostApiServices(
-        `/user/resetPassword`,
+        `/user/reset-password`,
         {
           email: authCtx.userEmail,
           newPassword: newPassword,

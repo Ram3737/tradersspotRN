@@ -36,7 +36,7 @@ function UserAuthenticationScreen() {
   function getAllUsers(page = 1) {
     if (searchedText) {
       CallGetApiServices(
-        `/user/getAllUsers?search=${searchedText}&page=${page}`,
+        `/user/get-all-users?search=${searchedText}&page=${page}`,
         (response) => {
           if (response.status === 200) {
             console.log(response.data);
@@ -51,7 +51,7 @@ function UserAuthenticationScreen() {
     } else {
       setAllUsersLoader(true);
       CallGetApiServices(
-        `/user/getAllUsers?page=${page}&courseType=${courseType}&ttu=${ttu}&paid=${paid}`,
+        `/user/get-all-users?page=${page}&courseType=${courseType}&ttu=${ttu}&paid=${paid}`,
         (response) => {
           if (response.status === 200) {
             setAllUsersLoader(false);

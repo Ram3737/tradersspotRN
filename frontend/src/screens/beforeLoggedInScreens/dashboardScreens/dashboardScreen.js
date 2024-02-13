@@ -75,7 +75,7 @@ function DashboardScreen() {
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
-      `/analysis/getAllFreeSwingAnalysis?page=1`,
+      `/analysis/free-swing-analysis/get-all-free-swing-analysis?page=1`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data.allSwingAnalyses);

@@ -70,9 +70,11 @@ function AdminAnalysisScreen() {
   function getAllAnalysis(page = 1) {
     if (searchedText) {
       CallGetApiServices(
-        `/analysis/getAll${
-          tab === "Swing" ? tab : tab + "Swing"
-        }Analysis?search=${searchedText}&page=${page}`,
+        `/analysis/${
+          tab === "Swing"
+            ? "swing-analysis/get-all-swing-analysis"
+            : "free-swing-analysis/get-all-free-swing-analysis"
+        }?search=${searchedText}&page=${page}`,
         (response) => {
           if (response.status === 200) {
             setAnalysisData(response.data.allSwingAnalyses);
@@ -90,9 +92,11 @@ function AdminAnalysisScreen() {
     } else {
       setAllAnalysisLoader(true);
       CallGetApiServices(
-        `/analysis/getAll${
-          tab === "Swing" ? tab : tab + "Swing"
-        }Analysis?page=${page}&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLinkFilt}&resultLink=${resultLink}`,
+        `/analysis/${
+          tab === "Swing"
+            ? "swing-analysis/get-all-swing-analysis"
+            : "free-swing-analysis/get-all-free-swing-analysis"
+        }?page=${page}&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLinkFilt}&resultLink=${resultLink}`,
         (response) => {
           if (response.status === 200) {
             setAllAnalysisLoader(false);
@@ -115,7 +119,11 @@ function AdminAnalysisScreen() {
     }
     setAnalysisLoader(true);
     CallPostApiServices(
-      `/analysis/create${tab === "Swing" ? tab : tab + "Swing"}Analysis`,
+      `/analysis/${
+        tab === "Swing"
+          ? "swing-analysis/create-swing-analysis"
+          : "free-swing-analysis/create-free-swing-analysis"
+      }`,
       {
         analysis: {
           stockName: selectedStockName,

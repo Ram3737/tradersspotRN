@@ -84,7 +84,10 @@ const signInUser = async (req, res) => {
       token: token,
       triedToUpdate: user.triedToUpdate,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("signin error", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 const getAllUsers = async (req, res) => {

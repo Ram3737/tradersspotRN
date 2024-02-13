@@ -39,7 +39,7 @@ function ForgotPasswordModal({ closeModal, isModalVisible }) {
   function otpHandler() {
     setOtpSendLoader(true);
     CallPostApiServices(
-      `/user/forgotPassword`,
+      `/user/forgot-password`,
       {
         email: enteredEmail,
       },
@@ -79,7 +79,7 @@ function ForgotPasswordModal({ closeModal, isModalVisible }) {
   function otpValidatdHandler() {
     setOtpValidateLoader(true);
     CallPostApiServices(
-      `/user/verifyOTP`,
+      `/user/verify-otp`,
       {
         email: enteredEmail,
         enteredOTP: enteredOtp,
@@ -128,7 +128,7 @@ function ForgotPasswordModal({ closeModal, isModalVisible }) {
       setNewPasswordErr(null);
       setNewPasswordLoader(true);
       CallPostApiServices(
-        `/user/resetPassword`,
+        `/user/reset-password`,
         {
           email: enteredEmail,
           newPassword: enteredNewPassword,

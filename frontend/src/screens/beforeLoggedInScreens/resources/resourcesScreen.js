@@ -10,7 +10,7 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useLayoutEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { config } from "../../../webServices/config";
@@ -20,10 +20,12 @@ import Colors from "../../../components/colors/colors";
 import CustomAlertMsgBox from "../../../components/customAlertBox/customAlertMsgBox";
 import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
 import calculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 
 function ResourcesScreen() {
   const authCtx = useContext(AuthContext);
+  const [token, setToken] = useState(null);
   const [btnLoader, setBtnLoader] = useState(false);
   const [register, setRegister] = useState(false);
   const [selectedBook, setSelectedBook] = useState(0);
@@ -59,6 +61,20 @@ function ResourcesScreen() {
     },
   ];
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   useEffect(() => {
     if (register) {
       setTimeout(() => {
@@ -73,12 +89,13 @@ function ResourcesScreen() {
   };
 
   const downloadPdf = async () => {
-    if (!authCtx.token) {
+    if (!token) {
       setRegister(true);
       return;
     }
     setBtnLoader(true);
     const url = `${config.apiurl}/book/${selectedBookLink}`;
+    // const url = `http://192.168.1.8:3000/api/book/download-trading-guide-pdf`;
     Linking.openURL(url);
     setBtnLoader(false);
   };

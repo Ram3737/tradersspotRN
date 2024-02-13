@@ -114,7 +114,9 @@ const SwingAnalysisTable = ({
       setBreakoutLoader(true);
       CallPatchApiServices(
         `/analysis/${
-          tab === "Free" ? "updateFreeSwingResults" : "updateSwingResults"
+          tab === "Free"
+            ? "free-swing-analysis/update-free-swing-analysis"
+            : "swing-analysis/update-swing-analysis"
         }/${selectedAnalysis._id}`,
         {
           result: {
@@ -158,7 +160,9 @@ const SwingAnalysisTable = ({
     setResultUpdateLoader(true);
     CallPatchApiServices(
       `/analysis/${
-        tab === "Free" ? "updateFreeSwingResults" : "updateSwingResults"
+        tab === "Free"
+          ? "free-swing-analysis/update-free-swing-analysis"
+          : "swing-analysis/update-swing-analysis"
       }/${selectedAnalysis._id}`,
       {
         result: {
@@ -202,7 +206,9 @@ const SwingAnalysisTable = ({
       setDeleteAnalysisLoader(true);
       CallDeleteApiServices(
         `/analysis/${
-          tab === "Free" ? "deleteFreeSwingAnalysis" : "deleteSwingAnalysis"
+          tab === "Free"
+            ? "free-swing-analysis/delete-free-swing-analysis"
+            : "swing-analysis/delete-swing-analysis"
         }/${id}`,
         (response) => {
           if (response.status === 200) {
@@ -246,7 +252,9 @@ const SwingAnalysisTable = ({
       setAnalysisUpdateLoader(true);
       CallPatchApiServices(
         `/analysis/${
-          tab === "Free" ? "updateFreeSwingResults" : "updateSwingResults"
+          tab === "Free"
+            ? "free-swing-analysis/update-free-swing-analysis"
+            : "swing-analysis/update-swing-analysis"
         }/${selectedAnalysis._id}`,
         {
           analysis: {

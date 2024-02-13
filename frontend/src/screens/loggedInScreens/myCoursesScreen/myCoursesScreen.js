@@ -150,7 +150,7 @@ function MyCoursesScreen() {
   function callCourseContent() {
     setIsLoading(true);
     CallGetApiServices(
-      `/course/getCourseContent`,
+      `/course/technical-course-content`,
       (response) => {
         if (response.status === 200) {
           setAllContent(response.data);

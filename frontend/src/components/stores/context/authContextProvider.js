@@ -58,7 +58,7 @@ function AuthContextProvider({ children }) {
   function swingAnalysisStatsFn() {
     setSwingAnalysisLoader(true);
     CallGetApiServices(
-      `/analysis/sumRiskRewardSwing`,
+      `/analysis/swing-analysis/sum-risk-reward-swing`,
       (response) => {
         if (response.status === 200) {
           setSwingAnalysisStats(response.data);
@@ -68,7 +68,7 @@ function AuthContextProvider({ children }) {
       (err) => {
         setSwingAnalysisLoader(false);
         Alert.alert("Server down", "Please try after sometime.");
-        console.log("fetching intraday analysis stats err", err);
+        console.log("fetching sum risk reward swing-analysis stats err", err);
       }
     );
   }
@@ -76,7 +76,7 @@ function AuthContextProvider({ children }) {
   function freeSwingAnalysisStatsFn() {
     setFreeSwingAnalysisLoader(true);
     CallGetApiServices(
-      `/analysis/sumRiskRewardFreeSwing`,
+      `/analysis/free-swing-analysis/sum-risk-reward-free-swing`,
       (response) => {
         if (response.status === 200) {
           setFreeSwingAnalysisStats(response.data);
@@ -86,7 +86,10 @@ function AuthContextProvider({ children }) {
       (err) => {
         setFreeSwingAnalysisLoader(false);
         Alert.alert("Server down", "Please try after sometime.");
-        console.log("fetching free analysis stats err", err);
+        console.log(
+          "fetching sum risk reward free-swing-analysis free analysis stats err",
+          err
+        );
       }
     );
   }

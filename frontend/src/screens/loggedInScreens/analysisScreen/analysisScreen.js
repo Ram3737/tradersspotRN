@@ -105,9 +105,11 @@ function AnalysisScreen() {
   function getAllAnalysis() {
     setIsLoading(true);
     CallGetApiServices(
-      `/analysis/getAll${
-        contToDisplay ? "FreeSwing" : "Swing"
-      }AnalysisUser?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
+      `/analysis/${
+        contToDisplay
+          ? "free-swing-analysis/get-all-free-swing-analysis-user"
+          : "swing-analysis/get-all-swing-analysis-user"
+      }?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
       (response) => {
         if (response.status === 200) {
           setAnalysisData(response.data.allSwingAnalyses);

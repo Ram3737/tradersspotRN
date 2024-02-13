@@ -233,7 +233,7 @@ function CourseDetailsModal({
     if (token && !paid) {
       setBuyNowLoader(true);
       CallPatchApiServices(
-        `/user/buyCourse`,
+        `/user/buy-course`,
         {
           email: email,
           courseType: course,
@@ -256,7 +256,7 @@ function CourseDetailsModal({
       console.log(2);
       setBuyNowLoader(true);
       CallPatchApiServices(
-        `/user/buyCourse`,
+        `/user/buy-course`,
         {
           email: email,
           courseType: courseType,

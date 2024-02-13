@@ -144,7 +144,7 @@ function LoginAndSignupScreen() {
     }
     setBtnLoader(true);
     CallPostApiServices(
-      `/user/signin`,
+      `/user/signin-user`,
       {
         email: loginEmail,
         password: loginPassword,
@@ -262,7 +262,7 @@ function LoginAndSignupScreen() {
 
     setBtnLoader(true);
     CallPostApiServices(
-      `/user/signup`,
+      `/user/create-user`,
       {
         name: name,
         email: email,
