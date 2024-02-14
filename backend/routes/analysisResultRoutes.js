@@ -43,55 +43,55 @@ router.get(
 
 //SWING
 router.post(
-  "/createSwingAnalysis",
+  "/swing-analysis/create-swing-analysis",
   swingAnalysisResultController.createSwingAnalysis
 );
 router.get(
-  "/getAllSwingAnalysis",
+  "/swing-analysis/get-all-swing-analysis",
   swingAnalysisResultController.getAllSwingAnalysis
 );
 router.get(
-  "/getAllSwingAnalysisUser",
+  "/swing-analysis/get-all-swing-analysis-user",
   swingAnalysisResultController.getAllSwingAnalysisUser
 );
 router.patch(
-  "/updateSwingResults/:id",
+  "/swing-analysis/update-swing-analysis/:id",
   swingAnalysisResultController.updateSwingResults
 );
 router.get(
-  "/sumRiskRewardSwing",
+  "/swing-analysis/sum-risk-reward-swing",
   swingAnalysisResultController.sumRiskRewardSwing
 );
 
 router.delete(
-  "/deleteSwingAnalysis/:id",
+  "/swing-analysis/delete-swing-analysis/:id",
   swingAnalysisResultController.deleteSwingAnalysis
 );
 
 //FREE SWING
 router.post(
-  "/createFreeSwingAnalysis",
+  "/free-swing-analysis/create-free-swing-analysis",
   freeSwingAnalysisResultController.createFreeSwingAnalysis
 );
 router.get(
-  "/getAllFreeSwingAnalysis",
+  "/free-swing-analysis/get-all-free-swing-analysis",
   freeSwingAnalysisResultController.getAllFreeSwingAnalysis
 );
 router.get(
-  "/getAllFreeSwingAnalysisUser",
+  "/free-swing-analysis/get-all-free-swing-analysis-user",
   freeSwingAnalysisResultController.getAllFreeSwingAnalysisUser
 );
 router.patch(
-  "/updateFreeSwingResults/:id",
+  "/free-swing-analysis/update-free-swing-analysis/:id",
   freeSwingAnalysisResultController.updateFreeSwingResults
 );
 router.get(
-  "/sumRiskRewardFreeSwing",
+  "/free-swing-analysis/sum-risk-reward-free-swing",
   freeSwingAnalysisResultController.sumRiskRewardFreeSwing
 );
 
 router.delete(
-  "/deleteFreeSwingAnalysis/:id",
+  "/free-swing-analysis/delete-free-swing-analysis/:id",
   freeSwingAnalysisResultController.deleteFreeSwingAnalysis
 );
 

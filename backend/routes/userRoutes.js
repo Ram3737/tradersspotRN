@@ -4,7 +4,7 @@ const { check, validationResult } = require("express-validator");
 const userController = require("../controller/userController");
 
 router.post(
-  "/signup",
+  "/create-user",
   // [
   //   check("email", "Invalid email address").isEmail(),
   //   check(
@@ -26,14 +26,17 @@ router.post(
   // }
 );
 
-router.post("/signin", userController.signInUser);
-router.get("/getAllUsers", userController.getAllUsers);
-router.patch("/buyCourse", userController.buyCourse);
-router.patch("/updateUser/:id", userController.updateUser);
-router.post("/checkPassword", userController.checkUserPassword);
-router.post("/resetPassword", userController.resetPassword);
-router.post("/forgotPassword", userController.forgotPassword);
-router.post("/verifyOTP", userController.verifyOTP);
-router.post("/confirmationEmail", userController.PurchaseConfirmationEmail);
-router.delete("/:id", userController.deleteUser);
+router.post("/signin-user", userController.signInUser);
+router.get("/get-all-users", userController.getAllUsers);
+router.patch("/buy-course", userController.buyCourse);
+router.patch("/update-user/:id", userController.updateUser);
+router.post("/check-user-password", userController.checkUserPassword);
+router.post("/reset-password", userController.resetPassword);
+router.post("/forgot-password", userController.forgotPassword);
+router.post("/verify-otp", userController.verifyOTP);
+router.post(
+  "/purchase-confirmation-email",
+  userController.PurchaseConfirmationEmail
+);
+router.delete("/delete-user/:id", userController.deleteUser);
 module.exports = router;

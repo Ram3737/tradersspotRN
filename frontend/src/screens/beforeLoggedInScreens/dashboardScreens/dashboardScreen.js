@@ -450,7 +450,7 @@ function DashboardScreen() {
                 >
                   <View
                     style={{
-                      width: authCtx.allBreakoutAnalyses.length * 50 || 200,
+                      width: authCtx.allBreakoutAnalyses.length * 70 || 200,
                       height: "100%",
                       flexDirection: "row",
                     }}
