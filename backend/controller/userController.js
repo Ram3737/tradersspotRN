@@ -181,9 +181,6 @@ const getUserByEmail = async (req, res) => {
   }
 };
 
-// Route to get user details by email
-app.get("/user/:email", getUserByEmail);
-
 const buyCourse = async (req, res) => {
   try {
     const { email, courseType, triedToUpdate } = req.body;
