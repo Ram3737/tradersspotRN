@@ -12,6 +12,8 @@ const courseContentRoutes = require("./routes/courseContentRoutes");
 dotenv.config();
 const MONGODB_URI = process.env.MONGO_CONNECTION;
 
+console.log(MONGODB_URI);
+
 const app = express();
 
 app.use(cors());
@@ -45,7 +47,7 @@ app.use((error, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 mongoose
-  .connect(MONGODB_URI)
+  .connect(`${MONGODB_URI}`)
   .then(() => {
     app.listen(PORT, () => console.log("Server listening on port", PORT));
   })
