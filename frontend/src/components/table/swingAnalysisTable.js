@@ -5,6 +5,7 @@ import {
   Text,
   ScrollView,
   Modal,
+  Alert,
   StyleSheet,
 } from "react-native";
 
@@ -162,6 +163,7 @@ const SwingAnalysisTable = ({
         },
         (err) => {
           setBreakoutLoader(false);
+          Alert.alert("Error", "Error in breakout handler");
           console.log("result update err", err);
         }
       );
@@ -213,6 +215,7 @@ const SwingAnalysisTable = ({
       },
       (err) => {
         setResultUpdateLoader(false);
+        Alert.alert("Error", "Error in analysis result btn handler");
         console.log("result update err", err);
       }
     );

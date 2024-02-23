@@ -125,7 +125,6 @@ function AnalysisScreen() {
       },
       (response) => {
         if (response.status === 200) {
-          console.log("hii", response.data);
           setAnalysisData(response.data.allSwingAnalyses);
           setTotalSwingAnalysis(response.data.totalSwingAnalysis);
           setWholeTotalSwingAnalysis(response.data.wholeTotalSwingAnalysis);
@@ -134,8 +133,8 @@ function AnalysisScreen() {
       },
       (err) => {
         setIsLoading(false);
-        Alert.alert("Error", "Error getting analysis");
-        console.log("err getting analysis screnn", err);
+        Alert.alert("Error", "Server error");
+        console.log("err getting allanalysis analysisScreen", err);
       }
     );
   }

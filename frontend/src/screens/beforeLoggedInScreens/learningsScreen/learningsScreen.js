@@ -10,6 +10,7 @@ import {
   Platform,
   Vibration,
   RefreshControl,
+  Alert,
   StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -123,7 +124,8 @@ function LearningsScreen() {
       },
       (err) => {
         setIsLoading(false);
-        console.log("err getting allCourseContents", err);
+        Alert.alert("Error", "Server error");
+        console.log("err getting freeCourseContents", err);
       }
     );
   }

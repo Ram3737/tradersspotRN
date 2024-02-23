@@ -11,6 +11,7 @@ import {
   Vibration,
   RefreshControl,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -195,6 +196,7 @@ function MyCoursesScreen() {
       },
       (err) => {
         setIsLoading(false);
+        Alert.alert("Error", "Server error");
         console.log("err getting allCourseContents", err);
       }
     );

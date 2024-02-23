@@ -88,7 +88,6 @@ function AnalysisStatsScreen() {
       },
       (response) => {
         if (response.status === 200) {
-          console.log("dataaa", response.data.allSwingAnalyses);
           if (!contToDisplay) {
             // const filteredData = response.data.allSwingAnalyses.filter(
             //   (data) => data.result.resultLink !== null
@@ -102,8 +101,8 @@ function AnalysisStatsScreen() {
       },
       (err) => {
         setIsLoading(false);
-        Alert.alert("Error", "Error getting analysis");
-        console.log("err getting getallanalysis", err);
+        Alert.alert("Error", "Server error");
+        console.log("err getting getallanalysis analysis stats", err);
       }
     );
   }

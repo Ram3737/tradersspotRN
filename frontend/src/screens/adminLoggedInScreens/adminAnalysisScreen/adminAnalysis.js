@@ -187,6 +187,7 @@ function AdminAnalysisScreen() {
       },
       (err) => {
         setAnalysisLoader(false);
+        Alert.alert("Error", "Analysis btn handlerc error");
         console.log(err);
       }
     );

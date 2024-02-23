@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
+  Alert,
   StyleSheet,
 } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
@@ -59,6 +60,7 @@ function UserAuthenticationScreen() {
         },
         (err) => {
           console.log(err);
+          Alert.alert("Error", "Error getting all users searched text");
         }
       );
     } else {
@@ -80,6 +82,7 @@ function UserAuthenticationScreen() {
         },
         (err) => {
           setAllUsersLoader(false);
+          Alert.alert("Error", "Error getting all users normal");
           console.log(err);
         }
       );
