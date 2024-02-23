@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   FlatList,
+  Alert,
   StyleSheet,
 } from "react-native";
 
@@ -25,7 +26,7 @@ import CalculateFontSize from "../../../components/calculateFontSize/calculateFo
 import Colors from "../../../components/colors/colors";
 import DonutChart from "../../../components/charts/donutChart";
 import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
-import { CallGetApiServices } from "../../../webServices/apiCalls";
+import { CallGetApiServicesWithTkn } from "../../../webServices/apiCalls";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,6 +52,7 @@ function AnalysisScreen() {
   const [viewResult, setViewResult] = useState(0);
   const [analysisData, setAnalysisData] = useState([]);
   const [totalSwingAnalysis, setTotalSwingAnalysis] = useState([]);
+  const [wholeTotalSwingAnalysis, setWholeTotalSwingAnalysis] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [analysisStat, setAnalysisStat] = useState("swingAnalysisStats");
   const [refreshing, setRefreshing] = useState(false);
@@ -62,6 +64,7 @@ function AnalysisScreen() {
   const [reward, setReward] = useState(null);
   const [analysisLink, setAnalysisLink] = useState(null);
   const [resultLink, setResultLink] = useState(null);
+  const [token, setToken] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -73,6 +76,7 @@ function AnalysisScreen() {
 
       setPaid(convertedPaid);
       setCourseType(cType);
+      setToken(tkn);
     } catch (error) {
       console.error("Error fetching data from AsyncStorage:", error);
     }
@@ -103,22 +107,34 @@ function AnalysisScreen() {
   };
 
   function getAllAnalysis() {
+    if (!token) {
+      return;
+    }
+
     setIsLoading(true);
-    CallGetApiServices(
+    CallGetApiServicesWithTkn(
       `/analysis/${
         contToDisplay
           ? "free-swing-analysis/get-all-free-swing-analysis-user"
           : "swing-analysis/get-all-swing-analysis-user"
       }?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
       (response) => {
         if (response.status === 200) {
+          console.log("hii", response.data);
           setAnalysisData(response.data.allSwingAnalyses);
           setTotalSwingAnalysis(response.data.totalSwingAnalysis);
+          setWholeTotalSwingAnalysis(response.data.wholeTotalSwingAnalysis);
           setIsLoading(false);
         }
       },
       (err) => {
         setIsLoading(false);
+        Alert.alert("Error", "Error getting analysis");
         console.log("err getting analysis screnn", err);
       }
     );
@@ -129,7 +145,7 @@ function AnalysisScreen() {
     contToDisplay
       ? setAnalysisStat("freeSwingAnalysisStats")
       : setAnalysisStat("swingAnalysisStats");
-  }, [contToDisplay, breakout, reward, analysisLink, resultLink]);
+  }, [contToDisplay, breakout, reward, analysisLink, resultLink, token]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -491,7 +507,7 @@ function AnalysisScreen() {
               style={{ marginTop: "18%" }}
             />
           )}
-          {analysisData.length > 0 &&
+          {analysisData.length >= 0 &&
             (!authCtx.swingAnalysisLoader ||
               !authCtx.freeSwingAnalysisLoader) &&
             !isLoading && (
@@ -532,7 +548,11 @@ function AnalysisScreen() {
                         Total analysis shared:
                       </Text>
                       <Text style={styles.topContSubBottomSubText2}>
-                        {totalSwingAnalysis || 0}
+                        {wholeTotalSwingAnalysis
+                          ? wholeTotalSwingAnalysis
+                          : totalSwingAnalysis
+                          ? totalSwingAnalysis
+                          : 0}
                       </Text>
                       <View style={styles.riskRewardStatMainCont}>
                         {authCtx[analysisStat] && (

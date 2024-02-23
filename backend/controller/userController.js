@@ -69,9 +69,11 @@ const signInUser = async (req, res) => {
       {
         email: user.email,
         userType: user.userType,
+        courseType: user.courseType,
+        paid: user.paid,
       },
-      "willbethebestsecretkeyintheworldnouniversenogalaxy", // Replace with your secret key
-      { expiresIn: "1h" } // Set the expiration time of the token
+      "willbethebestsecretkeyintheworldnouniversenogalaxy" // Replace with your secret key
+      // Set the expiration time of the token
     );
 
     res.status(200).json({
@@ -249,6 +251,31 @@ const checkUserPassword = async (req, res) => {
   } catch (error) {
     console.error("checkUserPassword", error.message);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const resetPasswordProfile = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("resetPassword", error.message);
+    res
+      .status(500)
+      .json({ message: "Internal server error, Try after sometime" });
   }
 };
 
@@ -436,6 +463,7 @@ module.exports = {
   updateUser,
   checkUserPassword,
   resetPassword,
+  resetPasswordProfile,
   forgotPassword,
   verifyOTP,
   PurchaseConfirmationEmail,

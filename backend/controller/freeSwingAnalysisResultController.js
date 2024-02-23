@@ -264,7 +264,7 @@ const sumRiskRewardFreeSwing = async (req, res) => {
     //   throw new Error("No analyses found to calculate sum");
     // }
 
-    const onlyBreakoutAnalyses = allFreeSwingAnalyses.filter(
+    const breakoutAnalyses = allFreeSwingAnalyses.filter(
       (analysis) => analysis.result.breakout !== "none"
     );
 
@@ -466,6 +466,15 @@ const sumRiskRewardFreeSwing = async (req, res) => {
       });
       await sumRiskRewardSwing.save();
     }
+
+    const onlyBreakoutAnalyses = breakoutAnalyses.map((item) => ({
+      analysis: {
+        stockName: item.analysis.stockName,
+      },
+      result: {
+        breakout: item.result.breakout,
+      },
+    }));
 
     res.status(200).json({
       totalRisk,

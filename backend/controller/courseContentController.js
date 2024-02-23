@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const courseContent = async (req, res) => {
+const courseContentTechnical = async (req, res) => {
   try {
     const basicsContent = [
       {
@@ -267,11 +267,87 @@ const courseContent = async (req, res) => {
       bonusContent,
     });
   } catch (error) {
-    console.error("courseContentError", error.message);
+    console.error("courseContentFundamental", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const courseContentFundamentalPaid = async (req, res) => {
+  try {
+    const startContent = [
+      {
+        name: "Importance of Fundamental and Technical Analysis",
+        link: `<iframe src="https://player.vimeo.com/video/914804308?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="1) Importance of Fundamental and Technical Analysis"></iframe`,
+        duration: `09:19 mins`,
+        pointOne: `In this video, we dissect the core principles of fundamental analysis, providing viewers with a comprehensive understanding of how to assess the intrinsic value of investments.`,
+        pointTwo: `Dive into an array of effective strategies aimed at fostering wealth creation, offering valuable insights and techniques to optimize investment portfolios and achieve financial goals.`,
+        pointThree: `Uncover the critical importance of Compound Annual Growth Rate (CAGR) in evaluating investment performance, illuminating its role in measuring the compounded annual return over a specified period.`,
+      },
+      {
+        name: "Learn to generate wealth using basic fundamental analysis concepts",
+        link: `<iframe src="https://player.vimeo.com/video/914796121?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="2) Learn to generate wealth using basic fundamental analysis concepts"></iframe>`,
+        duration: `07:12 mins`,
+        pointOne: `Delve into the contrasting methodologies of fundamental and technical analysis, elucidating how each approach provides distinct perspectives on investment evaluation and decision-making.`,
+        pointTwo: `Explore the synergistic effects of integrating fundamental and technical analysis, showcasing how combining these methodologies can lead to more informed investment decisions and robust risk management strategies.`,
+        pointThree: `Unlock the potential of informed decision-making by understanding how the combination of fundamental and technical analysis offers a holistic view of market conditions, empowering investors to navigate uncertainties and seize opportunities effectively.`,
+      },
+    ];
+
+    const coreContent = [
+      {
+        name: "Major key ratio in fundamental analysis",
+        link: `<iframe src="https://player.vimeo.com/video/914880176?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="7) Major key ratio in fundamental analysis"></iframe>`,
+        duration: `06:16 mins`,
+        pointOne: `The video delves into an in-depth exploration of the main important key ratios used in fundamental analysis. These ratios serve as vital metrics for assessing the financial health and performance of companies, providing valuable insights into their profitability, liquidity, leverage, and efficiency.`,
+        pointTwo: `Highlighting the significance of these key ratios, the video underscores their role as core concepts in fundamental analysis. By understanding and effectively utilizing these ratios, investors can make informed decisions regarding investment opportunities, risk assessment, and portfolio management.`,
+        pointThree: `Throughout the video, practical examples and case studies are utilized to illustrate how these key ratios are calculated and interpreted in real-world scenarios. This hands-on approach enables viewers to grasp the concepts more effectively and apply them confidently in their own investment analyses and decision-making processes.`,
+      },
+    ];
+    res.status(200).json({
+      startContent,
+      coreContent,
+    });
+  } catch (error) {
+    console.error("courseContentFundamentalPaidError", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const courseContentFundamentalFree = async (req, res) => {
+  try {
+    const startContent = [
+      {
+        name: "Introduction to the Market",
+        link: `<iframe src="https://player.vimeo.com/video/914875968?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="1) Introduction to the Market"></iframe>`,
+        duration: `17:00 mins`,
+        pointOne: `We explore the reasons behind investing in stocks, highlighting its potential for long-term wealth accumulation through share ownership in publicly traded companies. Investors can benefit from capital appreciation, dividend income, and portfolio diversification.`,
+        pointTwo: `We explain inflation's gradual price increase for goods and services, eroding purchasing power, and highlight compound growth's power of reinvesting returns over time for exponential portfolio growth. Understanding these concepts helps navigate inflation's impact and leverage compound growth's benefits.`,
+        pointThree: `We stress the importance of starting stock market investment early. Beginning at a young age allows individuals to benefit from long-term compounding effects, weather market fluctuations, and harness the power of time in wealth building, encouraging viewers to start their investment journey promptly for financial security.`,
+      },
+    ];
+
+    const coreContent = [
+      {
+        name: "To the Market",
+        link: `<iframe src="https://player.vimeo.com/video/914875968?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="1) Introduction to the Market"></iframe>`,
+        duration: `17:00 mins`,
+        pointOne: `We explore the reasons behind investing in stocks, highlighting its potential for long-term wealth accumulation through share ownership in publicly traded companies. Investors can benefit from capital appreciation, dividend income, and portfolio diversification.`,
+        pointTwo: `We explain inflation's gradual price increase for goods and services, eroding purchasing power, and highlight compound growth's power of reinvesting returns over time for exponential portfolio growth. Understanding these concepts helps navigate inflation's impact and leverage compound growth's benefits.`,
+        pointThree: `We stress the importance of starting stock market investment early. Beginning at a young age allows individuals to benefit from long-term compounding effects, weather market fluctuations, and harness the power of time in wealth building, encouraging viewers to start their investment journey promptly for financial security.`,
+      },
+    ];
+    res.status(200).json({
+      startContent,
+      coreContent,
+    });
+  } catch (error) {
+    console.error("courseContentFundamentalPaidError", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 module.exports = {
-  courseContent,
+  courseContentTechnical,
+  courseContentFundamentalPaid,
+  courseContentFundamentalFree,
 };

@@ -18,7 +18,10 @@ import Colors from "../../components/colors/colors";
 import CalculateFontSize from "../../components/calculateFontSize/calculateFontSize";
 import ButtonComponent from "../buttonComponent/buttonComponent";
 import { AuthContext } from "../stores/context/authContextProvider";
-import { CallPostApiServices } from "../../webServices/apiCalls";
+import {
+  CallPostApiServices,
+  CallPostApiServicesWithTkn,
+} from "../../webServices/apiCalls";
 import CustomAlertMsgBox from "../customAlertBox/customAlertMsgBox";
 
 function UserProfileModal({ closeModal, isModalVisible }) {
@@ -40,6 +43,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
   const [email, setEmail] = useState(null);
   const [courseType, setCourseType] = useState(null);
   const [mobileNo, setMobileNo] = useState(null);
+  const [token, setToken] = useState(null);
 
   function resetViewHandler() {
     setResetVisible(true);
@@ -61,11 +65,16 @@ function UserProfileModal({ closeModal, isModalVisible }) {
     }
     const timeoutId = setTimeout(() => {
       setOldPasswordCheckLoader(true);
-      CallPostApiServices(
+      CallPostApiServicesWithTkn(
         `/user/check-user-password`,
         {
           email: authCtx.userEmail,
           enteredPassword: oldPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
         (response) => {
           if (response.status === 200) {
@@ -102,11 +111,16 @@ function UserProfileModal({ closeModal, isModalVisible }) {
       oldPassword !== null
     ) {
       setIsLoading(true);
-      CallPostApiServices(
-        `/user/reset-password`,
+      CallPostApiServicesWithTkn(
+        `/user/reset-password-profile`,
         {
           email: authCtx.userEmail,
           newPassword: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
         (response) => {
           if (response.status === 200) {
@@ -165,6 +179,7 @@ function UserProfileModal({ closeModal, isModalVisible }) {
       setName(nm);
       setEmail(emil);
       setMobileNo(mblNo);
+      setToken(tkn);
     } catch (error) {
       console.error("Error fetching data from AsyncStorage:", error);
     }

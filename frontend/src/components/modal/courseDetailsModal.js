@@ -37,7 +37,10 @@ import OneToOneLogo from "../../images/logo/oneToOne.png";
 import FundamentalLogo from "../../images/logo/fundamental.png";
 import { AuthContext } from "../stores/context/authContextProvider";
 import CoursePricingModal from "./coursePricingModal";
-import { CallPatchApiServices } from "../../webServices/apiCalls";
+import {
+  CallPatchApiServices,
+  CallPatchApiServicesWithTkn,
+} from "../../webServices/apiCalls";
 
 function CourseDetailsModal({
   closeModal,
@@ -232,12 +235,17 @@ function CourseDetailsModal({
   function coursePricingModalOpenHandler() {
     if (token && !paid) {
       setBuyNowLoader(true);
-      CallPatchApiServices(
+      CallPatchApiServicesWithTkn(
         `/user/buy-course`,
         {
           email: email,
           courseType: course,
           triedToUpdate: false,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
         (response) => {
           if (response.status === 201) {
@@ -255,12 +263,17 @@ function CourseDetailsModal({
     } else if (token && paid) {
       console.log(2);
       setBuyNowLoader(true);
-      CallPatchApiServices(
+      CallPatchApiServicesWithTkn(
         `/user/buy-course`,
         {
           email: email,
           courseType: courseType,
           triedToUpdate: true,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
         (response) => {
           if (response.status === 201) {

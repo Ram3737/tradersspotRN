@@ -8,18 +8,26 @@ import {
   ActivityIndicator,
   RefreshControl,
   StyleSheet,
+  Alert,
 } from "react-native";
-import { useState, useEffect, useContext, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 
 import { LinkPreview } from "@flyerhq/react-native-link-preview";
 import { Switch } from "react-native-switch";
 import DonutChart from "../../../components/charts/donutChart";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
-import { CallGetApiServices } from "../../../webServices/apiCalls";
+import { CallGetApiServicesWithTkn } from "../../../webServices/apiCalls";
 import BlinkingDot from "../../../components/blinkingDot/blinkingDot";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
 import Colors from "../../../components/colors/colors";
@@ -50,22 +58,42 @@ function AnalysisStatsScreen() {
   const [reward, setReward] = useState(null);
   const [analysisLink, setAnalysisLink] = useState(null);
   const [resultLink, setResultLink] = useState(null);
+  const [token, setToken] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
 
   function getAllAnalysis() {
     setIsLoading(true);
-    CallGetApiServices(
+    CallGetApiServicesWithTkn(
       `/analysis/${
         contToDisplay
           ? "free-swing-analysis/get-all-free-swing-analysis-user"
           : "swing-analysis/get-all-swing-analysis-user"
       }?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
       (response) => {
         if (response.status === 200) {
+          console.log("dataaa", response.data.allSwingAnalyses);
           if (!contToDisplay) {
-            const filteredData = response.data.allSwingAnalyses.filter(
-              (data) => data.result.resultLink !== null
-            );
-            setAnalysisData(filteredData);
+            // const filteredData = response.data.allSwingAnalyses.filter(
+            //   (data) => data.result.resultLink !== null
+            // );
+            setAnalysisData(response.data.allSwingAnalyses);
           } else {
             setAnalysisData(response.data.allSwingAnalyses);
           }
@@ -74,6 +102,7 @@ function AnalysisStatsScreen() {
       },
       (err) => {
         setIsLoading(false);
+        Alert.alert("Error", "Error getting analysis");
         console.log("err getting getallanalysis", err);
       }
     );

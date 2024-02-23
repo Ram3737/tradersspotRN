@@ -10,13 +10,16 @@ import {
   KeyboardAvoidingView,
   Alert,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   CallPostApiServices,
+  CallPostApiServicesWithTkn,
   CallGetApiServices,
+  CallGetApiServicesWithTkn,
   CallPatchApiServices,
 } from "../../../webServices/apiCalls";
 import CommonStyles from "../../../components/css/commonStyles";
@@ -51,6 +54,7 @@ function AdminAnalysisScreen() {
   const [reward, setReward] = useState(null);
   const [analysisLinkFilt, setAnalysisLinkFilt] = useState(null);
   const [resultLink, setResultLink] = useState(null);
+  const [token, setToken] = useState(null);
 
   const patternArr = [
     "PRICE ACTION",
@@ -67,14 +71,36 @@ function AdminAnalysisScreen() {
     "DOUBLE BOTTOM",
   ];
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   function getAllAnalysis(page = 1) {
+    if (!token) {
+      return;
+    }
     if (searchedText) {
-      CallGetApiServices(
+      CallGetApiServicesWithTkn(
         `/analysis/${
           tab === "Swing"
             ? "swing-analysis/get-all-swing-analysis"
             : "free-swing-analysis/get-all-free-swing-analysis"
         }?search=${searchedText}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
         (response) => {
           if (response.status === 200) {
             setAnalysisData(response.data.allSwingAnalyses);
@@ -91,12 +117,17 @@ function AdminAnalysisScreen() {
       );
     } else {
       setAllAnalysisLoader(true);
-      CallGetApiServices(
+      CallGetApiServicesWithTkn(
         `/analysis/${
           tab === "Swing"
             ? "swing-analysis/get-all-swing-analysis"
             : "free-swing-analysis/get-all-free-swing-analysis"
         }?page=${page}&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLinkFilt}&resultLink=${resultLink}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
         (response) => {
           if (response.status === 200) {
             setAllAnalysisLoader(false);
@@ -118,7 +149,7 @@ function AdminAnalysisScreen() {
       return;
     }
     setAnalysisLoader(true);
-    CallPostApiServices(
+    CallPostApiServicesWithTkn(
       `/analysis/${
         tab === "Swing"
           ? "swing-analysis/create-swing-analysis"
@@ -137,6 +168,11 @@ function AdminAnalysisScreen() {
           breakout: "none",
           canSharetoAll: null,
           resultLink: null,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       },
       (response) => {
@@ -179,6 +215,12 @@ function AdminAnalysisScreen() {
       getAllAnalysis(currentPage);
     }
   }, [currentPage, searchedText]);
+
+  useEffect(() => {
+    if (token) {
+    }
+    getAllAnalysis();
+  }, [token]);
 
   function viewFilterTabHandler() {
     setViewFilterCont(!viewFilterCont);
@@ -568,6 +610,7 @@ function AdminAnalysisScreen() {
                 <SwingAnalysisTable
                   swingAnalysisData={analysisData}
                   getAllAnalysis={getAllAnalysis}
+                  token={token}
                   currentPage={currentPage}
                 />
               )}

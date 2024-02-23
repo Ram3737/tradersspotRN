@@ -268,7 +268,7 @@ function LoginAndSignupScreen() {
         email: email,
         mobileNumber: mblNo,
         password: Password,
-        courseType: authCtx.userSelectedCourse,
+        courseType: authCtx.userSelectedCourse || "none",
         triedToUpdate: false,
       },
       (response) => {

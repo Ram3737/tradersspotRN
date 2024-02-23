@@ -7,13 +7,17 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CommonStyles from "../../../components/css/commonStyles";
 import CommonTable from "../../../components/table/commonTable";
-import { CallGetApiServices } from "../../../webServices/apiCalls";
+import {
+  CallGetApiServices,
+  CallGetApiServicesWithTkn,
+} from "../../../webServices/apiCalls";
 import Colors from "../../../components/colors/colors";
 import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 import ButtonComponent from "../../../components/buttonComponent/buttonComponent";
@@ -31,12 +35,21 @@ function UserAuthenticationScreen() {
   const [courseType, setCourseType] = useState(null);
   const [ttu, setTtu] = useState(null);
   const [paid, setPaid] = useState(null);
+  const [token, setToken] = useState(null);
   const itemsPerPage = 10;
 
   function getAllUsers(page = 1) {
+    if (!token) {
+      return;
+    }
     if (searchedText) {
-      CallGetApiServices(
+      CallGetApiServicesWithTkn(
         `/user/get-all-users?search=${searchedText}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
         (response) => {
           if (response.status === 200) {
             console.log(response.data);
@@ -50,8 +63,13 @@ function UserAuthenticationScreen() {
       );
     } else {
       setAllUsersLoader(true);
-      CallGetApiServices(
+      CallGetApiServicesWithTkn(
         `/user/get-all-users?page=${page}&courseType=${courseType}&ttu=${ttu}&paid=${paid}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
         (response) => {
           if (response.status === 200) {
             setAllUsersLoader(false);
@@ -68,13 +86,29 @@ function UserAuthenticationScreen() {
     }
   }
 
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
+
   useEffect(() => {
     getAllUsers(currentPage);
   }, [currentPage, searchedText]);
 
   useEffect(() => {
-    getAllUsers();
-  }, [courseType, ttu, paid]);
+    if (token) {
+      getAllUsers();
+    }
+  }, [courseType, ttu, paid, token]);
 
   function tabPressHandler(pressedTab) {
     setFilterTab(pressedTab);

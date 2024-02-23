@@ -20,6 +20,7 @@ import ResourcesScreen from "./beforeLoggedInScreens/resources/resourcesScreen";
 import AdminHomeScreen from "./adminLoggedInScreens/adminHome/adminHomeScreen";
 import AdminAnalysisScreen from "./adminLoggedInScreens/adminAnalysisScreen/adminAnalysis";
 import UserAuthenticationScreen from "./adminLoggedInScreens/userAuthenticationScreens/userAuthenticationScreen";
+import LearningsScreen from "./beforeLoggedInScreens/learningsScreen/learningsScreen";
 import { AuthContext } from "../components/stores/context/authContextProvider";
 
 const stack = createNativeStackNavigator();
@@ -101,6 +102,8 @@ function BottomNavigatorBeforeLoggedIn() {
             iconName = focused ? "book-open" : "book-open-outline";
           } else if (route.name === "courses") {
             iconName = focused ? "school" : "school-outline";
+          } else if (route.name === "learnings") {
+            iconName = focused ? "book-open-variant" : "book-open-variant";
           }
 
           return (
@@ -128,6 +131,11 @@ function BottomNavigatorBeforeLoggedIn() {
       <bottomTab.Screen
         name="courses"
         component={OurCoursesScreen}
+        options={{ headerShown: false }}
+      />
+      <bottomTab.Screen
+        name="learnings"
+        component={LearningsScreen}
         options={{ headerShown: false }}
       />
     </bottomTab.Navigator>

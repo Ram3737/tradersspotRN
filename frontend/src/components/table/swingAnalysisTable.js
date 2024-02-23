@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   TextInput,
@@ -10,12 +10,15 @@ import {
 
 import SelectDropdown from "react-native-select-dropdown";
 import { DataTable } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import ButtonComponent from "../buttonComponent/buttonComponent";
 import {
   CallPatchApiServices,
+  CallPatchApiServicesWithTkn,
   CallGetApiServices,
   CallDeleteApiServices,
+  CallDeleteApiServicesWithTkn,
 } from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
 import CalculateFontSize from "../calculateFontSize/calculateFontSize";
@@ -45,6 +48,7 @@ const SwingAnalysisTable = ({
   const [deleteAnalysisLoader, setDeleteAnalysisLoader] = useState(false);
   const [analysisUpdateLoader, setAnalysisUpdateLoader] = useState(false);
   const [breakoutLoader, setBreakoutLoader] = useState(false);
+  const [token, setToken] = useState(null);
 
   const arr = ["true", "false"];
   const breakoutOptions = ["green", "orange", "none"];
@@ -62,6 +66,20 @@ const SwingAnalysisTable = ({
     "DOUBLE TOP",
     "DOUBLE BOTTOM",
   ];
+
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
 
   const openModal = (id) => {
     const analysis = swingAnalysisData.find((item) => item._id === id);
@@ -112,7 +130,7 @@ const SwingAnalysisTable = ({
   function breakoutBtnHandler() {
     if (breakout !== null) {
       setBreakoutLoader(true);
-      CallPatchApiServices(
+      CallPatchApiServicesWithTkn(
         `/analysis/${
           tab === "Free"
             ? "free-swing-analysis/update-free-swing-analysis"
@@ -126,6 +144,11 @@ const SwingAnalysisTable = ({
             breakout: breakout,
             canSharetoAll: shareToAll || null,
             resultLink: analysisResultLink || null,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
         },
         (response) => {
@@ -158,7 +181,7 @@ const SwingAnalysisTable = ({
       return;
     }
     setResultUpdateLoader(true);
-    CallPatchApiServices(
+    CallPatchApiServicesWithTkn(
       `/analysis/${
         tab === "Free"
           ? "free-swing-analysis/update-free-swing-analysis"
@@ -172,6 +195,11 @@ const SwingAnalysisTable = ({
           breakout: breakout,
           canSharetoAll: shareToAll || null,
           resultLink: analysisResultLink || null,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       },
       (response) => {
@@ -204,12 +232,17 @@ const SwingAnalysisTable = ({
   function deleteAnalysisHandler(id) {
     if (id) {
       setDeleteAnalysisLoader(true);
-      CallDeleteApiServices(
+      CallDeleteApiServicesWithTkn(
         `/analysis/${
           tab === "Free"
             ? "free-swing-analysis/delete-free-swing-analysis"
             : "swing-analysis/delete-swing-analysis"
         }/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
         (response) => {
           if (response.status === 200) {
             setDeleteAnalysisLoader(false);
@@ -250,7 +283,7 @@ const SwingAnalysisTable = ({
   function analysisUpdateHandler(id) {
     if (id) {
       setAnalysisUpdateLoader(true);
-      CallPatchApiServices(
+      CallPatchApiServicesWithTkn(
         `/analysis/${
           tab === "Free"
             ? "free-swing-analysis/update-free-swing-analysis"
@@ -265,6 +298,11 @@ const SwingAnalysisTable = ({
               updateAnalysisLink ||
               selectedAnalysis.analysis.analysisLink ||
               null,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
         },
         (response) => {

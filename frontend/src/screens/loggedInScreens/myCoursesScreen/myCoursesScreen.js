@@ -29,15 +29,17 @@ import CommonStyles from "../../../components/css/commonStyles";
 import Colors from "../../../components/colors/colors";
 import VideoModal from "./components/videoModal";
 import { AuthContext } from "../../../components/stores/context/authContextProvider";
-import { CallGetApiServices } from "../../../webServices/apiCalls";
+import { CallGetApiServicesWithTkn } from "../../../webServices/apiCalls";
 import UserProfileModal from "../../../components/modal/userProfileModal";
+import CustomAlertMsgBox from "../../../components/customAlertBox/customAlertMsgBox";
+import CalculateFontSize from "../../../components/calculateFontSize/calculateFontSize";
 
 //FOR FONT RESPONSIVE HEIGHT
-const { height } = Dimensions.get("window");
+// const { height } = Dimensions.get("window");
 
-const calculateFontSize = (percentage) => {
-  return (height * percentage) / 100;
-};
+// const calculateFontSize = (percentage) => {
+//   return (height * percentage) / 100;
+// };
 
 function MyCoursesScreen() {
   const navigation = useNavigation();
@@ -46,7 +48,7 @@ function MyCoursesScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
 
-  const [mainTopics, setMainTopics] = useState([
+  const [mainTopicsTechnicals, setMainTopicsTechnicals] = useState([
     {
       name: "BASICS",
       duration: `1hr:08 mins`,
@@ -84,16 +86,33 @@ function MyCoursesScreen() {
     },
   ]);
 
+  const [mainTopicsFundamentals, setMainTopicsFundamentals] = useState([
+    {
+      name: "STARTER",
+      duration: `1hr:08 mins`,
+      link: "startContent",
+    },
+    {
+      name: "CORE",
+      duration: `1hr:44 mins`,
+      link: "coreContent",
+    },
+  ]);
+
+  const [topic, setTopic] = useState(mainTopicsTechnicals);
+
   const [allContent, setAllContent] = useState();
   const [content, setContent] = useState([]);
   const [modalVideoContent, setModalVideoContent] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("BASICS");
   const [selectedContent, setSelectedContent] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [contToDisplay, setContToDisplay] = useState(false);
+  const [contToDisplay, setContToDisplay] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
+  const [courseType, setCourseType] = useState(null);
   const [name, setName] = useState(null);
+  const [upgradeCourseAlert, setUpgradeCourseAlert] = useState(false);
 
   const tradingViewWidget = `
   <div class="tradingview-widget-container" >
@@ -148,13 +167,29 @@ function MyCoursesScreen() {
   };
 
   function callCourseContent() {
+    if (!token) {
+      return;
+    }
     setIsLoading(true);
-    CallGetApiServices(
-      `/course/technical-course-content`,
+    CallGetApiServicesWithTkn(
+      `/course/${
+        contToDisplay
+          ? "technical-course-content"
+          : "fundamental-paid-course-content"
+      }`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
       (response) => {
         if (response.status === 200) {
           setAllContent(response.data);
-          setContent(response.data.basicsContent);
+          setContent(
+            contToDisplay
+              ? response.data.basicsContent
+              : response.data.startContent
+          );
           setIsLoading(false);
         }
       },
@@ -166,8 +201,16 @@ function MyCoursesScreen() {
   }
 
   useEffect(() => {
-    callCourseContent();
-  }, []);
+    if (token) {
+      contToDisplay
+        ? setTopic(mainTopicsTechnicals)
+        : setTopic(mainTopicsFundamentals);
+
+      setSelectedCategory(contToDisplay ? "BASICS" : "STARTER");
+      setSelectedContent(0);
+      callCourseContent();
+    }
+  }, [contToDisplay, token]);
 
   const fetchData = async () => {
     try {
@@ -179,6 +222,7 @@ function MyCoursesScreen() {
 
       setToken(tkn);
       setName(nm);
+      setCourseType(cType);
     } catch (error) {
       console.error("Error fetching data from AsyncStorage:", error);
     }
@@ -194,6 +238,14 @@ function MyCoursesScreen() {
   }
 
   const toggleModal = (content, selectedContent) => {
+    if (!contToDisplay && courseType !== "pro") {
+      setUpgradeCourseAlert(true);
+      setTimeout(() => {
+        setUpgradeCourseAlert(false);
+      }, 3000);
+
+      return;
+    }
     setModalVisible(!isModalVisible);
     setModalVideoContent(content);
     setSelectedContent(selectedContent);
@@ -215,6 +267,7 @@ function MyCoursesScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    setContToDisplay(true);
     callCourseContent();
     setSelectedCategory("BASICS");
     authCtx.nullCall();
@@ -307,10 +360,10 @@ function MyCoursesScreen() {
 
             <View style={styles.toggleContainer}>
               <Text style={styles.contToDisplayText}>
-                {contToDisplay ? "Fundamentals" : "Technicals"}
+                {contToDisplay ? "Technicals" : "Fundamentals"}
               </Text>
               <Switch
-                value={contToDisplay}
+                value={!contToDisplay}
                 onValueChange={toggleSwitch}
                 disabled={false}
                 activeText={""}
@@ -335,7 +388,7 @@ function MyCoursesScreen() {
             </View>
           </View>
           <ScrollView style={styles.categorySubCont} horizontal={true}>
-            {mainTopics.map((topic, index) => (
+            {topic.map((topic, index) => (
               <ImageBackground
                 key={index}
                 style={styles.categories}
@@ -444,10 +497,17 @@ function MyCoursesScreen() {
                         style={styles.playBtn}
                         onPress={() => toggleModal(content, index)}
                       >
-                        <Image
-                          source={require("../../../images/icons/play.png")}
-                          style={styles.playBtnImg}
-                        />
+                        {!contToDisplay && courseType !== "pro" ? (
+                          <Image
+                            source={require("../../../images/logo/lock.png")}
+                            style={styles.lockBtnImg}
+                          />
+                        ) : (
+                          <Image
+                            source={require("../../../images/icons/play.png")}
+                            style={styles.playBtnImg}
+                          />
+                        )}
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -459,7 +519,7 @@ function MyCoursesScreen() {
                     style={[
                       styles.labelContText,
                       {
-                        fontSize: calculateFontSize(1.5),
+                        fontSize: CalculateFontSize(1.5),
                         marginTop: "10%",
                         marginBottom: "20%",
                         alignSelf: "center",
@@ -487,6 +547,11 @@ function MyCoursesScreen() {
       <UserProfileModal
         closeModal={closeProfileModal}
         isModalVisible={isProfileModalVisible}
+      />
+
+      <CustomAlertMsgBox
+        visible={upgradeCourseAlert}
+        message={"Upgrade to 'pro' to view this content"}
       />
     </View>
   );
@@ -532,7 +597,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     color: "white",
-    fontSize: calculateFontSize(2),
+    fontSize: CalculateFontSize(2),
     textAlign: "left",
     marginBottom: 5,
     fontWeight: "400",
@@ -540,14 +605,14 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: calculateFontSize(2),
+    fontSize: CalculateFontSize(2),
     textAlign: "left",
     marginBottom: 5,
     fontWeight: "400",
   },
   text1: {
     color: "white",
-    fontSize: calculateFontSize(3),
+    fontSize: CalculateFontSize(3),
     textAlign: "left",
     fontWeight: "500",
   },
@@ -600,13 +665,13 @@ const styles = StyleSheet.create({
   },
 
   topInfoContFloatTopSubText: {
-    fontSize: calculateFontSize(1),
+    fontSize: CalculateFontSize(1),
     fontWeight: "500",
     color: "#fff",
   },
 
   topInfoContFloatTopSubText2: {
-    fontSize: calculateFontSize(1.8),
+    fontSize: CalculateFontSize(1.8),
     fontWeight: "400",
     marginBottom: 2,
     color: Colors.btnClr,
@@ -650,12 +715,12 @@ const styles = StyleSheet.create({
   },
   contToDisplayText: {
     color: Colors.midWhite,
-    fontSize: calculateFontSize(1.4),
+    fontSize: CalculateFontSize(1.4),
     fontWeight: "500",
     marginRight: 8,
   },
   categoryHeadingText: {
-    fontSize: calculateFontSize(2.5),
+    fontSize: CalculateFontSize(2.5),
     fontWeight: "500",
     color: Colors.clr4,
     paddingLeft: 10,
@@ -697,7 +762,7 @@ const styles = StyleSheet.create({
   },
 
   categoriesTopText: {
-    fontSize: calculateFontSize(2.2),
+    fontSize: CalculateFontSize(2.2),
     fontWeight: "500",
     color: "#fff",
   },
@@ -718,7 +783,7 @@ const styles = StyleSheet.create({
   },
 
   categoriesBottomText1: {
-    fontSize: calculateFontSize(1.2),
+    fontSize: CalculateFontSize(1.2),
     fontWeight: "500",
     color: "#fff",
   },
@@ -731,7 +796,7 @@ const styles = StyleSheet.create({
 
   categoriesBottomText2: {
     width: 70,
-    fontSize: calculateFontSize(1.4),
+    fontSize: CalculateFontSize(1.4),
     fontWeight: "500",
     color: Colors.clr4,
   },
@@ -754,7 +819,7 @@ const styles = StyleSheet.create({
   },
 
   viewBtnText: {
-    fontSize: calculateFontSize(1.4),
+    fontSize: CalculateFontSize(1.4),
     fontWeight: "700",
     color: "#000",
   },
@@ -773,13 +838,13 @@ const styles = StyleSheet.create({
   },
   contentToDisplayText: {
     color: Colors.midWhite,
-    fontSize: calculateFontSize(1.6),
+    fontSize: CalculateFontSize(1.6),
     fontWeight: "500",
     marginBottom: 4,
     marginLeft: 8,
   },
   contentHeadingText: {
-    fontSize: calculateFontSize(2.5),
+    fontSize: CalculateFontSize(2.5),
     fontWeight: "500",
     color: Colors.clr4,
     paddingLeft: 10,
@@ -817,7 +882,7 @@ const styles = StyleSheet.create({
   },
 
   contentsLeftText: {
-    fontSize: calculateFontSize(2.2),
+    fontSize: CalculateFontSize(2.2),
     fontWeight: "300",
     color: "#fff",
   },
@@ -830,13 +895,13 @@ const styles = StyleSheet.create({
     // backgroundColor: "cyan",
   },
   contentsCenterText1: {
-    fontSize: calculateFontSize(2),
+    fontSize: CalculateFontSize(2),
     fontWeight: "400",
     color: "#fff",
     marginBottom: 5,
   },
   contentsCenterText2: {
-    fontSize: calculateFontSize(1.4),
+    fontSize: CalculateFontSize(1.4),
     fontWeight: "500",
     color: Colors.btnClr,
   },
@@ -862,8 +927,12 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
   },
+  lockBtnImg: {
+    width: 25,
+    height: 25,
+  },
   labelContText: {
-    fontSize: calculateFontSize(1.2),
+    fontSize: CalculateFontSize(1.2),
     color: "#c9c8c7",
   },
 });

@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import { View, Text, ScrollView, Modal, Alert, StyleSheet } from "react-native";
 
 import SelectDropdown from "react-native-select-dropdown";
 import { DataTable } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import ButtonComponent from "../buttonComponent/buttonComponent";
-import { CallPatchApiServices } from "../../webServices/apiCalls";
-import { CallPostApiServices } from "../../webServices/apiCalls";
-import { CallDeleteApiServices } from "../../webServices/apiCalls";
+import {
+  CallPatchApiServices,
+  CallPatchApiServicesWithTkn,
+} from "../../webServices/apiCalls";
+import {
+  CallPostApiServices,
+  CallPostApiServicesWithTkn,
+} from "../../webServices/apiCalls";
+import {
+  CallDeleteApiServices,
+  CallDeleteApiServicesWithTkn,
+} from "../../webServices/apiCalls";
 import Colors from "../colors/colors";
 import BlinkingDot from "../blinkingDot/blinkingDot";
 import CustomAlertMsgBox from "../customAlertBox/customAlertMsgBox";
@@ -33,6 +43,21 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   const [mailBtnLoader, setMailBtnLoader] = useState(false);
   const [deleteUserLoader, setDeleteUserLoader] = useState(false);
   const [mailSentAlert, setMailSentAlert] = useState(false);
+  const [token, setToken] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const tkn = await AsyncStorage.getItem("token");
+
+      setToken(tkn);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchData();
+  });
 
   const openModal = (id) => {
     const user = usersData.find((item) => item._id === id);
@@ -48,10 +73,15 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
 
   function updateBtnHandler() {
     setUpdateBtnLoader(true);
-    CallPatchApiServices(
+    CallPatchApiServicesWithTkn(
       `/user/update-user/${selectedUser._id}`,
       {
         courseType: selectedCourseType,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
       (response) => {
         if (response.status === 201) {
@@ -71,10 +101,15 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
 
   function updateTtuBtnHandler() {
     setUpdateTtuBtnLoader(true);
-    CallPatchApiServices(
+    CallPatchApiServicesWithTkn(
       `/user/update-user/${selectedUser._id}`,
       {
         triedToUpdate: selectedTtUpdate ? selectedTtUpdate : false,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
       (response) => {
         if (response.status === 201) {
@@ -140,10 +175,15 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
 
   function updatePaidBtnHandler() {
     setPaidBtnLoader(true);
-    CallPatchApiServices(
+    CallPatchApiServicesWithTkn(
       `/user/update-user/${selectedUser._id}`,
       {
         paid: selectedPaid,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
       (response) => {
         if (response.status === 201) {
@@ -164,10 +204,15 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   function confirmMailHandler(mail) {
     if (mail) {
       setMailBtnLoader(true);
-      CallPostApiServices(
+      CallPostApiServicesWithTkn(
         `/user/purchase-confirmation-email`,
         {
           email: mail,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
         (response) => {
           if (response.status === 200) {
@@ -195,8 +240,13 @@ const CommonTable = ({ currentPage, usersData, getAllUsers }) => {
   function deleteUserHandler(id) {
     if (id) {
       setDeleteUserLoader(true);
-      CallDeleteApiServices(
+      CallDeleteApiServicesWithTkn(
         `/user/delete-user/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
         (response) => {
           if (response.status === 200) {
             setDeleteUserLoader(false);

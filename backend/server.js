@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 
 //MIDDLEWARE
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "*r");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -39,7 +39,7 @@ app.use("/api/course", courseContentRoutes);
 
 //ERROR MIDDLEWARE
 app.use((error, req, res, next) => {
-  console.log("here");
+  console.log("here", error);
   res.status(error.code || 500);
   res.json({ message: error.message || "An error occured" });
 });

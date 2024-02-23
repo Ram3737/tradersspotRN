@@ -129,6 +129,88 @@ const getAllSwingAnalysisUser = async (req, res) => {
 
     let query = [];
 
+    if (
+      req?.token === "null" &&
+      breakoutValue === "null" &&
+      rewardValue === "null" &&
+      analysisLinkValue === "null" &&
+      resultLinkValue === "null"
+    ) {
+      let allSwingAnalyses;
+      let totalSwingAnalysis;
+      let wholeTotalSwingAnalysis;
+
+      query.push({ "result.resultLink": "none" });
+      query.push({ ["result.reward"]: { $gt: 0 } });
+
+      const allSwingAnalyses1 = await SwingAnalysisResult.find(
+        query.length === 0
+          ? {}
+          : query.length > 0 && analysisLinkValue == "null"
+          ? { $or: query }
+          : query.length > 0 && analysisLinkValue == 1
+          ? { $and: query }
+          : {}
+      )
+        .sort({
+          createdAt: -1,
+        })
+        .limit(limit);
+
+      const totalSwingAnalysis1 = await SwingAnalysisResult.countDocuments(
+        query.length === 0
+          ? {}
+          : query.length > 0 && analysisLinkValue == "null"
+          ? { $or: query }
+          : query.length > 0 && analysisLinkValue == 1
+          ? { $and: query }
+          : {}
+      );
+
+      if (
+        (allSwingAnalyses1 || allSwingAnalyses1?.length >= 0) &&
+        (totalSwingAnalysis1 || totalSwingAnalysis1 >= 0)
+      ) {
+        query = [];
+        query.push({ ["result.reward"]: 0 });
+        const allSwingAnalyses2 = await SwingAnalysisResult.find(
+          query.length === 0
+            ? {}
+            : query.length > 0 && analysisLinkValue == "null"
+            ? { $or: query }
+            : query.length > 0 && analysisLinkValue == 1
+            ? { $and: query }
+            : {}
+        )
+          .sort({
+            createdAt: -1,
+          })
+          .limit(limit);
+
+        const totalSwingAnalysis2 = await SwingAnalysisResult.countDocuments(
+          query.length === 0
+            ? {}
+            : query.length > 0 && analysisLinkValue == "null"
+            ? { $or: query }
+            : query.length > 0 && analysisLinkValue == 1
+            ? { $and: query }
+            : {}
+        );
+
+        wholeTotalSwingAnalysis = await SwingAnalysisResult.countDocuments();
+
+        allSwingAnalyses = allSwingAnalyses1.concat(allSwingAnalyses2);
+        totalSwingAnalysis = +totalSwingAnalysis1 + +totalSwingAnalysis2;
+      }
+
+      res.status(200).json({
+        wholeTotalSwingAnalysis,
+        totalSwingAnalysis,
+        allSwingAnalyses,
+      });
+      return;
+    }
+
     if (analysisLinkValue !== "null") {
       console.log("0");
       query.push({ "result.resultLink": null });
@@ -265,7 +347,7 @@ const sumRiskRewardSwing = async (req, res) => {
     //   throw new Error("No analyses found to calculate sum");
     // }
 
-    const onlyBreakoutAnalyses = allSwingAnalyses.filter(
+    const breakoutAnalyses = allSwingAnalyses.filter(
       (analysis) => analysis.result.breakout !== "none"
     );
 
@@ -467,6 +549,15 @@ const sumRiskRewardSwing = async (req, res) => {
       });
       await sumRiskRewardSwing.save();
     }
+
+    const onlyBreakoutAnalyses = breakoutAnalyses.map((item) => ({
+      analysis: {
+        stockName: item.analysis.stockName,
+      },
+      result: {
+        breakout: item.result.breakout,
+      },
+    }));
 
     res.status(200).json({
       totalRisk,

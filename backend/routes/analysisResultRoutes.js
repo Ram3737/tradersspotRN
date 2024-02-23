@@ -4,6 +4,8 @@ const intradayAnalysisResultController = require("../controller/intradayAnalysis
 const freeAnalysisResultController = require("../controller/freeAnalysisResultController");
 const swingAnalysisResultController = require("../controller/swingAnalysisResultController");
 const freeSwingAnalysisResultController = require("../controller/freeSwingAnalysisResultController");
+const basicSwingAuth = require("../utils/swingAnalysisAuth/basicSwingAuth");
+const getAllSwingAnalysisUserAuth = require("../utils/swingAnalysisAuth/getAllSwingAnalysisUserAuth");
 
 //INTRADAY
 router.post(
@@ -44,18 +46,22 @@ router.get(
 //SWING
 router.post(
   "/swing-analysis/create-swing-analysis",
+  basicSwingAuth,
   swingAnalysisResultController.createSwingAnalysis
 );
 router.get(
   "/swing-analysis/get-all-swing-analysis",
+  basicSwingAuth,
   swingAnalysisResultController.getAllSwingAnalysis
 );
 router.get(
   "/swing-analysis/get-all-swing-analysis-user",
+  getAllSwingAnalysisUserAuth,
   swingAnalysisResultController.getAllSwingAnalysisUser
 );
 router.patch(
   "/swing-analysis/update-swing-analysis/:id",
+  basicSwingAuth,
   swingAnalysisResultController.updateSwingResults
 );
 router.get(
@@ -65,12 +71,14 @@ router.get(
 
 router.delete(
   "/swing-analysis/delete-swing-analysis/:id",
+  basicSwingAuth,
   swingAnalysisResultController.deleteSwingAnalysis
 );
 
 //FREE SWING
 router.post(
   "/free-swing-analysis/create-free-swing-analysis",
+  basicSwingAuth,
   freeSwingAnalysisResultController.createFreeSwingAnalysis
 );
 router.get(
@@ -83,6 +91,7 @@ router.get(
 );
 router.patch(
   "/free-swing-analysis/update-free-swing-analysis/:id",
+  basicSwingAuth,
   freeSwingAnalysisResultController.updateFreeSwingResults
 );
 router.get(
@@ -92,6 +101,7 @@ router.get(
 
 router.delete(
   "/free-swing-analysis/delete-free-swing-analysis/:id",
+  basicSwingAuth,
   freeSwingAnalysisResultController.deleteFreeSwingAnalysis
 );
 
