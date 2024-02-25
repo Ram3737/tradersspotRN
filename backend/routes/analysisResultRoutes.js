@@ -59,6 +59,11 @@ router.get(
   getAllSwingAnalysisUserAuth,
   swingAnalysisResultController.getAllSwingAnalysisUser
 );
+router.get(
+  "/swing-analysis/get-all-swing-analysis-user-pagination",
+  getAllSwingAnalysisUserAuth,
+  swingAnalysisResultController.getAllSwingAnalysisUserWithPagination
+);
 router.patch(
   "/swing-analysis/update-swing-analysis/:id",
   basicSwingAuth,
@@ -88,6 +93,10 @@ router.get(
 router.get(
   "/free-swing-analysis/get-all-free-swing-analysis-user",
   freeSwingAnalysisResultController.getAllFreeSwingAnalysisUser
+);
+router.get(
+  "/free-swing-analysis/get-all-free-swing-analysis-user-pagination",
+  freeSwingAnalysisResultController.getAllFreeSwingAnalysisUserWithPagination
 );
 router.patch(
   "/free-swing-analysis/update-free-swing-analysis/:id",

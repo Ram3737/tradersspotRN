@@ -10,6 +10,7 @@ const Colors = {
   clr5: "#284d5f",
   white: "#fff",
   midWhite: "#c9c8c7",
+  disabled: "#7e7e7e",
 };
 
 const Colors1 = {

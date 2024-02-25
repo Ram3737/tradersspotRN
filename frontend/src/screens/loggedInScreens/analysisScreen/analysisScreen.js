@@ -50,6 +50,7 @@ function AnalysisScreen() {
   ];
   const [contToDisplay, setContToDisplay] = useState(false);
   const [viewResult, setViewResult] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [analysisData, setAnalysisData] = useState([]);
   const [totalSwingAnalysis, setTotalSwingAnalysis] = useState([]);
   const [wholeTotalSwingAnalysis, setWholeTotalSwingAnalysis] = useState(0);
@@ -104,9 +105,10 @@ function AnalysisScreen() {
     setResultLink(null);
     setViewFilterCont(false);
     setContToDisplay(!contToDisplay);
+    setCurrentPage(1);
   };
 
-  function getAllAnalysis() {
+  function getAllAnalysis(page = 1) {
     if (!token) {
       return;
     }
@@ -115,9 +117,9 @@ function AnalysisScreen() {
     CallGetApiServicesWithTkn(
       `/analysis/${
         contToDisplay
-          ? "free-swing-analysis/get-all-free-swing-analysis-user"
-          : "swing-analysis/get-all-swing-analysis-user"
-      }?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
+          ? "free-swing-analysis/get-all-free-swing-analysis-user-pagination"
+          : "swing-analysis/get-all-swing-analysis-user-pagination"
+      }?page=${page}&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -140,11 +142,19 @@ function AnalysisScreen() {
   }
 
   useEffect(() => {
-    getAllAnalysis();
+    getAllAnalysis(currentPage);
     contToDisplay
       ? setAnalysisStat("freeSwingAnalysisStats")
       : setAnalysisStat("swingAnalysisStats");
-  }, [contToDisplay, breakout, reward, analysisLink, resultLink, token]);
+  }, [
+    contToDisplay,
+    breakout,
+    reward,
+    analysisLink,
+    resultLink,
+    token,
+    currentPage,
+  ]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -162,36 +172,43 @@ function AnalysisScreen() {
   function tabPressHandler(pressedTab) {
     setFilterTab(pressedTab);
     if (pressedTab === "All") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(null);
       setAnalysisLink(null);
       setResultLink(null);
     } else if (pressedTab === "Breakout") {
+      setCurrentPage(1);
       setBreakOut("green");
       setReward(null);
       setAnalysisLink(null);
       setResultLink(null);
     } else if (pressedTab === "Trailing") {
+      setCurrentPage(1);
       setBreakOut("orange");
       setReward(null);
       setAnalysisLink(null);
       setResultLink(null);
     } else if (pressedTab === "Reward") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(1);
       setAnalysisLink(null);
       setResultLink(null);
     } else if (pressedTab === "Stoploss") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(0);
       setAnalysisLink(null);
       setResultLink(null);
     } else if (pressedTab === "Idle") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(null);
       setAnalysisLink(1);
       setResultLink(null);
     } else if (pressedTab === "Nill") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(null);
       setAnalysisLink(null);
@@ -207,6 +224,14 @@ function AnalysisScreen() {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  const handlePageChangePrevious = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePageChangeNext = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   function upgradeBtnHandler() {
     navigation.navigate("Upgrade");
@@ -611,13 +636,46 @@ function AnalysisScreen() {
             )}
         </View>
       </View>
+
       <View style={styles.filterCont}>
-        <MaterialIcons
-          name={"filter-list"}
-          size={25}
-          color={Colors.btnClr}
-          onPress={viewFilterTabHandler}
-        />
+        <View style={styles.filterContSub}>
+          <MaterialIcons
+            name={"filter-list"}
+            size={25}
+            color={Colors.btnClr}
+            onPress={viewFilterTabHandler}
+          />
+          <View style={styles.paginationCont}>
+            <ButtonComponent
+              text={"<"}
+              style={{
+                paddingVertical: 3,
+                paddingHorizontal: 10,
+                backgroundColor:
+                  currentPage === 1 ? Colors.disabled : Colors.btnClr,
+              }}
+              handler={() => handlePageChangePrevious(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            <View style={styles.pageNoCont}>
+              <Text>{currentPage}</Text>
+            </View>
+            <ButtonComponent
+              text={">"}
+              style={{
+                paddingVertical: 3,
+                paddingHorizontal: 10,
+                backgroundColor:
+                  currentPage * 30 >= totalSwingAnalysis
+                    ? Colors.disabled
+                    : Colors.btnClr,
+              }}
+              handler={() => handlePageChangeNext(currentPage + 1)}
+              disabled={currentPage * 30 >= totalSwingAnalysis}
+            />
+          </View>
+        </View>
+
         {viewFilterCont && (
           <View style={styles.tabCont}>
             <ScrollView style={styles.tabSubCont} horizontal={true}>
@@ -798,6 +856,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // backgroundColor: "blue",
   },
+  filterContSub: {
+    width: "100%",
+    height: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    // backgroundColor: "blue",
+  },
   tabCont: {
     height: 30,
     width: "100%",
@@ -958,5 +1024,20 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     justifyContent: "center",
+  },
+  paginationCont: {
+    width: 90,
+    alignItems: "center",
+    alignSelf: "flex-end",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    // marginRight: "3.5%",
+    // marginTop: "3%",
+    // marginBottom: "3%",
+  },
+  pageNoCont: {
+    padding: 3,
+    backgroundColor: "#a8a8a8",
+    borderRadius: 5,
   },
 });

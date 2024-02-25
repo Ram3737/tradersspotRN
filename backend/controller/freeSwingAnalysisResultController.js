@@ -191,6 +191,81 @@ const getAllFreeSwingAnalysisUser = async (req, res) => {
   }
 };
 
+const getAllFreeSwingAnalysisUserWithPagination = async (req, res) => {
+  try {
+    const breakoutValue = req.query.breakout;
+    const rewardValue = req.query.reward;
+    const analysisLinkValue = req.query.analysisLink;
+    const resultLinkValue = req.query.resultLink;
+
+    const page = parseInt(req.query.page) || 1; // default page 1
+    const limit = parseInt(req.query.limit) || 30; // default limit 10
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    let query = [];
+
+    if (analysisLinkValue !== "null") {
+      console.log("0");
+      query.push({ "result.resultLink": null });
+      query.push({ "result.breakout": "none" });
+    }
+
+    if (resultLinkValue !== "null") {
+      console.log("1");
+      query.push({ "result.resultLink": "none" });
+    }
+
+    if (
+      analysisLinkValue == "null" &&
+      breakoutValue &&
+      breakoutValue !== "null"
+    ) {
+      console.log("2");
+      query.push({ ["result.breakout"]: breakoutValue });
+    }
+
+    if (rewardValue && rewardValue !== "null" && rewardValue == 0) {
+      console.log("3");
+      query.push({ ["result.reward"]: rewardValue });
+    }
+
+    if (rewardValue && rewardValue == 1) {
+      console.log("4");
+      query.push({ ["result.reward"]: { $gt: 0 } });
+    }
+
+    console.log("free", query);
+
+    const allSwingAnalyses = await FreeSwingAnalysisResult.find(
+      query.length === 0
+        ? {}
+        : query.length > 0 && analysisLinkValue == "null"
+        ? { $or: query }
+        : query.length > 0 && analysisLinkValue == 1
+        ? { $and: query }
+        : {}
+    )
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(startIndex);
+    const totalSwingAnalysis = await FreeSwingAnalysisResult.countDocuments(
+      query.length === 0
+        ? {}
+        : query.length > 0 && analysisLinkValue == "null"
+        ? { $or: query }
+        : query.length > 0 && analysisLinkValue == 1
+        ? { $and: query }
+        : {}
+    );
+
+    res.status(200).json({ totalSwingAnalysis, allSwingAnalyses });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const updateFreeSwingResults = async (req, res) => {
   try {
     const { id: userId } = req.params;
@@ -499,6 +574,7 @@ module.exports = {
   createFreeSwingAnalysis,
   getAllFreeSwingAnalysis,
   getAllFreeSwingAnalysisUser,
+  getAllFreeSwingAnalysisUserWithPagination,
   updateFreeSwingResults,
   sumRiskRewardFreeSwing,
   deleteFreeSwingAnalysis,

@@ -49,7 +49,9 @@ function AnalysisStatsScreen() {
   const [viewResult, setViewResult] = useState(0);
   const [contToDisplay, setContToDisplay] = useState(false);
   const [barChartValue, setBarChartValue] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [analysisData, setAnalysisData] = useState([]);
+  const [totalAnalysis, setTotalAnalysis] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [viewFilterCont, setViewFilterCont] = useState(false);
@@ -73,14 +75,14 @@ function AnalysisStatsScreen() {
     fetchData();
   });
 
-  function getAllAnalysis() {
+  function getAllAnalysis(page = 1) {
     setIsLoading(true);
     CallGetApiServicesWithTkn(
       `/analysis/${
         contToDisplay
-          ? "free-swing-analysis/get-all-free-swing-analysis-user"
-          : "swing-analysis/get-all-swing-analysis-user"
-      }?page=100&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
+          ? "free-swing-analysis/get-all-free-swing-analysis-user-pagination"
+          : "swing-analysis/get-all-swing-analysis-user-pagination"
+      }?page=${page}&breakout=${breakout}&reward=${reward}&analysisLink=${analysisLink}&resultLink=${resultLink}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,6 +98,7 @@ function AnalysisStatsScreen() {
           } else {
             setAnalysisData(response.data.allSwingAnalyses);
           }
+          setTotalAnalysis(response.data.totalSwingAnalysis);
           setIsLoading(false);
         }
       },
@@ -108,7 +111,7 @@ function AnalysisStatsScreen() {
   }
 
   useEffect(() => {
-    getAllAnalysis();
+    getAllAnalysis(currentPage);
     if (
       authCtx.freeSwingAnalysisStats.reversedMonthlyTotals &&
       authCtx.swingAnalysisStats.reversedMonthlyTotals
@@ -119,7 +122,15 @@ function AnalysisStatsScreen() {
           : authCtx.swingAnalysisStats?.reversedMonthlyTotals
       );
     }
-  }, [contToDisplay, authCtx, breakout, reward, analysisLink, resultLink]);
+  }, [
+    contToDisplay,
+    authCtx,
+    breakout,
+    reward,
+    analysisLink,
+    resultLink,
+    currentPage,
+  ]);
 
   function viewResultHandler(index) {
     setViewResult(index);
@@ -143,6 +154,7 @@ function AnalysisStatsScreen() {
     setResultLink(null);
     setViewFilterCont(false);
     setContToDisplay(!contToDisplay);
+    setCurrentPage(1);
   };
 
   function viewFilterTabHandler() {
@@ -152,11 +164,13 @@ function AnalysisStatsScreen() {
     setAnalysisLink(null);
     setResultLink(null);
     setFilterTab("All");
+    setCurrentPage(1);
   }
 
   function tabPressHandler(pressedTab) {
     setFilterTab(pressedTab);
     if (pressedTab === "All") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(null);
       setAnalysisLink(null);
@@ -165,6 +179,7 @@ function AnalysisStatsScreen() {
       if (!contToDisplay) {
         return;
       } else {
+        setCurrentPage(1);
         setBreakOut("green");
         setReward(null);
         setAnalysisLink(null);
@@ -174,17 +189,20 @@ function AnalysisStatsScreen() {
       if (!contToDisplay) {
         return;
       } else {
+        setCurrentPage(1);
         setBreakOut("orange");
         setReward(null);
         setAnalysisLink(null);
         setResultLink(null);
       }
     } else if (pressedTab === "Reward") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(1);
       setAnalysisLink(null);
       setResultLink(null);
     } else if (pressedTab === "Stoploss") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(0);
       setAnalysisLink(null);
@@ -194,12 +212,14 @@ function AnalysisStatsScreen() {
       if (!contToDisplay) {
         return;
       } else {
+        setCurrentPage(1);
         setBreakOut(null);
         setReward(null);
         setAnalysisLink(1);
         setResultLink(null);
       }
     } else if (pressedTab === "Nill") {
+      setCurrentPage(1);
       setBreakOut(null);
       setReward(null);
       setAnalysisLink(null);
@@ -210,6 +230,14 @@ function AnalysisStatsScreen() {
   function upgradeBtnHandler() {
     navigation.navigate("courses");
   }
+
+  const handlePageChangePrevious = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePageChangeNext = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -663,12 +691,44 @@ function AnalysisStatsScreen() {
       </View>
 
       <View style={styles.filterCont}>
-        <MaterialIcons
-          name={"filter-list"}
-          size={25}
-          color={Colors.btnClr}
-          onPress={viewFilterTabHandler}
-        />
+        <View style={styles.filterContSub}>
+          <MaterialIcons
+            name={"filter-list"}
+            size={25}
+            color={Colors.btnClr}
+            onPress={viewFilterTabHandler}
+          />
+          <View style={styles.paginationCont}>
+            <ButtonComponent
+              text={"<"}
+              style={{
+                paddingVertical: 3,
+                paddingHorizontal: 10,
+                backgroundColor:
+                  currentPage === 1 ? Colors.disabled : Colors.btnClr,
+              }}
+              handler={() => handlePageChangePrevious(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            <View style={styles.pageNoCont}>
+              <Text>{currentPage}</Text>
+            </View>
+            <ButtonComponent
+              text={">"}
+              style={{
+                paddingVertical: 3,
+                paddingHorizontal: 10,
+                backgroundColor:
+                  currentPage * 30 >= totalAnalysis
+                    ? Colors.disabled
+                    : Colors.btnClr,
+              }}
+              handler={() => handlePageChangeNext(currentPage + 1)}
+              disabled={currentPage * 30 >= totalAnalysis}
+            />
+          </View>
+        </View>
+
         {viewFilterCont && (
           <View style={styles.tabCont}>
             <ScrollView style={styles.tabSubCont} horizontal={true}>
@@ -845,9 +905,17 @@ const styles = StyleSheet.create({
   filterCont: {
     width: "95%",
     height: "auto",
-    marginTop: "2%",
+    marginTop: "3.5%",
     alignItems: "flex-end",
     justifyContent: "center",
+    // backgroundColor: "red",
+  },
+  filterContSub: {
+    width: "100%",
+    height: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     // backgroundColor: "blue",
   },
   tabCont: {
@@ -856,7 +924,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    marginTop: 5,
+    marginTop: 10,
   },
   tabSubCont: {
     height: "100%",
@@ -986,5 +1054,20 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     justifyContent: "center",
+  },
+  paginationCont: {
+    width: 90,
+    alignItems: "center",
+    alignSelf: "flex-end",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    // marginRight: "3.5%",
+    // marginTop: "3%",
+    // marginBottom: "3%",
+  },
+  pageNoCont: {
+    padding: 3,
+    backgroundColor: "#a8a8a8",
+    borderRadius: 5,
   },
 });
