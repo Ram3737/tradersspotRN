@@ -64,4 +64,5 @@ router.delete(
   getUpdateDeleteMailUserAuth,
   userController.deleteUser
 );
+router.post("/new-registration-otp", userController.newUserRegistrationOTP);
 module.exports = router;

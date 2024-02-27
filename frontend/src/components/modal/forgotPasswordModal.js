@@ -215,11 +215,8 @@ function ForgotPasswordModal({ closeModal, isModalVisible }) {
               </View>
 
               <ButtonComponent
-                text={"Sent OTP"}
+                text={"Send OTP"}
                 style={{
-                  // alignSelf: "flex-end",
-                  // paddingVertical: 3,
-                  // paddingHorizontal: 15,
                   marginTop: 25,
                 }}
                 fontStyle={{ fontSize: CalculateFontSize(1.7) }}

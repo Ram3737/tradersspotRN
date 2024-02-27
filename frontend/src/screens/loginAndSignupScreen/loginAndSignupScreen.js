@@ -25,6 +25,7 @@ import CustomAlertBox from "../../components/customAlertBox/customAlertBox";
 import { AuthContext } from "../../components/stores/context/authContextProvider";
 import CalculateFontSize from "../../components/calculateFontSize/calculateFontSize";
 import ForgotPasswordModal from "../../components/modal/forgotPasswordModal";
+import NewUserRegistrationOTPModal from "../../components/modal/newRegistrationOtpModal";
 
 import { Switch } from "react-native-switch";
 import HapticFeedback from "react-native-haptic-feedback";
@@ -51,6 +52,9 @@ function LoginAndSignupScreen() {
   const [btnLoader, setBtnLoader] = useState(false);
   const [isForgotPasswordModalVisible, setIsForgotPasswordModalVisible] =
     useState(false);
+  const [isNewRegisterOTPModalVisible, setIsNewRegisterOTPModalVisible] =
+    useState(false);
+  const [otpFromBackend, setOtpFromBackend] = useState(null);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -261,6 +265,34 @@ function LoginAndSignupScreen() {
     }
 
     setBtnLoader(true);
+
+    CallPostApiServices(
+      `/user/new-registration-otp`,
+      {
+        email: email,
+      },
+      (response) => {
+        if (response.status === 200) {
+          setBtnLoader(false);
+          setOtpFromBackend(response.data.otp);
+          setErrFromBackend(null);
+          openNewRegisterOTPModalHandler();
+        }
+      },
+      (err) => {
+        console.log("err sending otp on registration");
+        setBtnLoader(false);
+        if (err.response?.data.message) {
+          setErrFromBackend(err.response.data.message);
+        } else {
+          setErrFromBackend(err.message);
+        }
+      }
+    );
+  }
+
+  function registerAfterOTPHandler() {
+    setBtnLoader(true);
     CallPostApiServices(
       `/user/create-user`,
       {
@@ -279,7 +311,7 @@ function LoginAndSignupScreen() {
         }
       },
       (err) => {
-        console.log("err", err, "hiiiiiii");
+        console.log("err on signup", err);
         setBtnLoader(false);
         if (err.response?.data.message) {
           setErrFromBackend(err.response.data.message);
@@ -288,20 +320,6 @@ function LoginAndSignupScreen() {
         }
       }
     );
-
-    // axios
-    //   .post("http://192.168.1.8:3000/api/user/signup", {
-    //     email: email,
-    //     mobileNumber: mblNo,
-    //     password: Password,
-    //     courseType: null,
-    //   })
-    //   .then((response) => {
-    //     console.log("res", response);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
   }
 
   function viewForgotPasswordModal() {
@@ -310,6 +328,14 @@ function LoginAndSignupScreen() {
 
   function closeForgotPasswordModal() {
     setIsForgotPasswordModalVisible(!isForgotPasswordModalVisible);
+  }
+
+  function openNewRegisterOTPModalHandler() {
+    setIsNewRegisterOTPModalVisible(true);
+  }
+
+  function closeNewRegisterOTPModalHandler() {
+    setIsNewRegisterOTPModalVisible(false);
   }
 
   return (
@@ -446,6 +472,12 @@ function LoginAndSignupScreen() {
         <ForgotPasswordModal
           closeModal={closeForgotPasswordModal}
           isModalVisible={isForgotPasswordModalVisible}
+        />
+        <NewUserRegistrationOTPModal
+          closeModal={closeNewRegisterOTPModalHandler}
+          isModalVisible={isNewRegisterOTPModalVisible}
+          otp={otpFromBackend}
+          registerHandler={registerAfterOTPHandler}
         />
       </ScrollView>
     </KeyboardAvoidingView>

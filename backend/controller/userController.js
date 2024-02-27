@@ -352,6 +352,29 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+const newUserRegistrationOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const otp = generateOTP();
+
+    // Send OTP to user's email
+    const mailOptions = {
+      from: "tradersspot.in@gmail.com", // replace with your email
+      to: email,
+      subject: "Confirmation OTP",
+      text: `Your OTP for registration is: ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ otp: otp, message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("forgotPassword", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const verifyOTP = async (req, res) => {
   try {
     const { email, enteredOTP } = req.body;
@@ -466,6 +489,7 @@ module.exports = {
   resetPasswordProfile,
   forgotPassword,
   verifyOTP,
+  newUserRegistrationOTP,
   PurchaseConfirmationEmail,
   deleteUser,
 };
