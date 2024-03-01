@@ -240,6 +240,10 @@ function UserAuthenticationScreen() {
           <ButtonComponent
             text={"<"}
             handler={() => handlePageChangePrevious(currentPage - 1)}
+            style={{
+              backgroundColor:
+                currentPage === 1 ? Colors.disabled : Colors.btnClr,
+            }}
             disabled={currentPage === 1}
           />
           <View style={styles.pageNoCont}>
@@ -248,6 +252,12 @@ function UserAuthenticationScreen() {
           <ButtonComponent
             text={">"}
             handler={() => handlePageChangeNext(currentPage + 1)}
+            style={{
+              backgroundColor:
+                currentPage * 10 >= totalUsers
+                  ? Colors.disabled
+                  : Colors.btnClr,
+            }}
             disabled={currentPage * 10 >= totalUsers}
           />
         </View>

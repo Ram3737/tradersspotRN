@@ -509,6 +509,10 @@ function AdminAnalysisScreen() {
                 <ButtonComponent
                   text={"<"}
                   handler={() => handlePageChangePrevious(currentPage - 1)}
+                  style={{
+                    backgroundColor:
+                      currentPage === 1 ? Colors.disabled : Colors.btnClr,
+                  }}
                   disabled={currentPage === 1}
                 />
                 <View style={styles.pageNoCont}>
@@ -517,6 +521,12 @@ function AdminAnalysisScreen() {
                 <ButtonComponent
                   text={">"}
                   handler={() => handlePageChangeNext(currentPage + 1)}
+                  style={{
+                    backgroundColor:
+                      currentPage * 10 >= totalAnalysis
+                        ? Colors.disabled
+                        : Colors.btnClr,
+                  }}
                   disabled={currentPage * 10 >= totalAnalysis}
                 />
               </View>
@@ -684,6 +694,10 @@ function AdminAnalysisScreen() {
                 <ButtonComponent
                   text={"<"}
                   handler={() => handlePageChangePrevious(currentPage - 1)}
+                  style={{
+                    backgroundColor:
+                      currentPage === 1 ? Colors.disabled : Colors.btnClr,
+                  }}
                   disabled={currentPage === 1}
                 />
                 <View style={styles.pageNoCont}>
@@ -692,6 +706,12 @@ function AdminAnalysisScreen() {
                 <ButtonComponent
                   text={">"}
                   handler={() => handlePageChangeNext(currentPage + 1)}
+                  style={{
+                    backgroundColor:
+                      currentPage * 10 >= totalAnalysis
+                        ? Colors.disabled
+                        : Colors.btnClr,
+                  }}
                   disabled={currentPage * 10 >= totalAnalysis}
                 />
               </View>
