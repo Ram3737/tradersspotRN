@@ -381,16 +381,17 @@ function DashboardScreen() {
                       ]}
                       height={55}
                     />
-
-                    <Text style={styles.paidContSubText1}>{`${
-                      authCtx.swingAnalysisStats?.totalRisk > 0
-                        ? authCtx.swingAnalysisStats.totalRisk
-                        : 0
-                    }:${
-                      authCtx.swingAnalysisStats.totalReward > 0
-                        ? authCtx.swingAnalysisStats.totalReward
-                        : 0
-                    }`}</Text>
+                    <View style={styles.paidContSubTextCont}>
+                      <Text style={styles.paidContSubText1}>{`${
+                        authCtx.swingAnalysisStats?.totalRisk > 0
+                          ? authCtx.swingAnalysisStats.totalRisk
+                          : 0
+                      }:${
+                        authCtx.swingAnalysisStats.totalReward > 0
+                          ? authCtx.swingAnalysisStats.totalReward
+                          : 0
+                      }`}</Text>
+                    </View>
                   </>
                 )}
               {!isLoading && analysisData.length === 0 && (
@@ -964,13 +965,16 @@ const styles = StyleSheet.create({
     padding: 6,
     marginRight: 15,
   },
+  paidContSubTextCont: {
+    width: "100%",
+    height: "auto",
+    position: "absolute",
+    top: 26,
+  },
   paidContSubText1: {
     fontSize: CalculateFontSize(1.6),
     fontWeight: "400",
-    position: "absolute",
-    top: "29.5%",
-    left: "43%",
-    lineHeight: 19,
+    textAlign: "center",
     color: Colors.clr4,
   },
   paidContSubText2: {

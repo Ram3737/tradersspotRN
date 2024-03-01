@@ -90,14 +90,7 @@ function AnalysisStatsScreen() {
       },
       (response) => {
         if (response.status === 200) {
-          if (!contToDisplay) {
-            // const filteredData = response.data.allSwingAnalyses.filter(
-            //   (data) => data.result.resultLink !== null
-            // );
-            setAnalysisData(response.data.allSwingAnalyses);
-          } else {
-            setAnalysisData(response.data.allSwingAnalyses);
-          }
+          setAnalysisData(response.data.allSwingAnalyses);
           setTotalAnalysis(response.data.totalSwingAnalysis);
           setIsLoading(false);
         }
