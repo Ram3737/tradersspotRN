@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Trader's spot",
+    "name": "Charteey",
     "slug": "TradersSpotRN",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/tradersSpotLogo.png",
+    "icon": "./assets/charteeyLogo.png",
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
@@ -17,13 +17,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/tradersSpotLogo.png",
+        "foregroundImage": "./assets/charteeyLogo.png",
         "backgroundColor": "#000000"
       },
       "package": "com.ram37.TradersSpotRN"
     },
     "web": {
-      "favicon": "./assets/alien.png"
+      "favicon": "./assets/charteeyLogo.png"
     },
     "extra": {
       "eas": {

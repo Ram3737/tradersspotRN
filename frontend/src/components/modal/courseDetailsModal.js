@@ -59,7 +59,7 @@ function CourseDetailsModal({
   const [paid, setPaid] = useState(null);
   const [email, setEmail] = useState(null);
   const [courseType, setCourseType] = useState(null);
-  const courseContent = [
+  const technicalCourseContent = [
     {
       topic: "BASICS",
       subContent: [
@@ -201,6 +201,100 @@ function CourseDetailsModal({
         {
           contentName: "Trail your trade",
           contentDuration: "21:18 mins",
+        },
+      ],
+    },
+  ];
+
+  const fundamentalCourseContent = [
+    {
+      topic: "BASICS",
+      subContent: [
+        {
+          contentName:
+            "Learn to generate wealth using basic fundamental analysis concepts",
+          contentDuration: "07:12 mins",
+        },
+        {
+          contentName: "Importance of Fundamental and Technical Analysis",
+          contentDuration: "09:19 mins",
+        },
+        {
+          contentName: "Does Investment Work with Fundamental Analysis",
+          contentDuration: "08:03 mins",
+        },
+        {
+          contentName: "Categories of fundamental analysis",
+          contentDuration: "08:22 mins",
+        },
+        {
+          contentName: "What is qualitative analysis ?",
+          contentDuration: "17:36 mins",
+        },
+        {
+          contentName: "How do I evaluate stocks using qualitative analysis ?",
+          contentDuration: "05:35 mins",
+        },
+        {
+          contentName: "What is quantitative analysis ?",
+          contentDuration: "06:16 mins",
+        },
+      ],
+    },
+    {
+      topic: "CORE",
+      subContent: [
+        {
+          contentName: "6 important key ratios",
+          contentDuration: "03:13 mins",
+        },
+        {
+          contentName: "What is stock pe  why pe is important ?",
+          contentDuration: "05:15 mins",
+        },
+        {
+          contentName: "How to calculate PE ratio ?",
+          contentDuration: "21:29 mins",
+        },
+        {
+          contentName: "What is book value & why book value is important ?",
+          contentDuration: "09:30 mins",
+        },
+        {
+          contentName: "How to calculate book value ?",
+          contentDuration: "09:18 mins",
+        },
+        {
+          contentName: "What is dividend ?",
+          contentDuration: "08:17 mins",
+        },
+        {
+          contentName: "How to calculate dividend yield ?",
+          contentDuration: "04:41 mins",
+        },
+        {
+          contentName: "What is  Return-on-Equity ?",
+          contentDuration: "05:43 mins",
+        },
+        {
+          contentName: "How Return-on-equity is calculated ?",
+          contentDuration: "05:09 mins",
+        },
+        {
+          contentName: "What is Roce and how its calculated ?",
+          contentDuration: "03:25 mins",
+        },
+        {
+          contentName: "How to calculate Roce ?",
+          contentDuration: "05:13 mins",
+        },
+        {
+          contentName: "What is Debt-to-Equity Ratio ?",
+          contentDuration: "03:21 mins",
+        },
+        {
+          contentName: "How to do Debt-To-Equity Ratio calculation ?",
+          contentDuration: "05:14 mins",
         },
       ],
     },
@@ -792,7 +886,10 @@ function CourseDetailsModal({
           )}
           {contentTab === "contents" && (
             <View style={styles.scrollContSub}>
-              {courseContent.map((topic, topicIndex) => (
+              <Text style={[styles.sideHeadingText1, { marginBottom: 15 }]}>
+                Technical
+              </Text>
+              {technicalCourseContent.map((topic, topicIndex) => (
                 <View key={topicIndex} style={styles.contentMain}>
                   <Text style={[styles.sideHeadingText, { marginBottom: 15 }]}>
                     {topic.topic}
@@ -824,7 +921,7 @@ function CourseDetailsModal({
                       <View style={styles.contentsRight}>
                         <TouchableOpacity
                           style={styles.playBtn}
-                          onPress={() => toggleModal(content, index)}
+                          // onPress={() => toggleModal(content, index)}
                         >
                           <Image source={lockLogo} style={styles.playBtnImg} />
                         </TouchableOpacity>
@@ -833,6 +930,60 @@ function CourseDetailsModal({
                   ))}
                 </View>
               ))}
+
+              {course === "pro" && (
+                <>
+                  <Text style={[styles.sideHeadingText1, { marginBottom: 15 }]}>
+                    Fundamentals
+                  </Text>
+                  {fundamentalCourseContent.map((topic, topicIndex) => (
+                    <View key={topicIndex} style={styles.contentMain}>
+                      <Text
+                        style={[styles.sideHeadingText, { marginBottom: 15 }]}
+                      >
+                        {topic.topic}
+                      </Text>
+                      {topic.subContent.map((content, index) => (
+                        <View key={index} style={styles.contents}>
+                          <View style={styles.contentsLeft}>
+                            <Image
+                              source={VideosLogo}
+                              style={{
+                                width: 25,
+                                height: 36,
+                                marginRight: 3,
+                              }}
+                            />
+                          </View>
+                          <View style={styles.contentsCenter}>
+                            <Text
+                              style={styles.contentsCenterText1}
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {content.contentName}
+                            </Text>
+                            <Text style={styles.contentsCenterText2}>
+                              {content.contentDuration}
+                            </Text>
+                          </View>
+                          <View style={styles.contentsRight}>
+                            <TouchableOpacity
+                              style={styles.playBtn}
+                              // onPress={() => toggleModal(content, index)}
+                            >
+                              <Image
+                                source={lockLogo}
+                                style={styles.playBtnImg}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  ))}
+                </>
+              )}
             </View>
           )}
         </ScrollView>
@@ -1249,6 +1400,11 @@ const styles = StyleSheet.create({
     fontSize: CalculateFontSize(2.4),
     fontWeight: "500",
     color: Colors.clr4,
+  },
+  sideHeadingText1: {
+    fontSize: CalculateFontSize(2.5),
+    fontWeight: "500",
+    color: Colors.midWhite,
   },
   contentDescriptionText: {
     fontSize: CalculateFontSize(1.8),
