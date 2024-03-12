@@ -274,7 +274,7 @@ function ResourcesScreen() {
 
       <CustomAlertMsgBox
         visible={register}
-        message="please register for free to download"
+        message="please register for free to download this pdf"
       />
 
       <CustomAlertMsgBox

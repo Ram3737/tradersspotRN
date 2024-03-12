@@ -24,6 +24,7 @@ function NewUserRegistrationOTPModal({
   const [enteredOTP, setEnteredOTP] = useState(null);
   const [otpErr, setOTPErr] = useState(null);
   const [otpVerifiedMsg, setOtpVerifiedMsg] = useState(false);
+  const [otpVerifyBtnLoader, setOtpVerifyBtnLoader] = useState(false);
 
   function modalCloseHandler() {
     setEnteredOTP(null);
@@ -32,11 +33,15 @@ function NewUserRegistrationOTPModal({
   }
 
   function otpValidateHandler() {
+    setOtpVerifyBtnLoader(true);
     if (enteredOTP !== otp) {
       setOTPErr("Please enter valid OTP");
     } else {
       setOTPErr(null);
-      setOtpVerifiedMsg(true);
+      setTimeout(() => {
+        setOtpVerifyBtnLoader(false);
+        setOtpVerifiedMsg(true);
+      }, 1000);
       setTimeout(() => {
         setOtpVerifiedMsg(false);
         modalCloseHandler();
@@ -92,6 +97,7 @@ function NewUserRegistrationOTPModal({
                 marginTop: 25,
               }}
               fontStyle={{ fontSize: CalculateFontSize(1.7) }}
+              indicator={otpVerifyBtnLoader}
               handler={otpValidateHandler}
             />
           </View>

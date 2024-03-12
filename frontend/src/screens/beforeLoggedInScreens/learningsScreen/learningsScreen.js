@@ -213,7 +213,7 @@ function LearningsScreen() {
       >
         <View style={styles.topInfoContLeft}>
           <Text style={styles.text1}>
-            Learn the core froundations of Stock Market Trading
+            Learn the core foundations of Stock Market Trading
           </Text>
         </View>
 
@@ -410,7 +410,7 @@ function LearningsScreen() {
 
       <CustomAlertMsgBox
         visible={upgradeCourseAlert}
-        message={"Register for free to view this content"}
+        message={"please register for free to view this content"}
       />
     </View>
   );
