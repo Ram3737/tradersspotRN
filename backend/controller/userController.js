@@ -92,6 +92,46 @@ const signInUser = async (req, res) => {
   }
 };
 
+const signInUserWeb = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const token = jwt.sign(
+      {
+        name: user.name,
+        email: user.email,
+        mobileNumber: user.mobileNumber,
+        userType: user.userType,
+        courseType: user.courseType,
+        paid: user.paid,
+      },
+      "willbethebestsecretkeyintheworldnouniversenogalaxy",
+      {
+        expiresIn: "24h", // Token expires in 24 hours
+      }
+    );
+
+    res.status(200).json({
+      token: token,
+      triedToUpdate: user.triedToUpdate,
+    });
+  } catch (error) {
+    console.error("signin error", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   try {
     const page = req.query.page; // Get the page from the query parameters
@@ -477,9 +517,29 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const verifyToken = (req, res, next) => {
+  const token = req.get("Authorization")?.split(" ")[1];
+
+  console.log(req.get("Authorization"));
+
+  let decodedToken;
+
+  try {
+    decodedToken = jwt.verify(
+      token,
+      "willbethebestsecretkeyintheworldnouniversenogalaxy"
+    );
+  } catch (error) {
+    return res.status(200).json({ message: "invalid token", valid: false });
+  }
+
+  return res.status(200).json({ message: "valid token", valid: true });
+};
+
 module.exports = {
   createUser,
   signInUser,
+  signInUserWeb,
   getAllUsers,
   getUserByEmail,
   buyCourse,
@@ -492,4 +552,5 @@ module.exports = {
   newUserRegistrationOTP,
   PurchaseConfirmationEmail,
   deleteUser,
+  verifyToken,
 };

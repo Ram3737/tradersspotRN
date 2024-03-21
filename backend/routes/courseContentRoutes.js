@@ -12,6 +12,12 @@ router.get(
 );
 
 router.get(
+  "/technical-course-content-web",
+  technicalCourseAuth,
+  courseContentController.courseContentTechnicalWeb
+);
+
+router.get(
   "/fundamental-paid-course-content",
   fundamentalPaidCourseAuth,
   courseContentController.courseContentFundamentalPaid

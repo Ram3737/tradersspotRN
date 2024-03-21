@@ -30,6 +30,7 @@ router.post(
 );
 
 router.post("/signin-user", userController.signInUser);
+router.post("/signin-user-web", userController.signInUserWeb);
 router.get(
   "/get-all-users",
   getUpdateDeleteMailUserAuth,
@@ -65,4 +66,5 @@ router.delete(
   userController.deleteUser
 );
 router.post("/new-registration-otp", userController.newUserRegistrationOTP);
+router.post("/verify-token", userController.verifyToken);
 module.exports = router;

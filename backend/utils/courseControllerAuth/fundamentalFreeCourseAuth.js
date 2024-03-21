@@ -5,9 +5,25 @@ module.exports = (req, res, next) => {
 
   const startContent = [
     {
-      name: "Introduction to the Market",
+      name: "Introduction to the Market - 1",
       link: ``,
       duration: `17:00 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "Introduction to the Market - 2",
+      link: ``,
+      duration: `16:32 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "The hidden narrative of india's stock market",
+      link: ``,
+      duration: `11:38 mins`,
       pointOne: ``,
       pointTwo: ``,
       pointThree: ``,
