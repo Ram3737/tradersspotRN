@@ -2,7 +2,7 @@
   "expo": {
     "name": "Charteey",
     "slug": "TradersSpotRN",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/charteeyLogo.png",
     "userInterfaceStyle": "dark",
@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/charteeyLogo.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.ram37.TradersSpotRN"
+      "package": "com.ram37.TradersSpotRN",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/charteeyLogo.png"

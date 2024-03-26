@@ -44,7 +44,7 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An error occured" });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 mongoose
   .connect(`${MONGODB_URI}`)

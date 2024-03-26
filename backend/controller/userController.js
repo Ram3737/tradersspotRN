@@ -536,6 +536,15 @@ const verifyToken = (req, res, next) => {
   return res.status(200).json({ message: "valid token", valid: true });
 };
 
+const deleteUserForGPlay = async (req, res) => {
+  try {
+    res.status(200).json({ message: "your account will be deleted" });
+  } catch (error) {
+    console.error("deleteUser", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createUser,
   signInUser,
@@ -552,5 +561,6 @@ module.exports = {
   newUserRegistrationOTP,
   PurchaseConfirmationEmail,
   deleteUser,
+  deleteUserForGPlay,
   verifyToken,
 };

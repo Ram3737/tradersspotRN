@@ -65,6 +65,7 @@ router.delete(
   getUpdateDeleteMailUserAuth,
   userController.deleteUser
 );
+router.get("/delete-user-for", userController.deleteUserForGPlay);
 router.post("/new-registration-otp", userController.newUserRegistrationOTP);
 router.post("/verify-token", userController.verifyToken);
 module.exports = router;
