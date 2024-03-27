@@ -4,7 +4,6 @@ module.exports = (req, res, next) => {
   const token = req.get("Authorization")?.split(" ")[1];
 
   let decodedToken;
-  console.log("here delete");
   try {
     decodedToken = jwt.verify(
       token,

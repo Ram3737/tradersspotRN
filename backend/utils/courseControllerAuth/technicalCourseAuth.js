@@ -21,6 +21,12 @@ module.exports = (req, res, next) => {
     throw error;
   }
 
+  if (decodedToken?.courseType === "none") {
+    const error = new Error("Not Autheticated");
+    error.statusCode = 401;
+    throw error;
+  }
+
   if (
     decodedToken?.courseType === "basic" ||
     decodedToken?.courseType === "standard" ||

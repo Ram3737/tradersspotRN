@@ -21,9 +21,25 @@ module.exports = (req, res, next) => {
       pointThree: ``,
     },
     {
-      name: "The hidden narrative of india's stock market",
+      name: "The untold story of  the Stock Market in India",
       link: ``,
-      duration: `11:38 mins`,
+      duration: `01:38 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "How indian stock market works ?",
+      link: ``,
+      duration: `05:55 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "The inside market series",
+      link: ``,
+      duration: `01:19 mins`,
       pointOne: ``,
       pointTwo: ``,
       pointThree: ``,
@@ -32,9 +48,73 @@ module.exports = (req, res, next) => {
 
   const coreContent = [
     {
-      name: "To the Market",
+      name: "Why do companies get listed on the stock market ?",
       link: ``,
-      duration: `17:00 mins`,
+      duration: `10:00 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "What is primary market & secondary market ?",
+      link: ``,
+      duration: `04:11 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "What is NSE & BSE ?",
+      link: ``,
+      duration: `04:53 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "Types of investors in stock market",
+      link: ``,
+      duration: `07:01 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "Don't be IGF",
+      link: ``,
+      duration: `07:01 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "How to analyze stocks like a pro ?",
+      link: ``,
+      duration: `10:35 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "Trading vs Investment",
+      link: ``,
+      duration: `06:57 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "What is Demat and Trading Account ?",
+      link: ``,
+      duration: `06:35 mins`,
+      pointOne: ``,
+      pointTwo: ``,
+      pointThree: ``,
+    },
+    {
+      name: "Mandatory tools for every stock market investor",
+      link: ``,
+      duration: `05:39 mins`,
       pointOne: ``,
       pointTwo: ``,
       pointThree: ``,
@@ -60,9 +140,11 @@ module.exports = (req, res, next) => {
       throw error;
     }
     if (!decodedToken || decodedToken?.userType !== "learner") {
-      const error = new Error("Not Autheticated");
-      error.statusCode = 401;
-      throw error;
+      res.status(200).json({
+        startContent,
+        coreContent,
+      });
+      return;
     }
   }
 

@@ -24,9 +24,21 @@ router.get(
 );
 
 router.get(
+  "/fundamental-paid-course-content-web",
+  fundamentalPaidCourseAuth,
+  courseContentController.courseContentFundamentalPaidWeb
+);
+
+router.get(
   "/fundamental-free-course-content",
   fundamentalFreeCourseAuth,
   courseContentController.courseContentFundamentalFree
+);
+
+router.get(
+  "/fundamental-free-course-content-web",
+  fundamentalFreeCourseAuth,
+  courseContentController.courseContentFundamentalFreeWeb
 );
 
 module.exports = router;
